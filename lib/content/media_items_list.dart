@@ -47,13 +47,15 @@ class MediaItemsListRoute<T> extends PopupRoute<T> {
       child: Align(
         alignment: Alignment.centerRight,
         child: AppTheme(
-          child: _MediaItemsListView(
-            mediaItems: mediaItems,
-            contentProgress: contentProgress,
-            onSelect: (item) {
-              Navigator.of(context).pop();
-              onSelect(item);
-            },
+          child: SafeArea(
+            child: _MediaItemsListView(
+              mediaItems: mediaItems,
+              contentProgress: contentProgress,
+              onSelect: (item) {
+                Navigator.of(context).pop();
+                onSelect(item);
+              },
+            ),
           ),
         ),
       ),
@@ -266,7 +268,7 @@ class _MediaItemsListItem extends StatelessWidget {
           children: [
             Container(
               width: 96,
-              height: 64,
+              height: 72,
               decoration: BoxDecoration(
                 image: image != null
                     ? DecorationImage(

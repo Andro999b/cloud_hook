@@ -6,7 +6,7 @@ part of 'recomendations_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$recomendationsHash() => r'77be312a3cabdaed321295dfe0a1bf556476376b';
+String _$recomendationsHash() => r'b52e8a08e77d3ed9821a7449804fbdfb2c4bbe26';
 
 /// See also [recomendations].
 @ProviderFor(recomendations)

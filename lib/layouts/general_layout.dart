@@ -19,21 +19,23 @@ class GeneralLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppTheme(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth < mobileWidth) {
-            return BottomNavigationLayout(
-              selectedIndex: selectedIndex,
-              child: child,
-            );
-          } else {
-            return SideNavigationLayout(
-              selectedIndex: selectedIndex,
-              showBackButton: showBackButton,
-              child: child,
-            );
-          }
-        },
+      child: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < mobileWidth) {
+              return BottomNavigationLayout(
+                selectedIndex: selectedIndex,
+                child: child,
+              );
+            } else {
+              return SideNavigationLayout(
+                selectedIndex: selectedIndex,
+                showBackButton: showBackButton,
+                child: child,
+              );
+            }
+          },
+        ),
       ),
     );
   }

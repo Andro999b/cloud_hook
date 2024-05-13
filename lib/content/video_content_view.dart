@@ -195,10 +195,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
       ],
       primaryButtonBar: [
         const Spacer(flex: 2),
-        _SkipNextButton(
-          provider: provider,
-          playlistSize: widget.mediaItems.length,
-        ),
+        _SkipPrevButton(provider: provider),
         const Spacer(),
         const MaterialPlayOrPauseButton(iconSize: 48.0),
         const Spacer(),

@@ -7,26 +7,26 @@ abstract class Selector<R> {
   FutureOr<R> select(dom.Element element);
 }
 
-class ItemsList<R> extends Selector<List<R>> {
+class IterateOverScope<R> extends Selector<List<R>> {
   final String itemScope;
-  final Selector<R> child;
+  final Selector<R> item;
 
-  ItemsList({required this.itemScope, required this.child});
+  IterateOverScope({required this.itemScope, required this.item});
 
   @override
   FutureOr<List<R>> select(dom.Element element) async {
     return Stream.fromIterable(element.querySelectorAll(itemScope))
-        .asyncMap((e) => child.select(e))
+        .asyncMap((e) => item.select(e))
         .toList();
   }
 }
 
 class Scope<R> extends Selector<R> {
   final String scope;
-  final Selector<R> child;
+  final Selector<R> item;
   R? defaultValue;
 
-  Scope({required this.scope, required this.child, this.defaultValue});
+  Scope({required this.scope, required this.item, this.defaultValue});
 
   @override
   FutureOr<R> select(dom.Element element) {
@@ -36,14 +36,14 @@ class Scope<R> extends Selector<R> {
       return Future.value(defaultValue);
     }
 
-    return child.select(scopedElement);
+    return item.select(scopedElement);
   }
 }
 
-class SelectorsMap extends Selector<Map<String, Object?>> {
+class SelectorsToMap extends Selector<Map<String, Object?>> {
   final Map<String, Selector<Object?>> children;
 
-  SelectorsMap(this.children);
+  SelectorsToMap(this.children);
 
   @override
   FutureOr<Map<String, Object?>> select(dom.Element element) async {
@@ -64,24 +64,24 @@ typedef TransformFun<T, E> = T Function(E);
 
 class Transform<T, E> extends Selector<T> {
   final TransformFun<T, E> map;
-  final Selector<E> child;
+  final Selector<E> item;
 
-  Transform({required this.map, required this.child});
+  Transform({required this.map, required this.item});
 
   @override
   FutureOr<T> select(dom.Element element) async {
-    return map(await child.select(element));
+    return map(await item.select(element));
   }
 }
 
 class Text extends Selector<String?> {
   @override
   FutureOr<String?> select(dom.Element element) {
-    return element.text;
+    return element.text.trim();
   }
 
   static Selector<String?> forScope(String scope) {
-    return Scope(scope: scope, child: Text(), defaultValue: "");
+    return Scope(scope: scope, item: Text(), defaultValue: "");
   }
 }
 
@@ -96,7 +96,7 @@ class TextNodes extends Selector<String?> {
   }
 
   static Selector<String?> forScope(String scope) {
-    return Scope(scope: scope, child: TextNodes(), defaultValue: "");
+    return Scope(scope: scope, item: TextNodes(), defaultValue: "");
   }
 }
 
@@ -111,7 +111,7 @@ class Attribute extends Selector<String?> {
   }
 
   static Selector<String?> forScope(String scope, String attribute) {
-    return Scope(scope: scope, child: Attribute(attribute), defaultValue: "");
+    return Scope(scope: scope, item: Attribute(attribute), defaultValue: "");
   }
 }
 
@@ -133,10 +133,26 @@ class Merge<R, E> extends Selector<R> {
   }
 }
 
-class Join extends Merge<String, Object?> {
-  Join(Iterable<Selector<Object?>> children, {separator = " "})
+class Concat extends Merge<String, Object?> {
+  Concat(Iterable<Selector<Object?>> children, {separator = " "})
       : super(
           merge: (result) => result.nonNulls.join(separator),
+          children: children,
+        );
+}
+
+class ItemsList extends Merge<List<Object?>, Object?> {
+  ItemsList(Iterable<Selector<Object?>> children, {separator = " "})
+      : super(
+          merge: (result) => result,
+          children: children,
+        );
+}
+
+class JoinList extends Merge<List<Object?>, List<Object?>> {
+  JoinList(Iterable<Selector<List<Object?>>> children, {separator = " "})
+      : super(
+          merge: (result) => result.expand((e) => e).toList(),
           children: children,
         );
 }
@@ -145,14 +161,14 @@ class Image extends Transform<String, String?> {
   Image(String host, {attribute = "src"})
       : super(
           map: (url) => url != null ? absoluteUrl(host, url) : "",
-          child: Attribute(attribute),
+          item: Attribute(attribute),
         );
 
   static Selector<String?> forScope(String scope, String host,
       {attribute = "src"}) {
     return Scope(
       scope: scope,
-      child: Image(host, attribute: attribute),
+      item: Image(host, attribute: attribute),
       defaultValue: "",
     );
   }
@@ -162,13 +178,13 @@ class UrlId extends Transform<String, String?> {
   UrlId({attribute = "href"})
       : super(
           map: (url) => url != null ? extractIdFromUrl(url) : "",
-          child: Attribute(attribute),
+          item: Attribute(attribute),
         );
 
   static Selector<String?> forScope(String scope, {attribute = "href"}) {
     return Scope(
       scope: scope,
-      child: UrlId(attribute: attribute),
+      item: UrlId(attribute: attribute),
       defaultValue: "",
     );
   }

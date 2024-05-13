@@ -24,17 +24,3 @@ Map<String, dynamic> _$ContentSearchResultToJson(
       'title': instance.title,
       'subtitle': instance.subtitle,
     };
-
-ContentDetailsAdditionalInfo _$ContentDetailsAdditionalInfoFromJson(
-        Map<String, dynamic> json) =>
-    ContentDetailsAdditionalInfo(
-      name: json['name'] as String,
-      value: json['value'] as String,
-    );
-
-Map<String, dynamic> _$ContentDetailsAdditionalInfoToJson(
-        ContentDetailsAdditionalInfo instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'value': instance.value,
-    };

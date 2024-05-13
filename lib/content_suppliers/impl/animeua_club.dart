@@ -6,12 +6,12 @@ import 'package:cloud_hook/utils/scrapper/scrapper.dart';
 import 'package:cloud_hook/utils/scrapper/selectors.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'ua_films_tv.g.dart';
+part 'animeua_club.g.dart';
 
 @JsonSerializable()
 // ignore: must_be_immutable
-class UAFilmsTVContentDetails extends BaseContentDetails {
-  UAFilmsTVContentDetails({
+class AnimeUAClubContentDetails extends BaseContentDetails {
+  AnimeUAClubContentDetails({
     required super.id,
     required super.supplier,
     required super.title,
@@ -25,10 +25,10 @@ class UAFilmsTVContentDetails extends BaseContentDetails {
 
   final String iframe;
 
-  factory UAFilmsTVContentDetails.fromJson(Map<String, dynamic> json) =>
-      _$UAFilmsTVContentDetailsFromJson(json);
+  factory AnimeUAClubContentDetails.fromJson(Map<String, dynamic> json) =>
+      _$AnimeUAClubContentDetailsFromJson(json);
 
-  Map<String, dynamic> toJson() => _$UAFilmsTVContentDetailsToJson(this);
+  Map<String, dynamic> toJson() => _$AnimeUAClubContentDetailsToJson(this);
 
   Iterable<ContentMediaItem>? _mediaItems;
 
@@ -41,47 +41,34 @@ class UAFilmsTVContentDetails extends BaseContentDetails {
 
     return _mediaItems!;
   }
-
-  @override
-  MediaType get mediaType => MediaType.video;
 }
 
-class UAFilmsTVSupplier extends ContentSupplier {
-  static const String baseUrl = "uafilm.pro";
+class AnimeUAClubSupplier extends ContentSupplier {
+  static const String baseUrl = "animeua.club";
 
   @override
-  String get name => "UAFilmsTV";
+  String get name => "AnimeUAClub";
 
   @override
-  List<String> channels = const [
-    "Новинки",
-    "Фільми",
-    "Серіали",
-    "Мультфільми",
-    "Мультсеріали",
-    "Аніме"
-  ];
+  Set<ContentType> get supportedTypes => const {ContentType.anime};
 
   @override
-  Set<ContentType> get supportedTypes => const {
-        ContentType.movie,
-        ContentType.cartoon,
-        ContentType.series,
-        ContentType.anime,
-      };
+  List<String> get channels => const [
+        "Новинки",
+        "ТОП 100",
+        "Повнометражки",
+        "Аніме серіали",
+      ];
 
   late final _movieItemSelector = IterateOverScope(
-    itemScope: ".movie-item",
+    itemScope: ".grid-item",
     item: SelectorsToMap({
       "supplier": Const(name),
-      "id": UrlId.forScope("a.movie-title"),
-      "title": Text.forScope("a.movie-title"),
-      "subtitle": Concat([
-        Text.forScope(".movie-img>span"),
-        Text.forScope(".movie-img>.movie-series"),
-      ]),
+      "id": UrlId(),
+      "title": Text.forScope(".poster__desc > .poster__title"),
+      "subtitle": Text.forScope(".poster__subtitle"),
       "image": Image.forScope(
-        ".movie-img img",
+        ".poster__img img",
         baseUrl,
         attribute: "data-src",
       ),
@@ -90,11 +77,8 @@ class UAFilmsTVSupplier extends ContentSupplier {
 
   @override
   Future<List<ContentSearchResult>> search(
-    String query,
-    Set<ContentType> type,
-  ) async {
+      String query, Set<ContentType> type) async {
     final uri = Uri.https(baseUrl, "/index.php", {"do": "search"});
-
     final scrapper = Scrapper(
       uri: uri,
       method: "post",
@@ -104,17 +88,12 @@ class UAFilmsTVSupplier extends ContentSupplier {
       form: {
         "do": "search",
         "subaction": "search",
-        "full_search": "1",
+        "full_search": "0",
+        "search_start": "0",
+        "result_from": "1",
         "story": query,
         "sortby": "date",
         "resorder": "desc",
-        if (type.isNotEmpty)
-          "catlist": [
-            if (type.contains(ContentType.movie)) "1",
-            if (type.contains(ContentType.series)) "3",
-            if (type.contains(ContentType.anime)) "46",
-            if (type.contains(ContentType.cartoon)) ...["2", "46"],
-          ],
       },
     );
 
@@ -133,32 +112,29 @@ class UAFilmsTVSupplier extends ContentSupplier {
         {
           "id": Const(id),
           "supplier": Const(name),
-          "title": Text.forScope("h1[itemprop='name']"),
+          "title": Text.forScope(".page__subcol-main > h1"),
           "originalTitle":
-              Text.forScope("span[itemprop='alternativeHeadline']"),
-          "image": Image.forScope(".m-img>img", baseUrl),
-          "description": TextNodes.forScope(".m-desc"),
-          "additionalInfo": IterateOverScope(
-            itemScope: ".m-desc>.m-info>.m-info>.mi-item",
-            item: Concat(
-              [Text.forScope(".mi-label-desc"), Text.forScope(".mi-desc")],
-            ),
+              Text.forScope(".page__subcol-main > .pmovie__original-title"),
+          "image": Image.forScope(
+              ".pmovie__poster > img", attribute: "data-src", baseUrl),
+          "description": Text.forScope(".page__text"),
+          "additionalInfo": JoinList([
+            ItemsList([
+              Text.forScope(".page__subcol-main > .pmovie__year"),
+              Text.forScope(".page__subcol-main > .pmovie__genres"),
+            ]),
+            IterateOverScope(itemScope: ".page__subcol-side2 li", item: Text())
+          ]),
+          "similar": Scope(scope: ".pmovie__related", item: _movieItemSelector),
+          "iframe": Attribute.forScope(
+            ".pmovie__player .video-inside iframe",
+            "data-src",
           ),
-          "similar": IterateOverScope(
-            itemScope: "#owl-rel a",
-            item: SelectorsToMap({
-              "id": UrlId(),
-              "supplier": Const(name),
-              "title": Text.forScope(".rel-movie-title"),
-              "image": Image.forScope("img", baseUrl, attribute: "data-src"),
-            }),
-          ),
-          "iframe": Attribute.forScope(".player-box>iframe", "src")
         },
       ),
     ));
 
-    return UAFilmsTVContentDetails.fromJson(result);
+    return AnimeUAClubContentDetails.fromJson(result);
   }
 
   @override
@@ -172,12 +148,10 @@ class UAFilmsTVSupplier extends ContentSupplier {
 
   Future<List<ContentInfo>> _loadChannel(String channel) async {
     final path = switch (channel) {
-      "Новинки" => "/year/${DateTime.now().year}/",
-      "Фільми" => "/filmys/",
-      "Серіали" => "/serialy/",
-      "Мультфільми" => "/cartoons/",
-      "Мультсеріали" => "/multserialy/",
-      "Аніме" => "/anime/",
+      "Новинки" => "",
+      "ТОП 100" => "/top.html",
+      "Повнометражки" => "/film/",
+      "Аніме серіали" => "/anime/",
       _ => null
     };
 

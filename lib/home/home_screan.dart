@@ -14,7 +14,7 @@ class HomeScrean extends StatelessWidget {
     return GeneralLayout(
       selectedIndex: 0,
       child: ListView(
-        padding: EdgeInsets.symmetric(horizontal: paddings),
+        padding: EdgeInsets.only(left: paddings),
         children: const [CollectionContinueView(), Recommendations()],
       ),
     );

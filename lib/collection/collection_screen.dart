@@ -44,7 +44,7 @@ class CollectionHorizontalView extends ConsumerWidget {
     final paddings = getPadding(context);
 
     return ListView(
-      padding: EdgeInsets.symmetric(horizontal: paddings),
+      padding: EdgeInsets.only(left: paddings),
       children:
           groupsOrder.map((e) => CollectionHorizontalGroup(status: e)).toList(),
     );

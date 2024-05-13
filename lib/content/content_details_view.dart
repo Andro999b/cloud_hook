@@ -98,11 +98,10 @@ class ContentDetailsView extends ConsumerWidget {
           SizedBox(height: mobile ? 240 : paddings * 2),
           _ContentWatchButtons(contentDetails),
           _MediaCollectionItemButtons(contentDetails),
-          SizedBox(height: paddings),
-          _renderAdditionalInfo(),
+          if (contentDetails.additionalInfo.isNotEmpty)
+            ..._renderAdditionalInfo(context),
           SizedBox(height: paddings),
           _renderDescription(context),
-          SizedBox(height: paddings),
           if (contentDetails.similar.isNotEmpty) ..._renderSimilar(context)
         ],
       ),
@@ -119,10 +118,11 @@ class ContentDetailsView extends ConsumerWidget {
           contentDetails.title,
           style: theme.textTheme.headlineLarge?.copyWith(height: 1),
         ),
-        SelectableText(
-          contentDetails.originalTitle,
-          style: theme.textTheme.bodyMedium,
-        ),
+        if (contentDetails.originalTitle != null)
+          SelectableText(
+            contentDetails.originalTitle!,
+            style: theme.textTheme.bodyMedium,
+          ),
       ],
     );
 
@@ -135,14 +135,19 @@ class ContentDetailsView extends ConsumerWidget {
     return title;
   }
 
-  Widget _renderAdditionalInfo() {
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      children: contentDetails.additionalInfo
-          .map((e) => Chip(label: Text("${e.name} ${e.value}")))
-          .toList(),
-    );
+  List<Widget> _renderAdditionalInfo(BuildContext context) {
+    final paddings = getPadding(context);
+
+    return [
+      SizedBox(height: paddings),
+      Wrap(
+        spacing: 6,
+        runSpacing: 6,
+        children: contentDetails.additionalInfo
+            .map((e) => Chip(label: Text(e.replaceAll('\n', ' '))))
+            .toList(),
+      )
+    ];
   }
 
   Widget _renderDescription(BuildContext context) {
@@ -155,7 +160,7 @@ class ContentDetailsView extends ConsumerWidget {
       trimCollapsedText: AppLocalizations.of(context)!.readMore,
       trimExpandedText: AppLocalizations.of(context)!.readLess,
       style: theme.textTheme.bodyLarge?.copyWith(
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w300,
         inherit: true,
       ),
     );
@@ -166,6 +171,7 @@ class ContentDetailsView extends ConsumerWidget {
     final paddings = getPadding(context);
 
     return [
+      SizedBox(height: paddings),
       Text(
         AppLocalizations.of(context)!.recomendations,
         style: theme.textTheme.headlineSmall,
@@ -212,6 +218,11 @@ class _ContentWatchButtons extends HookWidget {
     }
 
     final mediaItems = snapshot.data!.toList();
+
+    if (mediaItems.isEmpty) {
+      return const SizedBox(height: 40);
+    }
+
     final showList = mediaItems.firstOrNull?.title.isNotEmpty ?? false;
 
     return Row(

@@ -59,7 +59,8 @@ class MainApp extends StatelessWidget {
           // initialLocation: "/search",
           // initialLocation: "/collection",
           // initialLocation: "/settings",
-          // initialLocation: "/content/UAFilmsTV/11542-mob-variat-100",
+          // initialLocation:
+          // "/content/AnimeUAClub/7771-houkago-shounen-hanako-kun",
           // initialLocation: "/video/UAFilmsTV/18323-utawarerumono",
           routes: [
             GoRoute(

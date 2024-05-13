@@ -37,7 +37,6 @@ class CollectionTopBar extends HookConsumerWidget {
                     padding: const MaterialStatePropertyAll<EdgeInsets>(
                       EdgeInsets.only(left: 16.0, right: 8.0),
                     ),
-                    autoFocus: true,
                     focusNode: focusNode,
                     leading: const Icon(Icons.search),
                     trailing: [

@@ -68,8 +68,16 @@ class ContentInfoCard extends StatelessWidget {
                   ),
                   child: ListTile(
                     mouseCursor: SystemMouseCursors.click,
-                    title: Text(contentInfo.title),
-                    subtitle: Text(contentInfo.subtitle ?? ""),
+                    title: Text(
+                      contentInfo.title,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                    subtitle: Text(
+                      contentInfo.subtitle ?? "",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
                   ),
                 )
               ],

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_hook/app_preferences.dart';
 import 'package:firebase_dart/firebase_dart.dart';
@@ -103,16 +104,18 @@ class Auth {
 
     final clientId = await loadClientId();
 
-    final credentials = await obtainAccessCredentialsViaUserConsent(
-      clientId,
-      scopes,
-      Client(),
-      (uri) {
-        launchUrl(Uri.parse(uri));
-      },
-    );
+    if (Platform.isLinux || Platform.isWindows) {
+      final credentials = await obtainAccessCredentialsViaUserConsent(
+        clientId,
+        scopes,
+        Client(),
+        (uri) {
+          launchUrl(Uri.parse(uri));
+        },
+      );
 
-    _setCredentials(credentials);
+      _setCredentials(credentials);
+    } else {}
   }
 
   Future<void> singOut() async {

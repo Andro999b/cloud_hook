@@ -1,5 +1,6 @@
 import 'dart:isolate';
 
+import 'package:cloud_hook/content_suppliers/impl/animeua_club.dart';
 import 'package:cloud_hook/content_suppliers/impl/ua_films_tv.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/logger.dart';
@@ -11,6 +12,7 @@ class ContentSuppliers {
 
   final List<ContentSupplier> suppliers = List.unmodifiable([
     UAFilmsTVSupplier(),
+    AnimeUAClubSupplier(),
   ]);
 
   Set<String> get suppliersName => suppliers.map((i) => i.name).toSet();
@@ -27,21 +29,27 @@ class ContentSuppliers {
     Set<ContentType> contentTypes,
   ) async* {
     final results = <String, List<ContentSearchResult>>{};
-    for (var p in suppliers) {
+    for (var s in suppliers) {
+      if (contentSuppliers.isNotEmpty && !contentSuppliers.contains(s.name)) {
+        continue;
+      }
+
       if (contentTypes.isNotEmpty &&
-          p.supportedTypes.where((e) => contentTypes.contains(e)).isEmpty) {
+          s.supportedTypes.where((e) => contentTypes.contains(e)).isEmpty) {
         continue;
       }
 
       try {
-        final res = await Isolate.run(() => p.search(query, contentTypes));
-        results[p.name] = res;
+        final res = await Isolate.run(() => s.search(query, contentTypes));
+        results[s.name] = res;
         yield results;
       } catch (error, stackTrace) {
-        logger.e("Supplier ${p.name} fail",
+        logger.e("Supplier ${s.name} fail",
             error: error, stackTrace: stackTrace);
       }
     }
+
+    yield results;
   }
 
   Stream<Map<String, SupplierChannels>> loadRecomendations(
@@ -69,7 +77,7 @@ class ContentSuppliers {
   }
 
   Future<ContentDetails> detailsById(String supplierName, String id) async {
-    logger.i("Load content details supplier: $suppliersName id: $id");
+    logger.i("Load content details supplier: $supplierName id: $id");
 
     final supplier = suppliers.where((e) => e.name == supplierName).first;
 

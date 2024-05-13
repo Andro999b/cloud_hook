@@ -19,15 +19,16 @@ enum MediaType {
   manga,
 }
 
-abstract interface class ContentSupplier {
+abstract class ContentSupplier {
   String get name;
-  List<String> get channels;
-  Set<ContentType> get supportedTypes;
+  List<String> get channels => const [];
+  Set<ContentType> get supportedTypes => const {};
   Future<List<ContentSearchResult>> search(
     String query,
     Set<ContentType> type,
-  );
-  Future<SupplierChannels> loadChannels(Set<String> channels);
+  ) async =>
+      const [];
+  Future<SupplierChannels> loadChannels(Set<String> channels) async => const {};
   Future<ContentDetails> detailsById(String id);
 }
 
@@ -57,11 +58,11 @@ mixin ContentDetails {
   String get id;
   String get supplier;
   String get title;
-  String get originalTitle;
+  String? get originalTitle;
   String get image;
   String get description;
   MediaType get mediaType;
-  List<ContentDetailsAdditionalInfo> get additionalInfo;
+  List<String> get additionalInfo;
   List<ContentInfo> get similar;
   Future<Iterable<ContentMediaItem>> get mediaItems;
 }
@@ -105,15 +106,21 @@ abstract class BaseContentDetails extends Equatable with ContentDetails {
   @override
   final String title;
   @override
-  final String originalTitle;
+  final String? originalTitle;
   @override
   final String image;
   @override
   final String description;
   @override
-  final List<ContentDetailsAdditionalInfo> additionalInfo;
+  @JsonKey(defaultValue: [])
+  final List<String> additionalInfo;
   @override
+  @JsonKey(defaultValue: [])
   final List<ContentSearchResult> similar;
+  @override
+  MediaType get mediaType => MediaType.video;
+  @override
+  Future<Iterable<ContentMediaItem>> get mediaItems => Future.value(const []);
 
   BaseContentDetails({
     required this.id,
@@ -137,23 +144,6 @@ abstract class BaseContentDetails extends Equatable with ContentDetails {
         additionalInfo,
         similar
       ];
-}
-
-@immutable
-@JsonSerializable()
-class ContentDetailsAdditionalInfo extends Equatable {
-  final String name;
-  final String value;
-
-  const ContentDetailsAdditionalInfo({required this.name, required this.value});
-
-  factory ContentDetailsAdditionalInfo.fromJson(Map<String, dynamic> json) =>
-      _$ContentDetailsAdditionalInfoFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ContentDetailsAdditionalInfoToJson(this);
-
-  @override
-  List<Object?> get props => [name, value];
 }
 
 class SimpleContentMediaItemSource extends Equatable

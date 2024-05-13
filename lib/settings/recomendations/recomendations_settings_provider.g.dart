@@ -7,7 +7,7 @@ part of 'recomendations_settings_provider.dart';
 // **************************************************************************
 
 String _$recomendationSettingsHash() =>
-    r'17e3787210d9b29044bc97c83f96b4c2f5a97f3a';
+    r'92b8b99014068c48813fa7354dbbd6f38f6733a6';
 
 /// See also [RecomendationSettings].
 @ProviderFor(RecomendationSettings)

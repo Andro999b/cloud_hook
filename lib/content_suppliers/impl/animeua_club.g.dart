@@ -1,14 +1,14 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'ua_films_tv.dart';
+part of 'animeua_club.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-UAFilmsTVContentDetails _$UAFilmsTVContentDetailsFromJson(
+AnimeUAClubContentDetails _$AnimeUAClubContentDetailsFromJson(
         Map<String, dynamic> json) =>
-    UAFilmsTVContentDetails(
+    AnimeUAClubContentDetails(
       id: json['id'] as String,
       supplier: json['supplier'] as String,
       title: json['title'] as String,
@@ -27,8 +27,8 @@ UAFilmsTVContentDetails _$UAFilmsTVContentDetailsFromJson(
       iframe: json['iframe'] as String,
     );
 
-Map<String, dynamic> _$UAFilmsTVContentDetailsToJson(
-        UAFilmsTVContentDetails instance) =>
+Map<String, dynamic> _$AnimeUAClubContentDetailsToJson(
+        AnimeUAClubContentDetails instance) =>
     <String, dynamic>{
       'id': instance.id,
       'supplier': instance.supplier,

@@ -28,10 +28,10 @@ class SearchResultsView extends HookConsumerWidget {
 
   Widget _renderResults(BuildContext context, SearchState searchState) {
     final paddings = getPadding(context);
-    final noResults =
-        searchState.results.values.where((r) => r.isNotEmpty).isEmpty;
+    final suppliersWithResult =
+        searchState.results.entries.where((r) => r.value.isNotEmpty);
 
-    if (!searchState.isLoading && noResults) {
+    if (!searchState.isLoading && suppliersWithResult.isEmpty) {
       // no result
       return Center(
         child: Text(
@@ -45,9 +45,9 @@ class SearchResultsView extends HookConsumerWidget {
 
     // loading providers
     return ListView(
-      padding: EdgeInsets.symmetric(horizontal: paddings),
+      padding: EdgeInsets.only(left: paddings),
       children: [
-        ...searchState.results.entries
+        ...suppliersWithResult
             .map((e) => _renderSupplierResults(context, e.key, e.value)),
         if (searchState.isLoading)
           const Center(child: CircularProgressIndicator())
