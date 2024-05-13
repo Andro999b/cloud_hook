@@ -1,3 +1,4 @@
+import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/search/search_provider.dart';
@@ -11,11 +12,7 @@ class SearchTopBar extends HookConsumerWidget {
   const SearchTopBar({super.key});
 
   void _search(WidgetRef ref, String query) {
-    final selecterSuppliers = ref.read(selectedSupplierProvider);
-    final contentTypes = ref.read(selectedContentProvider);
-    ref
-        .read(searchProvider.notifier)
-        .search(query, selecterSuppliers, contentTypes);
+    ref.read(searchProvider.notifier).search(query);
     ref.read(suggestionsProvider.notifier).addSuggestion(query);
   }
 
@@ -88,6 +85,14 @@ class SearchTopBar extends HookConsumerWidget {
 class _FilterSelectors extends ConsumerWidget {
   const _FilterSelectors();
 
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(children: [
+      _renderSuppliers(ref),
+      _renderContentType(context, ref),
+    ]);
+  }
+
   Widget _renderSuppliers(WidgetRef ref) {
     final selectedSuppliers = ref.watch(selectedSupplierProvider);
 
@@ -116,7 +121,7 @@ class _FilterSelectors extends ConsumerWidget {
     );
   }
 
-  Widget _renderContentType(WidgetRef ref) {
+  Widget _renderContentType(BuildContext context, WidgetRef ref) {
     final selectedContentType = ref.watch(selectedContentProvider);
 
     return Padding(
@@ -129,7 +134,7 @@ class _FilterSelectors extends ConsumerWidget {
           ...ContentType.values.map(
             (type) => FilterChip(
               selected: selectedContentType.contains(type),
-              label: Text(type.name),
+              label: Text(contentTypeLable(context, type)),
               onSelected: (value) {
                 var notifier = ref.read(selectedContentProvider.notifier);
                 if (value) {
@@ -143,11 +148,6 @@ class _FilterSelectors extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Column(children: [_renderSuppliers(ref), _renderContentType(ref)]);
   }
 }
 

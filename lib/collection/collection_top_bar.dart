@@ -25,36 +25,32 @@ class CollectionTopBar extends HookConsumerWidget {
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: paddings),
           child: Row(
             children: [
-              if (MediaQuery.of(context).size.width > 896)
-                const SizedBox(width: 56),
+              if (isMobile(context))
+                const Padding(
+                  padding: EdgeInsets.only(right: 8.0),
+                  child: AuthIcon(),
+                ),
               Expanded(
                 child: Center(
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 800),
-                    child: SearchBar(
-                      controller: controller,
-                      padding: const MaterialStatePropertyAll<EdgeInsets>(
-                        EdgeInsets.only(left: 16.0, right: 8.0),
-                      ),
-                      autoFocus: true,
-                      focusNode: focusNode,
-                      leading: const Icon(Icons.search),
-                      trailing: [
-                        _renderTrailingIcon(ref, controller, showFilter)
-                      ],
-                      onSubmitted: (value) {
-                        ref.read(collectionFilterQueryProvider.notifier).state =
-                            value;
-                        focusNode.requestFocus();
-                      },
+                  child: SearchBar(
+                    controller: controller,
+                    padding: const MaterialStatePropertyAll<EdgeInsets>(
+                      EdgeInsets.only(left: 16.0, right: 8.0),
                     ),
+                    autoFocus: true,
+                    focusNode: focusNode,
+                    leading: const Icon(Icons.search),
+                    trailing: [
+                      _renderTrailingIcon(ref, controller, showFilter)
+                    ],
+                    onSubmitted: (value) {
+                      ref.read(collectionFilterQueryProvider.notifier).state =
+                          value;
+                      focusNode.requestFocus();
+                    },
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(left: paddings),
-                child: const AuthIcon(),
-              )
             ],
           ),
         ),

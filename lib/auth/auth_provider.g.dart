@@ -6,11 +6,11 @@ part of 'auth_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authHash() => r'9a12133dad8c394f93636e7013724bf66dc25819';
+String _$authHash() => r'0bb7fac45712e60414c669a90b422a1730154ea0';
 
 /// See also [auth].
 @ProviderFor(auth)
-final authProvider = AutoDisposeProvider<Auth>.internal(
+final authProvider = Provider<Auth>.internal(
   auth,
   name: r'authProvider',
   debugGetCreateSourceHash:
@@ -19,12 +19,12 @@ final authProvider = AutoDisposeProvider<Auth>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef AuthRef = AutoDisposeProviderRef<Auth>;
-String _$userHash() => r'b798a76a0d8a63bd2e090e5146c752d1f013f9a9';
+typedef AuthRef = ProviderRef<Auth>;
+String _$userHash() => r'c19c193f6338006eb89427bec654ad7c6399cee6';
 
 /// See also [user].
 @ProviderFor(user)
-final userProvider = AutoDisposeStreamProvider<User?>.internal(
+final userProvider = StreamProvider<User?>.internal(
   user,
   name: r'userProvider',
   debugGetCreateSourceHash:
@@ -33,6 +33,6 @@ final userProvider = AutoDisposeStreamProvider<User?>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef UserRef = AutoDisposeStreamProviderRef<User?>;
+typedef UserRef = StreamProviderRef<User?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -1,7 +1,9 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/scrapper/scrapper.dart';
+import 'package:cloud_hook/utils/text.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:http/http.dart' as http;
 
@@ -35,31 +37,43 @@ abstract class PlaylistConvertStrategy {
   Iterable<ContentMediaItem> convert(Iterable<PlayerJSFile> playlist);
 }
 
+RegExp digitRegExp = RegExp(r'\d+');
+typedef SeasonEpisodeId = Comparable Function(String season, String eposode);
+Comparable defaultSeasonEpisodeId(String season, String episode) {
+  return extractDigits(season) * 10000 + extractDigits(episode);
+}
+
 class DubSeasonEpisodeConvertStrategy extends PlaylistConvertStrategy {
+  final SeasonEpisodeId seasonEpisodeId;
+
+  DubSeasonEpisodeConvertStrategy({
+    this.seasonEpisodeId = defaultSeasonEpisodeId,
+  });
+
   @override
   Iterable<ContentMediaItem> convert(Iterable<PlayerJSFile> playlist) {
-    final mediaItems = <Record, SimpleContentMediaItem>{};
+    final mediaItems = SplayTreeMap<Comparable, SimpleContentMediaItem>();
 
     for (var dub in playlist) {
       dub.folder?.forEach((season) {
         season.folder?.forEach((episode) {
           final title = episode.title.trim();
           final section = season.title.trim();
-          final id = (section, title);
+          final id = defaultSeasonEpisodeId(section, title);
 
           final mediaItem = mediaItems.putIfAbsent(
             id,
             () => SimpleContentMediaItem(
               number: mediaItems.length,
-              title: episode.title.trim(),
-              section: season.title.trim(),
+              title: title,
+              section: section,
               image: episode.poster,
+              // ignore: prefer_const_literals_to_create_immutables
               sources: [],
             ),
           );
 
           mediaItem.sources.add(SimpleContentMediaItemSource(
-            type: "",
             description: dub.title.trim(),
             link: Uri.parse(episode.file!),
           ));
@@ -99,8 +113,6 @@ class PlayerJSScrapper {
   }
 
   Iterable<ContentMediaItem> decodePlaylist(String filesEncodedJson) {
-    // TODO: decrypt
-
     if (filesEncodedJson.startsWith("[{")) {
       final fileJson = jsonDecode(filesEncodedJson);
       Iterable fileListJson = fileJson as Iterable;
@@ -120,7 +132,6 @@ class PlayerJSScrapper {
         title: "",
         sources: [
           SimpleContentMediaItemSource(
-            type: "",
             description: "",
             link: Uri.parse(fileJson),
           )

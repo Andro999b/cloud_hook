@@ -8,12 +8,12 @@ class GeneralLayout extends StatelessWidget {
   const GeneralLayout({
     super.key,
     this.showBackButton = false,
-    this.selectedIndex = 0,
+    this.selectedIndex,
     required this.child,
   });
 
   final bool showBackButton;
-  final int selectedIndex;
+  final int? selectedIndex;
   final Widget child;
 
   @override

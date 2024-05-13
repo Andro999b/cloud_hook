@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:cloud_hook/app_preferences.dart';
+import 'package:firebase_dart/firebase_dart.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 abstract class AuthTokenStore {
   FutureOr<void> write(AccessCredentials? credentials);
@@ -17,11 +18,11 @@ class PerferenceTokenStore extends AuthTokenStore {
   final String key = "access_credentials";
 
   @override
-  FutureOr<void> delete() => Preferences.instance.remove(key);
+  FutureOr<void> delete() => AppPreferences.instance.remove(key);
 
   @override
   FutureOr<AccessCredentials?> read() {
-    final accessCredentialsJson = Preferences.instance.getString(key);
+    final accessCredentialsJson = AppPreferences.instance.getString(key);
 
     if (accessCredentialsJson != null) {
       return AccessCredentials.fromJson(json.decode(accessCredentialsJson));
@@ -32,20 +33,18 @@ class PerferenceTokenStore extends AuthTokenStore {
 
   @override
   FutureOr<void> write(AccessCredentials? credentials) {
-    Preferences.instance.setString(key, json.encode(credentials));
+    AppPreferences.instance.setString(key, json.encode(credentials));
   }
 }
 
 class User {
-  final String name;
-  final String firstName;
-  final String lastName;
-  final String picture;
+  final String id;
+  final String? name;
+  final String? picture;
 
   const User({
+    required this.id,
     required this.name,
-    required this.firstName,
-    required this.lastName,
     required this.picture,
   });
 
@@ -57,9 +56,8 @@ class User {
             as Map<String, dynamic>;
 
     return User(
+      id: payload["sub"].toString(),
       name: payload["name"].toString(),
-      firstName: payload["given_name"].toString(),
-      lastName: payload["family_name"].toString(),
       picture: payload["picture"].toString(),
     );
   }
@@ -70,75 +68,87 @@ class Auth {
   final StreamController<User?> _userStreamController = StreamController();
   late Stream<User?> _userStream;
 
-  ClientId? _clientId;
+  static ClientId? clientId;
   User? _currentUser;
-  AutoRefreshingAuthClient? _currentClient;
 
   static final Auth instance = Auth._();
 
   Auth._() {
     _userStream = _userStreamController.stream.asBroadcastStream();
-    _userStream.listen(
-      (event) => _currentUser = event,
-    );
-    _restore();
+
+    FirebaseAuth.instance.userChanges().listen((event) {
+      if (event != null) {
+        _currentUser = User(
+          id: event.uid,
+          name: event.displayName,
+          picture: event.photoURL,
+        );
+        _userStreamController.add(_currentUser);
+      } else {
+        _currentUser = null;
+      }
+    });
+
+    restore();
   }
 
-  AutoRefreshingAuthClient? get currentClient => _currentClient;
   User? get currentUser => _currentUser;
   Stream<User?> get userUpdate => _userStream;
 
   Future<void> signIn() async {
-    final scopes = ["https://www.googleapis.com/auth/userinfo.profile"];
+    final scopes = [
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email"
+    ];
 
-    final clientId = await _loadClientId();
+    final clientId = await loadClientId();
 
-    final authClient = await clientViaUserConsent(clientId, scopes, (uri) {
-      launchUrl(Uri.parse(uri));
-    });
+    final credentials = await obtainAccessCredentialsViaUserConsent(
+      clientId,
+      scopes,
+      Client(),
+      (uri) {
+        launchUrl(Uri.parse(uri));
+      },
+    );
 
-    _tokenStore.write(authClient.credentials);
-    _currentUser = User.fromIdToken(authClient.credentials.idToken!);
-    _userStreamController.add(_currentUser);
-
-    _setClient(authClient);
+    _setCredentials(credentials);
   }
 
   Future<void> singOut() async {
     _tokenStore.delete();
-    _currentClient = null;
+    _currentUser = null;
     _userStreamController.add(null);
   }
 
-  Future<ClientId> _loadClientId() async {
-    if (_clientId == null) {
-      final clientSecretJson = await File("client_secret.json").readAsString();
-      _clientId = ClientId.fromJson(json.decode(clientSecretJson));
+  static Future<ClientId> loadClientId() async {
+    if (clientId == null) {
+      final clientSecretJson =
+          await rootBundle.loadString("client_secret.json");
+      clientId = ClientId.fromJson(json.decode(clientSecretJson));
     }
 
-    return _clientId!;
+    return clientId!;
   }
 
-  Future<void> _restore() async {
-    final clientId = await _loadClientId();
-    final credentials = await _tokenStore.read();
+  Future<void> restore() async {
+    final clientId = await loadClientId();
+    var credentials = await _tokenStore.read();
 
     if (credentials != null) {
-      final authClient = autoRefreshingClient(clientId, credentials, Client());
-
-      _currentUser = User.fromIdToken(authClient.credentials.idToken!);
-      _userStreamController.add(_currentUser);
-
-      _setClient(authClient);
+      if (credentials.accessToken.hasExpired) {
+        credentials = await refreshCredentials(clientId, credentials, Client());
+      }
+      _setCredentials(credentials);
     }
   }
 
-  void _setClient(AutoRefreshingAuthClient authClient) {
-    authClient.credentialUpdates.listen((event) {
-      _currentUser = User.fromIdToken(event.idToken!);
-      _tokenStore.write(event);
-    });
-
-    _currentClient = authClient;
+  void _setCredentials(AccessCredentials credentials) {
+    FirebaseAuth.instance.signInWithCredential(
+      GoogleAuthProvider.credential(
+        accessToken: credentials.accessToken.data,
+        idToken: credentials.idToken,
+      ),
+    );
   }
 }

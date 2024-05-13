@@ -10,8 +10,7 @@ class AppDatabase {
   static late Isar _isar;
 
   static Future<void> init() async {
-    final directory =
-        "${(await getApplicationSupportDirectory()).path}/.cloud_hook";
+    final directory = (await getApplicationSupportDirectory()).path;
 
     logger.i("Database directory: $directory");
 

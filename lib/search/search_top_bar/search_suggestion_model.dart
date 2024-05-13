@@ -10,7 +10,7 @@ class SearchSuggestion {
   final String text;
   final DateTime lastSeen;
 
-  SearchSuggestion({
+  const SearchSuggestion({
     this.id,
     required this.text,
     required this.lastSeen,

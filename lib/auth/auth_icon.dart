@@ -1,13 +1,53 @@
+import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/auth/auth.dart';
 import 'package:cloud_hook/auth/auth_provider.dart';
+import 'package:cloud_hook/collection/collection_sync.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AuthIcon extends ConsumerWidget {
   const AuthIcon({super.key});
 
-  Widget _renderUser(WidgetRef ref, User user) {
-    return CircleAvatar(backgroundImage: NetworkImage(user.picture));
+  Widget _renderUser(BuildContext context, WidgetRef ref, User user) {
+    return MenuAnchor(
+      builder: (context, controller, child) {
+        return GestureDetector(
+          onTap: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Tooltip(
+              message: user.name,
+              child: CircleAvatar(
+                backgroundImage:
+                    user.picture != null ? NetworkImage(user.picture!) : null,
+              ),
+            ),
+          ),
+        );
+      },
+      style: const MenuStyle(alignment: Alignment.topRight),
+      alignmentOffset: const Offset(8, 0),
+      menuChildren: [
+        MenuItemButton(
+          onPressed: () => CollectionSync.run(),
+          leadingIcon: const Icon(Icons.refresh),
+          child: Text(AppLocalizations.of(context)!.reload),
+        ),
+        MenuItemButton(
+          onPressed: () {
+            Auth.instance.singOut();
+          },
+          leadingIcon: const Icon(Icons.logout),
+          child: Text(AppLocalizations.of(context)!.singOut),
+        )
+      ],
+    );
   }
 
   Widget _renderLogin(WidgetRef ref) {
@@ -26,7 +66,9 @@ class AuthIcon extends ConsumerWidget {
 
     return user.maybeWhen(
       data: (user) {
-        return user != null ? _renderUser(ref, user) : _renderLogin(ref);
+        return user != null
+            ? _renderUser(context, ref, user)
+            : _renderLogin(ref);
       },
       orElse: () => _renderLogin(ref),
     );

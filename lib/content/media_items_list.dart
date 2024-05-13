@@ -7,11 +7,12 @@ import 'package:collection/collection.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 typedef SelectCallback = void Function(ContentMediaItem item);
 
 class MediaItemsListRoute<T> extends PopupRoute<T> {
-  final Iterable<ContentMediaItem> mediaItems;
+  final List<ContentMediaItem> mediaItems;
   final ContentProgress? contentProgress;
   final SelectCallback onSelect;
 
@@ -60,8 +61,8 @@ class MediaItemsListRoute<T> extends PopupRoute<T> {
   }
 }
 
-class _MediaItemsListView extends HookWidget {
-  final Iterable<ContentMediaItem> mediaItems;
+class _MediaItemsListView extends StatelessWidget {
+  final List<ContentMediaItem> mediaItems;
   final ContentProgress? contentProgress;
   final SelectCallback onSelect;
 
@@ -79,10 +80,6 @@ class _MediaItemsListView extends HookWidget {
 
     const radius = Radius.circular(10);
 
-    final groups = useMemoized(
-      () => mediaItems.groupListsBy((element) => element.section ?? ""),
-    );
-
     return Container(
       padding: const EdgeInsets.all(8.0),
       width: mobileWidth * 0.7,
@@ -94,17 +91,19 @@ class _MediaItemsListView extends HookWidget {
           bottomLeft: mobile ? Radius.zero : radius,
         ),
       ),
-      child: Column(
-        children: [
-          _renderTitle(context),
-          Expanded(
-            child: _MediaItemsList(
-              groups: groups,
-              contentProgress: contentProgress,
-              onSelect: onSelect,
-            ),
-          )
-        ],
+      child: Material(
+        child: Column(
+          children: [
+            _renderTitle(context),
+            Expanded(
+              child: _MediaItemsList(
+                mediaItems: mediaItems,
+                contentProgress: contentProgress,
+                onSelect: onSelect,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -131,19 +130,23 @@ class _MediaItemsListView extends HookWidget {
   }
 }
 
-class _MediaItemsList extends StatelessWidget {
-  final Map<String, List<ContentMediaItem>> groups;
+class _MediaItemsList extends HookWidget {
+  final List<ContentMediaItem> mediaItems;
   final ContentProgress? contentProgress;
   final SelectCallback onSelect;
 
   const _MediaItemsList({
-    required this.groups,
+    required this.mediaItems,
     required this.contentProgress,
     required this.onSelect,
   });
 
   @override
   Widget build(BuildContext context) {
+    final groups = useMemoized(
+      () => mediaItems.groupListsBy((element) => element.section ?? ""),
+    );
+
     if (groups.length == 1) {
       return _MediaItemsListSection(
         list: groups.values.first,
@@ -153,11 +156,13 @@ class _MediaItemsList extends StatelessWidget {
     }
 
     return DefaultTabController(
+      initialIndex: _currentSectionIndex(groups),
       length: groups.length,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TabBar(
+            isScrollable: true,
             tabs: groups.keys.map((e) => Tab(text: e)).toList(),
           ),
           Expanded(
@@ -177,6 +182,15 @@ class _MediaItemsList extends StatelessWidget {
       ),
     );
   }
+
+  int _currentSectionIndex(Map<String, dynamic> groups) {
+    if (contentProgress == null) {
+      return 0;
+    }
+
+    final currentItem = mediaItems[contentProgress!.currentItem];
+    return groups.keys.toList().indexOf(currentItem.section!);
+  }
 }
 
 class _MediaItemsListSection extends HookWidget {
@@ -192,21 +206,14 @@ class _MediaItemsListSection extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final index = contentProgress?.currentItem ?? 0;
+    final index = useMemoized(() {
+      final currentItem = contentProgress?.currentItem ?? 0;
+      final index = list.indexWhere((element) => element.number == currentItem);
+      return index > 0 ? index - 1 : 0;
+    });
 
-    final controller = useScrollController(initialScrollOffset: index * 72);
-
-    // useEffect(
-    //   () {
-    //     final index = contentProgress?.currentItem ?? 0;
-    //     controller.jumpTo(index * 64);
-    //     return null;
-    //   },
-    //   [contentProgress?.currentItem],
-    // );
-
-    return ListView.builder(
-      controller: controller,
+    return ScrollablePositionedList.builder(
+      initialScrollIndex: index,
       itemBuilder: (context, index) {
         final item = list[index];
         final image = item.image;

@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:cloud_hook/app_database.dart';
+import 'package:cloud_hook/auth/auth.dart' as auth;
 import 'package:cloud_hook/collection/collection_item_model.dart';
+import 'package:cloud_hook/collection/collection_sync.dart';
+import 'package:firebase_dart/firebase_dart.dart';
 import 'package:isar/isar.dart';
 
 part 'collection_repository.g.dart';
@@ -110,12 +113,12 @@ class IsarMediaItemPosition {
 abstract class CollectionRepository {
   Stream<void> get changesStream;
   FutureOr<MediaCollectionItem?> getCollectionItem(String supplier, String id);
-  FutureOr<int?> save(MediaCollectionItem collectionItem);
+  FutureOr<int> save(MediaCollectionItem collectionItem);
   FutureOr<Iterable<MediaCollectionItem>> search({
     String? query,
-    Set<MediaCollectionItemStatus> status,
+    Set<MediaCollectionItemStatus>? status,
   });
-  FutureOr<void> delete(String supplier, String id) {}
+  FutureOr<void> delete(String supplier, String id);
 }
 
 class IsarCollectionRepository extends CollectionRepository {
@@ -128,21 +131,13 @@ class IsarCollectionRepository extends CollectionRepository {
   @override
   FutureOr<MediaCollectionItem?> getCollectionItem(
       String supplier, String id) async {
-    final collectionItem = await collection.getByIndex(
-      "supplierId",
-      [supplier, id],
-    );
+    final collectionItem = await collection.getBySupplierId(supplier, id);
 
     return collectionItem?.toMediaCollectionItem();
   }
 
   @override
-  FutureOr<int?> save(MediaCollectionItem collectionItem) async {
-    if (collectionItem.status == MediaCollectionItemStatus.none) {
-      await delete(collectionItem.supplier, collectionItem.id);
-      return null;
-    }
-
+  FutureOr<int> save(MediaCollectionItem collectionItem) async {
     final item =
         IsarMediaCollectionItem.fromMediaCollectionItem(collectionItem);
 
@@ -154,10 +149,7 @@ class IsarCollectionRepository extends CollectionRepository {
   @override
   FutureOr<void> delete(String supplier, String id) async {
     return await db.writeTxn(
-      () async => await collection.deleteByIndex(
-        "supplierId",
-        [supplier, id],
-      ),
+      () async => await collection.deleteBySupplierId(supplier, id),
     );
   }
 
@@ -201,5 +193,72 @@ class IsarCollectionRepository extends CollectionRepository {
         .findAll();
 
     return result.map((e) => e.toMediaCollectionItem());
+  }
+}
+
+class FirebaseRepository extends CollectionRepository {
+  final CollectionRepository downstream;
+  final auth.User? user;
+  late final FirebaseDatabase database;
+
+  FirebaseRepository({
+    required this.downstream,
+    required this.user,
+  }) {
+    database = FirebaseDatabase(app: Firebase.app());
+
+    if (user != null) {
+      CollectionSync.run();
+    }
+  }
+
+  @override
+  Stream<void> get changesStream => downstream.changesStream;
+
+  @override
+  FutureOr<MediaCollectionItem?> getCollectionItem(String supplier, String id) {
+    return downstream.getCollectionItem(supplier, id);
+  }
+
+  @override
+  FutureOr<int> save(MediaCollectionItem collectionItem) {
+    _saveToFirebase(collectionItem);
+    return downstream.save(collectionItem);
+  }
+
+  @override
+  FutureOr<Iterable<MediaCollectionItem>> search({
+    String? query,
+    Set<MediaCollectionItemStatus>? status,
+  }) {
+    return downstream.search(query: query, status: status);
+  }
+
+  @override
+  FutureOr<void> delete(String supplier, String id) {
+    _deleteFromFirebase(supplier, id);
+    return downstream.delete(supplier, id);
+  }
+
+  Future<void> _saveToFirebase(MediaCollectionItem collectionItem) async {
+    if (user == null) {
+      return;
+    }
+
+    final itemId = "${collectionItem.supplier}${collectionItem.id}";
+    final ref = database.reference().child("collection/${user!.id}/$itemId");
+
+    await ref.set(collectionItem.toJson());
+  }
+
+  Future<void> _deleteFromFirebase(String supplier, String id) async {
+    if (user == null) {
+      return;
+    }
+
+    final itemId = "$supplier$id";
+    final ref = database.reference().child("collection/${user!.id}/$itemId");
+
+    await ref.remove();
   }
 }

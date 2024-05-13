@@ -12,7 +12,7 @@ UAFilmsTVContentDetails _$UAFilmsTVContentDetailsFromJson(
       id: json['id'] as String,
       supplier: json['supplier'] as String,
       title: json['title'] as String,
-      oroginalTitle: json['oroginalTitle'] as String,
+      originalTitle: json['originalTitle'] as String,
       image: json['image'] as String,
       description: json['description'] as String,
       additionalInfo: (json['additionalInfo'] as List<dynamic>)
@@ -31,7 +31,7 @@ Map<String, dynamic> _$UAFilmsTVContentDetailsToJson(
       'id': instance.id,
       'supplier': instance.supplier,
       'title': instance.title,
-      'oroginalTitle': instance.oroginalTitle,
+      'originalTitle': instance.originalTitle,
       'image': instance.image,
       'description': instance.description,
       'additionalInfo': instance.additionalInfo,

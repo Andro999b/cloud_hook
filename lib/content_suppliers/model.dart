@@ -1,23 +1,37 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'model.g.dart';
 
-enum ContentType { movie, anime, cartoon, tvShow, manga }
+enum ContentType {
+  movie,
+  anime,
+  cartoon,
+  series,
+  manga,
+}
+
+enum MediaType {
+  video,
+  manga,
+}
 
 abstract interface class ContentSupplier {
   String get name;
+  List<String> get channels;
   Set<ContentType> get supportedTypes;
-  Future<Iterable<ContentSearchResult>> search(
+  Future<List<ContentSearchResult>> search(
     String query,
     Set<ContentType> type,
   );
+  Future<SupplierChannels> loadChannels(Set<String> channels);
   Future<ContentDetails> detailsById(String id);
 }
 
 mixin ContentInfo {
-  // TODO: Add content type?
   String get id;
   String get supplier;
   String get title;
@@ -28,13 +42,12 @@ mixin ContentInfo {
 mixin ContentMediaItem {
   int get number;
   String get title;
-  List<ContentMediaItemSource> get sources;
+  FutureOr<List<ContentMediaItemSource>> get sources;
   String? get section;
   String? get image;
 }
 
 mixin ContentMediaItemSource {
-  String get type;
   String get description;
   Uri get link;
   Map<String, String>? get headers;
@@ -44,16 +57,18 @@ mixin ContentDetails {
   String get id;
   String get supplier;
   String get title;
-  String get oroginalTitle;
+  String get originalTitle;
   String get image;
   String get description;
-  Iterable<ContentDetailsAdditionalInfo> get additionalInfo;
-  Iterable<ContentInfo> get similar;
+  MediaType get mediaType;
+  List<ContentDetailsAdditionalInfo> get additionalInfo;
+  List<ContentInfo> get similar;
   Future<Iterable<ContentMediaItem>> get mediaItems;
 }
 
+@immutable
 @JsonSerializable()
-class ContentSearchResult with ContentInfo {
+class ContentSearchResult extends Equatable with ContentInfo {
   @override
   final String id;
   @override
@@ -65,7 +80,7 @@ class ContentSearchResult with ContentInfo {
   @override
   final String? subtitle;
 
-  ContentSearchResult({
+  const ContentSearchResult({
     required this.id,
     required this.supplier,
     required this.image,
@@ -77,9 +92,12 @@ class ContentSearchResult with ContentInfo {
       _$ContentSearchResultFromJson(json);
 
   Map<String, dynamic> toJson() => _$ContentSearchResultToJson(this);
+
+  @override
+  List<Object?> get props => [id, supplier, image, title, subtitle];
 }
 
-abstract class BaseContentDetails with ContentDetails {
+abstract class BaseContentDetails extends Equatable with ContentDetails {
   @override
   final String id;
   @override
@@ -87,7 +105,7 @@ abstract class BaseContentDetails with ContentDetails {
   @override
   final String title;
   @override
-  final String oroginalTitle;
+  final String originalTitle;
   @override
   final String image;
   @override
@@ -101,30 +119,45 @@ abstract class BaseContentDetails with ContentDetails {
     required this.id,
     required this.supplier,
     required this.title,
-    required this.oroginalTitle,
+    required this.originalTitle,
     required this.image,
     required this.description,
     required this.additionalInfo,
     required this.similar,
   });
+
+  @override
+  List<Object?> get props => [
+        id,
+        supplier,
+        title,
+        originalTitle,
+        image,
+        description,
+        additionalInfo,
+        similar
+      ];
 }
 
+@immutable
 @JsonSerializable()
-class ContentDetailsAdditionalInfo {
+class ContentDetailsAdditionalInfo extends Equatable {
   final String name;
   final String value;
 
-  ContentDetailsAdditionalInfo({required this.name, required this.value});
+  const ContentDetailsAdditionalInfo({required this.name, required this.value});
 
   factory ContentDetailsAdditionalInfo.fromJson(Map<String, dynamic> json) =>
       _$ContentDetailsAdditionalInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$ContentDetailsAdditionalInfoToJson(this);
+
+  @override
+  List<Object?> get props => [name, value];
 }
 
-class SimpleContentMediaItemSource with ContentMediaItemSource {
-  @override
-  final String type;
+class SimpleContentMediaItemSource extends Equatable
+    with ContentMediaItemSource {
   @override
   final String description;
   @override
@@ -133,14 +166,17 @@ class SimpleContentMediaItemSource with ContentMediaItemSource {
   final Map<String, String>? headers;
 
   SimpleContentMediaItemSource({
-    required this.type,
     required this.description,
     required this.link,
     this.headers,
   });
+
+  @override
+  List<Object?> get props => [description, link, headers];
 }
 
-class SimpleContentMediaItem with ContentMediaItem {
+@immutable
+class SimpleContentMediaItem extends Equatable with ContentMediaItem {
   @override
   final int number;
   @override
@@ -148,15 +184,20 @@ class SimpleContentMediaItem with ContentMediaItem {
   @override
   final List<ContentMediaItemSource> sources;
   @override
-  String? section;
+  final String? section;
   @override
-  String? image;
+  final String? image;
 
-  SimpleContentMediaItem({
+  const SimpleContentMediaItem({
     required this.number,
     required this.title,
     required this.sources,
     this.section,
     this.image,
   });
+
+  @override
+  List<Object?> get props => [number, title, sources, section, image];
 }
+
+typedef SupplierChannels = Map<String, List<ContentInfo>>;

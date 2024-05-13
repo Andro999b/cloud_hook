@@ -9,12 +9,13 @@ import 'package:json_annotation/json_annotation.dart';
 part 'ua_films_tv.g.dart';
 
 @JsonSerializable()
+// ignore: must_be_immutable
 class UAFilmsTVContentDetails extends BaseContentDetails {
   UAFilmsTVContentDetails({
     required super.id,
     required super.supplier,
     required super.title,
-    required super.oroginalTitle,
+    required super.originalTitle,
     required super.image,
     required super.description,
     required super.additionalInfo,
@@ -40,6 +41,9 @@ class UAFilmsTVContentDetails extends BaseContentDetails {
 
     return _mediaItems!;
   }
+
+  @override
+  MediaType get mediaType => MediaType.video;
 }
 
 class UAFilmsTVSupplier implements ContentSupplier {
@@ -49,25 +53,47 @@ class UAFilmsTVSupplier implements ContentSupplier {
   String get name => "UAFilmsTV";
 
   @override
+  List<String> channels = [
+    "Новинки",
+    "Фільми",
+    "Серіали",
+    "Мультфільми",
+    "Мультсеріали",
+    "Аніме"
+  ];
+
+  @override
   Set<ContentType> get supportedTypes => {
         ContentType.movie,
         ContentType.cartoon,
-        ContentType.tvShow,
+        ContentType.series,
         ContentType.anime,
       };
+
+  late final _movieItemSelector = ItemsList(
+    itemScope: ".movie-item",
+    child: SelectorsMap({
+      "supplier": Const(name),
+      "id": UrlId.forScope("a.movie-title"),
+      "title": Text.forScope("a.movie-title"),
+      "subtitle": Join([
+        Text.forScope(".movie-img>span"),
+        Text.forScope(".movie-img>.movie-series"),
+      ]),
+      "image": Image.forScope(
+        ".movie-img img",
+        baseUrl,
+        attribute: "data-src",
+      ),
+    }),
+  );
 
   @override
   Future<List<ContentSearchResult>> search(
     String query,
     Set<ContentType> type,
   ) async {
-    final uri = Uri.https(
-      baseUrl,
-      "/index.php",
-      {
-        "do": "search",
-      },
-    );
+    final uri = Uri.https(baseUrl, "/index.php", {"do": "search"});
 
     final scrapper = Scrapper(
       uri: uri,
@@ -75,33 +101,24 @@ class UAFilmsTVSupplier implements ContentSupplier {
       headers: const {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: {
+      form: {
         "do": "search",
         "subaction": "search",
         "full_search": "1",
         "story": query,
         "sortby": "date",
-        "resorder": "desc"
+        "resorder": "desc",
+        if (type.isNotEmpty)
+          "catlist": [
+            if (type.contains(ContentType.movie)) "1",
+            if (type.contains(ContentType.series)) "3",
+            if (type.contains(ContentType.anime)) "46",
+            if (type.contains(ContentType.cartoon)) ...["2", "46"],
+          ],
       },
     );
 
-    final results = await scrapper.scrap(ItemsList(
-      itemScope: ".movie-item",
-      child: SelectorsMap({
-        "supplier": Const(name),
-        "id": UrlId.forScope("a.movie-title"),
-        "title": Text.forScope("a.movie-title"),
-        "subtitle": Join([
-          Text.forScope(".movie-img>span"),
-          Text.forScope(".movie-img>.movie-series"),
-        ]),
-        "image": Image.forScope(
-          ".movie-img img",
-          baseUrl,
-          attribute: "data-src",
-        ),
-      }),
-    ));
+    final results = await scrapper.scrap(_movieItemSelector);
 
     return results.map((e) => ContentSearchResult.fromJson(e)).toList();
   }
@@ -122,7 +139,7 @@ class UAFilmsTVSupplier implements ContentSupplier {
           "id": Const(id),
           "supplier": Const(name),
           "title": Text.forScope("h1[itemprop='name']"),
-          "oroginalTitle":
+          "originalTitle":
               Text.forScope("span[itemprop='alternativeHeadline']"),
           "image": Image.forScope(".m-img>img", baseUrl),
           "description": TextNodes.forScope(".m-desc"),
@@ -148,5 +165,35 @@ class UAFilmsTVSupplier implements ContentSupplier {
     ));
 
     return UAFilmsTVContentDetails.fromJson(result);
+  }
+
+  @override
+  Future<SupplierChannels> loadChannels(
+    Set<String> channels,
+  ) async {
+    return {
+      for (final channel in channels) channel: await _loadChannel(channel)
+    };
+  }
+
+  Future<List<ContentInfo>> _loadChannel(String channel) async {
+    final path = switch (channel) {
+      "Новинки" => "/year/${DateTime.now().year}/",
+      "Фільми" => "/filmys/",
+      "Серіали" => "/serialy/",
+      "Мультфільми" => "/cartoons/",
+      "Мультсеріали" => "/multserialy/",
+      "Аніме" => "/anime/",
+      _ => null
+    };
+
+    if (path == null) {
+      return List.empty();
+    }
+
+    final scrapper = Scrapper(uri: Uri.https(baseUrl, path));
+    final results = await scrapper.scrap(_movieItemSelector);
+
+    return results.map((e) => ContentSearchResult.fromJson(e)).toList();
   }
 }

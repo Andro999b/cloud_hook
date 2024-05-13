@@ -7,7 +7,7 @@ class AppImageCache {
 
   static Future<void> init() async {
     String storageLocation =
-        "${(await getApplicationSupportDirectory()).path}/.cloud_hook/images";
+        "${(await getApplicationSupportDirectory()).path}/images";
 
     logger.i("Image cache directory: $storageLocation");
 

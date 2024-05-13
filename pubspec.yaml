@@ -8,7 +8,6 @@ environment:
   flutter: ">=3.0.0"
 
 dependencies:
-  firedart: ^0.9.8
   flutter:
     sdk: flutter
   flutter_hooks: ^0.20.5
@@ -18,7 +17,6 @@ dependencies:
   googleapis_auth: ^1.6.0
   hooks_riverpod: ^2.5.1
   html: ^0.15.4
-  http: ^1.2.1
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
   path_provider: ^2.0.15
@@ -36,6 +34,12 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  # firebase_dart_flutter: ^1.1.4
+  firebase_dart: ^1.1.4
+  dio: ^5.4.3+1
+  http: ^1.2.1
+  equatable: ^2.0.5
+  scrollable_positioned_list: ^0.3.8
 
 dependency_overrides:
   analyzer: ^6.4.1
@@ -68,4 +72,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  generate: true 
+  generate: true
+  assets:
+    - client_secret.json
+    - firebase_config.json

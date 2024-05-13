@@ -8,11 +8,11 @@ part 'settings_provider.g.dart';
 class BrigthnesSetting extends _$BrigthnesSetting {
   @override
   Brightness? build() {
-    return Preferences.themeBrightness;
+    return AppPreferences.themeBrightness;
   }
 
   void select(Brightness? brightness) {
-    Preferences.themeBrightness = brightness;
+    AppPreferences.themeBrightness = brightness;
     state = brightness;
   }
 }
@@ -21,11 +21,11 @@ class BrigthnesSetting extends _$BrigthnesSetting {
 class ColorSettings extends _$ColorSettings {
   @override
   Color build() {
-    return Preferences.themeColor;
+    return AppPreferences.themeColor;
   }
 
   void select(Color color) {
-    Preferences.themeColor = color;
+    AppPreferences.themeColor = color;
     state = color;
   }
 }

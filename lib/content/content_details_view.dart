@@ -7,6 +7,7 @@ import 'package:cloud_hook/content/content_info_card.dart';
 import 'package:cloud_hook/content/media_items_list.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:cloud_hook/widgets/back_nav_button.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -22,6 +23,7 @@ class ContentDetailsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final size = MediaQuery.of(context).size;
+
     return Container(
       height: size.height,
       width: size.width,
@@ -36,12 +38,7 @@ class ContentDetailsView extends ConsumerWidget {
         children: [
           _renderGradient(context),
           SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _renderMainInfo(context),
-              ],
-            ),
+            child: _renderMainInfo(context),
           ),
         ],
       ),
@@ -62,7 +59,7 @@ class ContentDetailsView extends ConsumerWidget {
           stops: const [0, 0.9, 1.0],
           colors: [
             theme.colorScheme.background.withOpacity(0.5),
-            theme.colorScheme.background.withOpacity(0.5),
+            theme.colorScheme.background.withOpacity(0.3),
             theme.colorScheme.background.withOpacity(0),
           ],
         ),
@@ -71,9 +68,9 @@ class ContentDetailsView extends ConsumerWidget {
   }
 
   double _calcMaxWidth(BuildContext context) {
-    var maxWidth = isMobile(context)
-        ? MediaQuery.of(context).size.width
-        : MediaQuery.of(context).size.width * .5;
+    final size = MediaQuery.of(context).size;
+    var maxWidth =
+        isMobile(context) ? size.width : size.width - size.height * .85;
 
     if (maxWidth < mobileWidth) {
       maxWidth = mobileWidth;
@@ -83,7 +80,6 @@ class ContentDetailsView extends ConsumerWidget {
   }
 
   Widget _renderMainInfo(BuildContext context) {
-    final theme = Theme.of(context);
     final paddings = getPadding(context);
     final mobile = isMobile(context);
 
@@ -97,15 +93,9 @@ class ContentDetailsView extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SelectableText(
-            contentDetails.title,
-            style: theme.textTheme.headlineLarge?.copyWith(height: 1),
-          ),
-          SelectableText(
-            contentDetails.oroginalTitle,
-            style: theme.textTheme.bodyMedium,
-          ),
-          SizedBox(height: paddings * 2),
+          const SizedBox(height: 8),
+          _renderTitile(context),
+          SizedBox(height: mobile ? 240 : paddings * 2),
           _ContentWatchButtons(contentDetails),
           _MediaCollectionItemButtons(contentDetails),
           SizedBox(height: paddings),
@@ -117,6 +107,32 @@ class ContentDetailsView extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Widget _renderTitile(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final title = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SelectableText(
+          contentDetails.title,
+          style: theme.textTheme.headlineLarge?.copyWith(height: 1),
+        ),
+        SelectableText(
+          contentDetails.originalTitle,
+          style: theme.textTheme.bodyMedium,
+        ),
+      ],
+    );
+
+    if (isMobile(context)) {
+      return Row(
+        children: [const BackNavButton(), Flexible(child: title)],
+      );
+    }
+
+    return title;
   }
 
   Widget _renderAdditionalInfo() {
@@ -138,7 +154,10 @@ class ContentDetailsView extends ConsumerWidget {
       trimLines: 4,
       trimCollapsedText: AppLocalizations.of(context)!.readMore,
       trimExpandedText: AppLocalizations.of(context)!.readLess,
-      style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+      style: theme.textTheme.bodyLarge?.copyWith(
+        fontWeight: FontWeight.w500,
+        inherit: true,
+      ),
     );
   }
 
@@ -182,10 +201,17 @@ class _ContentWatchButtons extends HookWidget {
 
     if (snapshot.connectionState == ConnectionState.waiting ||
         !snapshot.hasData) {
-      return const SizedBox(height: 40);
+      return const SizedBox(
+        height: 40,
+        width: 40,
+        child: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
-    final mediaItems = snapshot.data!;
+    final mediaItems = snapshot.data!.toList();
     final showList = mediaItems.firstOrNull?.title.isNotEmpty ?? false;
 
     return Row(
@@ -219,7 +245,7 @@ class _ContentPlaylistButton extends ConsumerWidget {
   }) : provider = collectionItemProvider(contentDetails);
 
   final ContentDetails contentDetails;
-  final Iterable<ContentMediaItem> mediaItems;
+  final List<ContentMediaItem> mediaItems;
   final CollectionItemProvider provider;
 
   @override

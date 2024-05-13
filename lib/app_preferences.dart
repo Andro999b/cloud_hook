@@ -3,7 +3,7 @@ import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Preferences {
+class AppPreferences {
   static late final SharedPreferences instance;
   static const Color defaultColor = Colors.green;
 
@@ -70,4 +70,46 @@ class Preferences {
         "collection_item_status",
         value?.map((type) => type.name).toList() ?? List.empty(),
       );
+
+  static int get lastSyncTimestamp =>
+      instance.getInt("last_sync_timestamp") ?? 0;
+
+  static set lastSyncTimestamp(int timestamp) =>
+      instance.setInt("last_sync_timestamp", timestamp);
+
+  static double get volume => instance.getDouble("volume") ?? 100.0;
+
+  static set volume(double value) => instance.setDouble("volume", value);
+
+  static List<String> get recomendationsOrder =>
+      instance.getStringList("recomendations_order") ?? List.empty();
+
+  static set recomendationsOrder(List<String> value) =>
+      instance.setStringList("recomendations_order", value);
+
+  static void setRecomendationSupplierEnabled(
+    String supplierName,
+    bool enabled,
+  ) {
+    instance.setBool("recomendations.$supplierName.enabled", enabled);
+  }
+
+  static bool getRecomendationSupplierEnabled(String supplierName) =>
+      instance.getBool("recomendations.$supplierName.enabled") ?? false;
+
+  static void setRecomendationSupplierChannels(
+    String supplierName,
+    Set<String> channels,
+  ) {
+    instance.setStringList(
+      "recomendations.$supplierName.channels",
+      channels.toList(),
+    );
+  }
+
+  static Set<String> getRecomendationSupplierChannels(String supplierName) =>
+      instance
+          .getStringList("recomendations.$supplierName.channels")
+          ?.toSet() ??
+      const {};
 }

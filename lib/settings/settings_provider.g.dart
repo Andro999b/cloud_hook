@@ -6,7 +6,7 @@ part of 'settings_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$brigthnesSettingHash() => r'16777333ac4f2bcae772e5785a92159d85f6a403';
+String _$brigthnesSettingHash() => r'63cb3de25442c79c9cb28ce1d7670f1d960cd409';
 
 /// See also [BrigthnesSetting].
 @ProviderFor(BrigthnesSetting)
@@ -22,7 +22,7 @@ final brigthnesSettingProvider =
 );
 
 typedef _$BrigthnesSetting = AutoDisposeNotifier<Brightness?>;
-String _$colorSettingsHash() => r'4d75266bbe12d7d0be03346b38231016f2a659a9';
+String _$colorSettingsHash() => r'b73ce6f6b4e78ee51f330e974cd9f0ffecf5826f';
 
 /// See also [ColorSettings].
 @ProviderFor(ColorSettings)

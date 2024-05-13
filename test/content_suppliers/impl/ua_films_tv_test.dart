@@ -12,7 +12,7 @@ void main() {
       expect(details.id, id);
       expect(details.supplier, supplier.name);
       expect(details.title, "Підземелля смакоти");
-      expect(details.oroginalTitle, "Delicious in Dungeon");
+      expect(details.originalTitle, "Delicious in Dungeon");
     });
   });
 }

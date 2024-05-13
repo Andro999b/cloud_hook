@@ -6,24 +6,22 @@ part of 'collection_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$collectionItemRepositoryHash() =>
-    r'de7763e06d4d73f99a9598decbd74c1f38fc6761';
+String _$collectionServiceHash() => r'903f958ae1c771553d27ee159089b670a27e5d67';
 
-/// See also [collectionItemRepository].
-@ProviderFor(collectionItemRepository)
-final collectionItemRepositoryProvider =
-    Provider<CollectionRepository>.internal(
-  collectionItemRepository,
-  name: r'collectionItemRepositoryProvider',
+/// See also [collectionService].
+@ProviderFor(collectionService)
+final collectionServiceProvider = Provider<CollectionService>.internal(
+  collectionService,
+  name: r'collectionServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$collectionItemRepositoryHash,
+      : _$collectionServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef CollectionItemRepositoryRef = ProviderRef<CollectionRepository>;
-String _$collectionHash() => r'7ae8fbff22cf8aec1690bee21fd91136ef2ee54b';
+typedef CollectionServiceRef = ProviderRef<CollectionService>;
+String _$collectionHash() => r'75c3457e751fd68bf9ad2d90c64d2ef0a29e9740';
 
 /// See also [collection].
 @ProviderFor(collection)
@@ -39,25 +37,24 @@ final collectionProvider = AutoDisposeFutureProvider<
 
 typedef CollectionRef = AutoDisposeFutureProviderRef<
     Map<MediaCollectionItemStatus, List<MediaCollectionItem>>>;
-String _$collectionItemRepositoryChangesHash() =>
-    r'eb068ad6981e409664326d2f453c2eacc70d7b03';
+String _$collectionChangesHash() => r'9cdbf00aee59ae6661f58a392677e0a6aa07d663';
 
-/// See also [CollectionItemRepositoryChanges].
-@ProviderFor(CollectionItemRepositoryChanges)
-final collectionItemRepositoryChangesProvider =
-    StreamNotifierProvider<CollectionItemRepositoryChanges, void>.internal(
-  CollectionItemRepositoryChanges.new,
-  name: r'collectionItemRepositoryChangesProvider',
+/// See also [CollectionChanges].
+@ProviderFor(CollectionChanges)
+final collectionChangesProvider =
+    StreamNotifierProvider<CollectionChanges, void>.internal(
+  CollectionChanges.new,
+  name: r'collectionChangesProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$collectionItemRepositoryChangesHash,
+      : _$collectionChangesHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$CollectionItemRepositoryChanges = StreamNotifier<void>;
+typedef _$CollectionChanges = StreamNotifier<void>;
 String _$collectionItemStatusFilterHash() =>
-    r'38fb5a8f9f028e89fb1d28e64366a34318bf4531';
+    r'5653bc5b9b99f94eb3c02dd8c60a3bb7e828de1e';
 
 /// See also [CollectionItemStatusFilter].
 @ProviderFor(CollectionItemStatusFilter)

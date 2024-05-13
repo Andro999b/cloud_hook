@@ -7,6 +7,7 @@ import 'package:cloud_hook/collection/widgets/status_selector.dart';
 import 'package:cloud_hook/content/content_info_card.dart';
 import 'package:cloud_hook/layouts/general_layout.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:cloud_hook/widgets/horizontal_list.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -40,69 +41,41 @@ class CollectionHorizontalView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncCollection = ref.watch(collectionProvider);
-
-    return asyncCollection.when(
-      data: (data) => _renderGroups(context, ref, data),
-      loading: () => const SizedBox.shrink(),
-      error: (error, stackTrace) => Center(
-        child: Text(error.toString()),
-      ),
-    );
-  }
-
-  _renderGroups(
-    BuildContext context,
-    WidgetRef ref,
-    Map<MediaCollectionItemStatus, List<MediaCollectionItem>> groups,
-  ) {
     final paddings = getPadding(context);
 
     return ListView(
       padding: EdgeInsets.symmetric(horizontal: paddings),
-      children: groupsOrder
-          .where((e) => groups.containsKey(e))
-          .map(
-            (e) => _renderGroup(context, ref, e, groups[e]!),
-          )
-          .toList(),
+      children:
+          groupsOrder.map((e) => CollectionHorizontalGroup(status: e)).toList(),
+    );
+  }
+}
+
+class CollectionHorizontalGroup extends ConsumerWidget {
+  final MediaCollectionItemStatus status;
+
+  const CollectionHorizontalGroup({super.key, required this.status});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final group = ref.watch(
+      collectionProvider.select((value) => value.valueOrNull?[status]),
+    );
+
+    if (group == null) {
+      return const SizedBox.shrink();
+    }
+
+    return HorizontalList(
+      title: statusLabel(context, status),
+      itemBuilder: (context, index) {
+        return _renderInfoCard(context, ref, group[index]);
+      },
+      itemCount: group.length,
     );
   }
 
-  Widget _renderGroup(
-    BuildContext context,
-    WidgetRef ref,
-    MediaCollectionItemStatus status,
-    List<MediaCollectionItem> items,
-  ) {
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text(
-            statusLabel(context, status),
-            style: theme.textTheme.titleMedium,
-          ),
-        ),
-        SizedBox(
-          height: 300,
-          child: ListView.builder(
-            padding: const EdgeInsets.only(bottom: 8),
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) {
-              return _renderInfoCard(context, ref, items[index]);
-            },
-            itemCount: items.length,
-          ),
-        )
-      ],
-    );
-  }
-
-  ContentInfoCard _renderInfoCard(
+  Widget _renderInfoCard(
     BuildContext context,
     WidgetRef ref,
     MediaCollectionItem item,
@@ -123,7 +96,7 @@ class CollectionHorizontalView extends ConsumerWidget {
             CollectionItemPrioritySelector(
               collectionItem: item,
               onSelect: (priority) {
-                ref.read(collectionItemRepositoryProvider).save(
+                ref.read(collectionServiceProvider).save(
                       item.copyWith(
                         priority: priority,
                       ),
@@ -133,7 +106,7 @@ class CollectionHorizontalView extends ConsumerWidget {
             CollectionItemStatusSelector.iconButton(
               collectionItem: item,
               onSelect: (status) {
-                ref.read(collectionItemRepositoryProvider).save(
+                ref.read(collectionServiceProvider).save(
                       item.copyWith(
                         status: status,
                       ),

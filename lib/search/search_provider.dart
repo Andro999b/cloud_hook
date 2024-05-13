@@ -14,8 +14,7 @@ class Search extends _$Search {
   @override
   SearchState build() => SearchState.empty;
 
-  void search(String query, Set<String> contentSuppliers,
-      Set<ContentType> contentTypes) async {
+  void search(String query) async {
     final text = cleanupQuery(query);
 
     if (text.isEmpty) {
@@ -24,25 +23,28 @@ class Search extends _$Search {
 
     state = SearchState.loading(query);
 
+    final contentSuppliers = ref.read(selectedSupplierProvider);
+    final contentTypes = ref.read(selectedContentProvider);
+
     final stream =
         contentProviders.search(query, contentSuppliers, contentTypes);
 
     final subscription = stream.listen((event) {
-      state = state.addResults(event);
+      state = state.copyWith(results: event);
     });
 
     subscription.onDone(() {
-      state = state.loadingDone();
+      state = state.copyWith(isLoading: false);
       subscription.cancel();
     });
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class SelectedSupplier extends _$SelectedSupplier {
   @override
   Set<String> build() {
-    var selectedContentSuppliers = Preferences.selectedContentSuppliers;
+    var selectedContentSuppliers = AppPreferences.selectedContentSuppliers;
 
     selectedContentSuppliers ??= ContentSuppliers.instance.suppliersName;
 
@@ -51,20 +53,20 @@ class SelectedSupplier extends _$SelectedSupplier {
 
   void select(String supplier) async {
     state = Set.from(state)..add(supplier);
-    Preferences.selectedContentSuppliers = state;
+    AppPreferences.selectedContentSuppliers = state;
   }
 
   void unselect(String supplier) async {
     state = Set.from(state)..remove(supplier);
-    Preferences.selectedContentSuppliers = state;
+    AppPreferences.selectedContentSuppliers = state;
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class SelectedContent extends _$SelectedContent {
   @override
   Set<ContentType> build() {
-    var selectedContentTypes = Preferences.selectedContentType;
+    var selectedContentTypes = AppPreferences.selectedContentType;
 
     selectedContentTypes ??= ContentType.values.toSet();
 
@@ -73,11 +75,11 @@ class SelectedContent extends _$SelectedContent {
 
   void select(ContentType type) async {
     state = Set.from(state)..add(type);
-    Preferences.selectedContentType = state;
+    AppPreferences.selectedContentType = state;
   }
 
   void unselect(ContentType type) async {
     state = Set.from(state)..remove(type);
-    Preferences.selectedContentType = state;
+    AppPreferences.selectedContentType = state;
   }
 }

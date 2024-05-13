@@ -9,7 +9,7 @@ part 'collection_item_provider.g.dart';
 class CollectionItem extends _$CollectionItem {
   @override
   FutureOr<MediaCollectionItem> build(ContentDetails details) async {
-    final repository = ref.read(collectionItemRepositoryProvider);
+    final repository = ref.read(collectionServiceProvider);
     final item = await repository.getCollectionItem(
       details.supplier,
       details.id,
@@ -78,14 +78,9 @@ class CollectionItem extends _$CollectionItem {
   Future<MediaCollectionItem> _saveNewValue(
     MediaCollectionItem newValue,
   ) async {
-    final repository = ref.read(collectionItemRepositoryProvider);
+    final service = ref.read(collectionServiceProvider);
 
-    newValue.lastSeen = DateTime.now();
-    if (newValue.internalId == null) {
-      newValue.internalId = await repository.save(newValue);
-    } else {
-      await repository.save(newValue);
-    }
+    await service.save(newValue);
 
     return newValue;
   }

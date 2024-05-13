@@ -3,6 +3,7 @@
     "search": "Пошук",
     "collection": "Коллекці",
     "settings": "Налаштунки",
+    "searchNoResults": "Нічого не знайдено по запиту",
     "readMore": "читати більше",
     "readLess": "сховати",
     "recomendations": "Рекомендації",
@@ -23,5 +24,14 @@
     "settingsThemeLight": "Світла",
     "settingsThemeSystem": "Системна",
     "settingsThemeDark": "Темна",
-    "settingsColor": "Колір"
+    "settingsColor": "Колір",
+    "singOut": "Вийти",
+    "reload": "Оновити",
+    "collectionContiue": "Продовжити перегляд",
+    "collectionBegin": "Почати перегляд",
+    "contentTypeMovie": "Фільми",
+    "contentTypeAnime": "Аніме",
+    "contentTypeSeries": "Серіали",
+    "contentTypeCartoon": "Мультфільми",
+    "contentTypeManga": "Манга"
 }

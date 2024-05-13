@@ -1,14 +1,15 @@
 import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 @immutable
-class SearchState {
+class SearchState extends Equatable {
   final Map<String, List<ContentSearchResult>> results;
   final bool isLoading;
   final String? query;
 
   const SearchState({
-    required this.results,
+    this.results = const {},
     required this.isLoading,
     this.query,
   });
@@ -20,21 +21,14 @@ class SearchState {
   )   : isLoading = true,
         results = const {};
 
-  SearchState addResults(
-      MapEntry<String, Iterable<ContentSearchResult>> providerResults) {
-    final Map<String, Iterable<ContentSearchResult>> newResults =
-        Map.from(results);
-    newResults[providerResults.key] = providerResults.value;
+  SearchState copyWith(
+      {Map<String, List<ContentSearchResult>>? results, bool? isLoading}) {
     return SearchState(
-      results: Map.unmodifiable(newResults),
-      isLoading: isLoading,
-      query: query,
+      results: results ?? this.results,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 
-  SearchState loadingDone() => SearchState(
-        results: results,
-        isLoading: false,
-        query: query,
-      );
+  @override
+  List<Object?> get props => [results, isLoading, query];
 }

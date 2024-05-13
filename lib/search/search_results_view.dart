@@ -1,8 +1,10 @@
+import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/content/content_info_card.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/search/search_model.dart';
 import 'package:cloud_hook/search/search_provider.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:cloud_hook/widgets/horizontal_list.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,9 +18,7 @@ class SearchResultsView extends HookConsumerWidget {
 
     final content = switch (searchState) {
       SearchState.empty => _renderEmptyResults(context),
-      SearchState(isLoading: true) =>
-        const Center(child: CircularProgressIndicator()),
-      _ => _renderResults(context, searchState.results)
+      _ => _renderResults(context, searchState)
     };
 
     return Expanded(
@@ -26,55 +26,54 @@ class SearchResultsView extends HookConsumerWidget {
     );
   }
 
-  Widget _renderResults(
-    BuildContext context,
-    Map<String, List<ContentSearchResult>> resutls,
-  ) {
+  Widget _renderResults(BuildContext context, SearchState searchState) {
     final paddings = getPadding(context);
+    final noResults =
+        searchState.results.values.where((r) => r.isNotEmpty).isEmpty;
 
+    if (!searchState.isLoading && noResults) {
+      // no result
+      return Center(
+        child: Text(
+          AppLocalizations.of(context)!.searchNoResults,
+        ),
+      );
+    } else if (searchState.results.isEmpty) {
+      // wait for firast provider
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // loading providers
     return ListView(
       padding: EdgeInsets.symmetric(horizontal: paddings),
-      children: resutls.entries
-          .map((e) => _renderSupplierResults(context, e.key, e.value))
-          .toList(),
+      children: [
+        ...searchState.results.entries
+            .map((e) => _renderSupplierResults(context, e.key, e.value)),
+        if (searchState.isLoading)
+          const Center(child: CircularProgressIndicator())
+      ],
     );
   }
 
   Widget _renderEmptyResults(BuildContext context) {
-    return const Center(child: Text("Пошук"));
+    return Center(child: Text(AppLocalizations.of(context)!.search));
   }
 
   Widget _renderSupplierResults(
       BuildContext context, String key, List<ContentSearchResult> value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            key,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
-        SizedBox(
-          height: 300,
-          child: ListView.builder(
-            padding: const EdgeInsets.only(bottom: 8),
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) {
-              final item = value[index];
+    return HorizontalList(
+      title: key,
+      itemBuilder: (context, index) {
+        final item = value[index];
 
-              return ContentInfoCard(
-                contentInfo: item,
-                onTap: () {
-                  context.push("/content/${item.supplier}/${item.id}");
-                },
-              );
-            },
-            itemCount: value.length,
-          ),
-        )
-      ],
+        return ContentInfoCard(
+          contentInfo: item,
+          onTap: () {
+            context.push("/content/${item.supplier}/${item.id}");
+          },
+        );
+      },
+      itemCount: value.length,
     );
   }
 }

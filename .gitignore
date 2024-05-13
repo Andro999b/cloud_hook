@@ -43,3 +43,4 @@ app.*.map.json
 /android/app/release
 
 client_secret.json
+firebase_config.json

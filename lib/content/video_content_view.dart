@@ -1,8 +1,10 @@
+import 'package:cloud_hook/app_preferences.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/media_items_list.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
+import 'package:cloud_hook/utils/logger.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -116,6 +118,11 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
         notifier.setCurrentPosition(position, duration);
       }
     });
+
+    player.setVolume(AppPreferences.volume);
+    player.stream.volume.listen((event) {
+      AppPreferences.volume = event;
+    });
   }
 
   @override
@@ -127,27 +134,88 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
 
   @override
   Widget build(BuildContext context) {
-    final desktopThemeData = _createDesktopThemeData();
+    switch (Theme.of(context).platform) {
+      case TargetPlatform.android:
+      case TargetPlatform.iOS:
+        final mobileThemeData = _createMobileThemeData();
+        return MaterialVideoControlsTheme(
+          normal: mobileThemeData,
+          fullscreen: mobileThemeData,
+          child: _renderVideo(),
+        );
+      default:
+        final desktopThemeData = _createDesktopThemeData();
+        return MaterialDesktopVideoControlsTheme(
+          normal: desktopThemeData,
+          fullscreen: desktopThemeData,
+          child: _renderVideo(),
+        );
+    }
+  }
 
+  Widget _renderVideo() {
     var size = MediaQuery.of(context).size;
-
-    return Center(
-      child: MaterialDesktopVideoControlsTheme(
-        normal: desktopThemeData,
-        fullscreen: desktopThemeData,
-        child: SizedBox(
-          width: size.width,
-          height: size.height,
-          child: Video(
-            controller: videoController,
-            controls: (state) {
-              // dirty hack to catch vieo state for fullscreen
-              videoState.value = state;
-              return AdaptiveVideoControls(state);
-            },
-          ),
-        ),
+    return SizedBox(
+      width: size.width,
+      height: size.height,
+      child: Video(
+        controller: videoController,
+        controls: (state) {
+          // dirty hack to catch vieo state for fullscreen
+          videoState.value = state;
+          return AdaptiveVideoControls(state);
+        },
       ),
+    );
+  }
+
+  // Mobile theme
+
+  MaterialVideoControlsThemeData _createMobileThemeData() {
+    return MaterialVideoControlsThemeData(
+      buttonBarButtonColor: Colors.white,
+      topButtonBarMargin: const EdgeInsets.only(top: 8),
+      topButtonBar: [
+        _ExitButton(),
+        const SizedBox(width: 8),
+        _Title(
+          details: widget.details,
+          playlistSize: widget.mediaItems.length,
+          provider: provider,
+        ),
+        const Spacer(),
+        if (widget.mediaItems.length > 1)
+          _PlaylistButton(
+            mediaItems: widget.mediaItems,
+            provider: provider,
+            onSelect: (item) {
+              _setItemIdx(item.number);
+            },
+          )
+      ],
+      primaryButtonBar: [
+        const Spacer(flex: 2),
+        _SkipNextButton(
+          provider: provider,
+          playlistSize: widget.mediaItems.length,
+        ),
+        const Spacer(),
+        const MaterialPlayOrPauseButton(iconSize: 48.0),
+        const Spacer(),
+        _SkipNextButton(
+          provider: provider,
+          playlistSize: widget.mediaItems.length,
+        ),
+        const Spacer(flex: 2),
+      ],
+      bottomButtonBar: [
+        const MaterialPositionIndicator(),
+        const Spacer(),
+        _SourceSelector(mediaItems: widget.mediaItems, provider: provider),
+        const MaterialFullscreenButton(),
+      ],
+      seekGesture: true,
+      seekOnDoubleTap: true,
     );
   }
 
@@ -157,7 +225,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
     const marging = EdgeInsets.symmetric(horizontal: 20.0);
     return MaterialDesktopVideoControlsThemeData(
       buttonBarButtonColor: Colors.white,
-      topButtonBarMargin: marging,
+      topButtonBarMargin: marging.copyWith(top: 8),
       bottomButtonBarMargin: marging,
       topButtonBar: [
         _ExitButton(),
@@ -203,20 +271,26 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
   // playback callbacks
 
   Future<void> _playMediaItem(ContentProgress progress) async {
-    final itemIdx = progress.currentItem;
-    final sourceIdx = progress.currentSource;
+    try {
+      final itemIdx = progress.currentItem;
+      final sourceIdx = progress.currentSource;
 
-    final item = widget.mediaItems[itemIdx];
-    final sourceIndex = sourceIdx >= item.sources.length ? 0 : sourceIdx;
-    final source = item.sources[sourceIndex];
+      final item = widget.mediaItems[itemIdx];
+      final sources = await item.sources;
 
-    final media = Media(
-      source.link.toString(),
-      httpHeaders: source.headers,
-      start: Duration(seconds: progress.currentPosition),
-    );
+      final sourceIndex = sourceIdx >= sources.length ? 0 : sourceIdx;
+      final source = sources[sourceIndex];
 
-    await player.open(media);
+      final media = Media(
+        source.link.toString(),
+        httpHeaders: source.headers,
+        start: Duration(seconds: progress.currentPosition),
+      );
+
+      await player.open(media);
+    } on Exception catch (e, stackTrace) {
+      logger.e("Fail to play", error: e, stackTrace: stackTrace);
+    }
   }
 
   void _nextItem() {
@@ -246,7 +320,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
   }
 
   bool _isValidItemIdx(int itemIdx) {
-    return itemIdx > widget.mediaItems.length || itemIdx < 0;
+    return itemIdx < widget.mediaItems.length && itemIdx >= 0;
   }
 }
 
@@ -396,23 +470,37 @@ class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
           clipBehavior: Clip.antiAlias,
           child: SizedBox(
             width: 300,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: mediaItems[data.currentItem]
-                  .sources
-                  .mapIndexed((idx, e) => MenuItemButton(
-                        trailingIcon: data.currentSource == idx
-                            ? const Icon(Icons.check)
-                            : null,
-                        onPressed: () {
-                          context.pop();
-                          final notifier = ref.read(provider.notifier);
-                          notifier.setCurrentSource(idx);
-                        },
-                        child: Text(e.description),
-                      ))
-                  .toList(),
+            child: FutureBuilder(
+              future: Future.value(mediaItems[data.currentItem].sources),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text(snapshot.error!.toString()));
+                }
+
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: snapshot.data!
+                      .mapIndexed(
+                        (idx, e) => MenuItemButton(
+                          trailingIcon: data.currentSource == idx
+                              ? const Icon(Icons.check)
+                              : null,
+                          onPressed: () {
+                            context.pop();
+                            final notifier = ref.read(provider.notifier);
+                            notifier.setCurrentSource(idx);
+                          },
+                          child: Text(e.description),
+                        ),
+                      )
+                      .toList(),
+                );
+              },
             ),
           ),
         ),

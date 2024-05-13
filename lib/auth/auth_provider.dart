@@ -4,12 +4,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 Auth auth(Ref ref) {
   return Auth.instance;
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Stream<User?> user(Ref ref) {
-  return ref.read(authProvider).userUpdate;
+  return Auth.instance.userUpdate;
 }

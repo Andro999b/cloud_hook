@@ -1,5 +1,9 @@
 import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'collection_item_model.g.dart';
 
 enum MediaCollectionItemStatus {
   none,
@@ -9,7 +13,23 @@ enum MediaCollectionItemStatus {
   onHold,
 }
 
+DateTime? _dateTimeFormMilli(value) {
+  if (value is int) {
+    return DateTime.fromMillisecondsSinceEpoch(value);
+  }
+  return null;
+}
+
+int? _dateTimeToMilli(DateTime? value) {
+  return value?.millisecondsSinceEpoch;
+}
+
+@JsonSerializable()
 class MediaCollectionItem with ContentInfo, ContentProgress {
+  @JsonKey(
+    includeFromJson: false,
+    includeToJson: false,
+  )
   int? internalId; // for database
 
   @override
@@ -29,9 +49,13 @@ class MediaCollectionItem with ContentInfo, ContentProgress {
   @override
   Map<int, MediaItemPosition> positions;
 
-  MediaCollectionItemStatus status;
-  int priority;
+  final MediaCollectionItemStatus status;
+  final int priority;
 
+  @JsonKey(
+    fromJson: _dateTimeFormMilli,
+    toJson: _dateTimeToMilli,
+  )
   DateTime? lastSeen;
 
   MediaCollectionItem({
@@ -72,16 +96,25 @@ class MediaCollectionItem with ContentInfo, ContentProgress {
       image: image ?? this.image,
       currentItem: currentItem ?? this.currentItem,
       currentSource: currentSource ?? this.currentSource,
-      positions: {...this.positions, if (positions != null) ...positions},
+      positions: positions != null
+          ? {...this.positions, ...positions}
+          : this.positions,
       status: status ?? this.status,
       priority: priority ?? this.priority,
       internalId: internalId,
+      lastSeen: lastSeen,
     );
   }
+
+  factory MediaCollectionItem.fromJson(Map<String, dynamic> json) =>
+      _$MediaCollectionItemFromJson(json);
+
+  Map<String, dynamic> toJson() => _$MediaCollectionItemToJson(this);
 }
 
 @immutable
-class MediaItemPosition {
+@JsonSerializable()
+class MediaItemPosition extends Equatable {
   final int position;
   final int length;
 
@@ -106,6 +139,14 @@ class MediaItemPosition {
     position: 0,
     length: 0,
   );
+
+  factory MediaItemPosition.fromJson(Map<String, dynamic> json) =>
+      _$MediaItemPositionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$MediaItemPositionToJson(this);
+
+  @override
+  List<Object?> get props => [position, length];
 }
 
 mixin ContentProgress {
