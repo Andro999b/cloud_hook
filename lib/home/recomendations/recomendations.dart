@@ -1,6 +1,7 @@
 import 'package:cloud_hook/content/content_info_card.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/home/recomendations/recomendations_provider.dart';
+import 'package:cloud_hook/utils/visual.dart';
 import 'package:cloud_hook/widgets/display_error.dart';
 import 'package:cloud_hook/widgets/horizontal_list.dart';
 import 'package:flutter/material.dart';
@@ -19,9 +20,7 @@ class Recommendations extends ConsumerWidget {
         error: error,
         stackTrace: stackTrace,
       ),
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      loading: () => const SizedBox.shrink(),
     );
   }
 
@@ -30,13 +29,18 @@ class Recommendations extends ConsumerWidget {
     Map<String, SupplierChannels> data,
   ) {
     final theme = Theme.of(context);
+    final paddings = getPadding(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: data.entries
           .where((e) => e.value.isNotEmpty)
           .map(
             (e) => [
-              Text(e.key, style: theme.textTheme.titleLarge),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: paddings),
+                child: Text(e.key, style: theme.textTheme.titleLarge),
+              ),
               ...e.value.entries.map(
                 (channel) => _renderChannel(channel.key, channel.value),
               ),

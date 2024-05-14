@@ -38,6 +38,7 @@ class _RecomendationsSettingsList extends ConsumerWidget {
       constraints: const BoxConstraints.tightFor(width: 800),
       child: ReorderableListView(
         shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         proxyDecorator: _proxyDecorator,
         buildDefaultDragHandles: false,
         onReorder: (oldIndex, newIndex) {

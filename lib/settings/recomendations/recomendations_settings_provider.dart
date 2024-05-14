@@ -61,12 +61,25 @@ class RecomendationsModel extends Equatable {
 class RecomendationSettings extends _$RecomendationSettings {
   @override
   RecomendationsModel build() {
-    final suppliers = ContentSuppliers.instance.suppliersName;
+    final defaultSuppliers = ContentSuppliers.instance.suppliers
+        .where((s) => s.defaultChannels.isNotEmpty);
 
-    final Set<String> suppliersOrder =
-        Set.from(AppPreferences.recomendationsOrder);
-    suppliersOrder.removeWhere((e) => !suppliers.contains(e));
-    suppliersOrder.addAll(suppliers);
+    final defaultSuppliersByName = {
+      for (final supplier in defaultSuppliers) supplier.name: supplier
+    };
+
+    final supplierNames = ContentSuppliers.instance.suppliersName;
+
+    Set<String> suppliersOrder;
+    final savedOrder = AppPreferences.recomendationsOrder;
+
+    if (savedOrder != null) {
+      suppliersOrder = Set.from(savedOrder);
+      suppliersOrder.removeWhere((e) => !supplierNames.contains(e));
+      suppliersOrder.addAll(supplierNames);
+    } else {
+      suppliersOrder = defaultSuppliers.map((e) => e.name).toSet();
+    }
 
     return RecomendationsModel(
       suppliersOrder: suppliersOrder.toList(),
@@ -74,9 +87,12 @@ class RecomendationSettings extends _$RecomendationSettings {
         for (final supplierName in suppliersOrder)
           supplierName: RecomendationConfig(
             enabled:
-                AppPreferences.getRecomendationSupplierEnabled(supplierName),
+                AppPreferences.getRecomendationSupplierEnabled(supplierName) ??
+                    defaultSuppliersByName.keys.contains(supplierName),
             channels:
-                AppPreferences.getRecomendationSupplierChannels(supplierName),
+                AppPreferences.getRecomendationSupplierChannels(supplierName) ??
+                    defaultSuppliersByName[supplierName]?.defaultChannels ??
+                    const {},
           )
       },
     );

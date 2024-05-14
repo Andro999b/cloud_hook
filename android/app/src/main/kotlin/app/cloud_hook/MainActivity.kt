@@ -1,4 +1,4 @@
-package com.example.cloud_hook
+package app.cloud_hook
 
 import io.flutter.embedding.android.FlutterActivity
 

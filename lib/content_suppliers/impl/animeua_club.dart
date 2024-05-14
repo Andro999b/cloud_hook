@@ -53,12 +53,18 @@ class AnimeUAClubSupplier extends ContentSupplier {
   Set<ContentType> get supportedTypes => const {ContentType.anime};
 
   @override
-  List<String> get channels => const [
+  Set<String> get channels => const {
         "Новинки",
         "ТОП 100",
         "Повнометражки",
         "Аніме серіали",
-      ];
+      };
+
+  @override
+  Set<String> get defaultChannels => const {
+        "Новинки",
+        "ТОП 100",
+      };
 
   late final _movieItemSelector = IterateOverScope(
     itemScope: ".grid-item",

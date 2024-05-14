@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:cloud_hook/app_preferences.dart';
 import 'package:firebase_dart/firebase_dart.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -64,12 +65,17 @@ class User {
   }
 }
 
+const scopes = [
+  "https://www.googleapis.com/auth/userinfo.profile",
+  "https://www.googleapis.com/auth/userinfo.email"
+];
+
 class Auth {
   final AuthTokenStore _tokenStore = PerferenceTokenStore();
   final StreamController<User?> _userStreamController = StreamController();
   late Stream<User?> _userStream;
 
-  static ClientId? clientId;
+  static ClientId? desktopClientId;
   User? _currentUser;
 
   static final Auth instance = Auth._();
@@ -97,12 +103,7 @@ class Auth {
   Stream<User?> get userUpdate => _userStream;
 
   Future<void> signIn() async {
-    final scopes = [
-      "https://www.googleapis.com/auth/userinfo.profile",
-      "https://www.googleapis.com/auth/userinfo.email"
-    ];
-
-    final clientId = await loadClientId();
+    final clientId = await _loadDesktopClientId();
 
     if (Platform.isLinux || Platform.isWindows) {
       final credentials = await obtainAccessCredentialsViaUserConsent(
@@ -114,8 +115,12 @@ class Auth {
         },
       );
 
-      _setCredentials(credentials);
-    } else {}
+      _setAccessCredentials(credentials);
+    } else {
+      final googleSign = await GoogleSignIn(scopes: scopes).signIn();
+
+      _setGoogleSignInAccount(googleSign);
+    }
   }
 
   Future<void> singOut() async {
@@ -124,34 +129,50 @@ class Auth {
     _userStreamController.add(null);
   }
 
-  static Future<ClientId> loadClientId() async {
-    if (clientId == null) {
+  static Future<ClientId> _loadDesktopClientId() async {
+    if (desktopClientId == null) {
       final clientSecretJson =
-          await rootBundle.loadString("client_secret.json");
-      clientId = ClientId.fromJson(json.decode(clientSecretJson));
+          await rootBundle.loadString("desktop_client_secret.json");
+      desktopClientId = ClientId.fromJson(json.decode(clientSecretJson));
     }
 
-    return clientId!;
+    return desktopClientId!;
   }
 
   Future<void> restore() async {
-    final clientId = await loadClientId();
-    var credentials = await _tokenStore.read();
+    if (Platform.isLinux || Platform.isWindows) {
+      final clientId = await _loadDesktopClientId();
+      var credentials = await _tokenStore.read();
 
-    if (credentials != null) {
-      if (credentials.accessToken.hasExpired) {
-        credentials = await refreshCredentials(clientId, credentials, Client());
+      if (credentials != null) {
+        if (credentials.accessToken.hasExpired) {
+          credentials =
+              await refreshCredentials(clientId, credentials, Client());
+        }
+        _setAccessCredentials(credentials);
       }
-      _setCredentials(credentials);
+    } else {
+      final googleSign = await GoogleSignIn(scopes: scopes).signInSilently();
+      _setGoogleSignInAccount(googleSign);
     }
   }
 
-  void _setCredentials(AccessCredentials credentials) {
+  void _setGoogleSignInAccount(GoogleSignInAccount? account) async {
+    if (account != null) {
+      final auth = await account.authentication;
+      if (auth.accessToken != null) {
+        _setCredentials(auth.accessToken!, auth.idToken);
+      }
+    }
+  }
+
+  void _setAccessCredentials(AccessCredentials credentials) {
+    _setCredentials(credentials.accessToken.data, credentials.idToken);
+  }
+
+  void _setCredentials(String accessToken, String? idToken) {
     FirebaseAuth.instance.signInWithCredential(
-      GoogleAuthProvider.credential(
-        accessToken: credentials.accessToken.data,
-        idToken: credentials.idToken,
-      ),
+      GoogleAuthProvider.credential(accessToken: accessToken, idToken: idToken),
     );
   }
 }

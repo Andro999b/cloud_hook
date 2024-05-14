@@ -21,7 +21,8 @@ enum MediaType {
 
 abstract class ContentSupplier {
   String get name;
-  List<String> get channels => const [];
+  Set<String> get channels => const {};
+  Set<String> get defaultChannels => const {};
   Set<ContentType> get supportedTypes => const {};
   Future<List<ContentSearchResult>> search(
     String query,

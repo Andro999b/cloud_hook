@@ -3,6 +3,7 @@ import 'package:cloud_hook/home/recomendations/recomendations.dart';
 import 'package:cloud_hook/layouts/general_layout.dart';
 import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class HomeScrean extends StatelessWidget {
   const HomeScrean({super.key});
@@ -14,7 +15,7 @@ class HomeScrean extends StatelessWidget {
     return GeneralLayout(
       selectedIndex: 0,
       child: ListView(
-        padding: EdgeInsets.only(left: paddings),
+        padding: EdgeInsets.only(top: paddings),
         children: const [CollectionContinueView(), Recommendations()],
       ),
     );

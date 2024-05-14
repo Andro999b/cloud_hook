@@ -60,7 +60,7 @@ class MainApp extends StatelessWidget {
           // initialLocation: "/collection",
           // initialLocation: "/settings",
           // initialLocation:
-          // "/content/AnimeUAClub/7771-houkago-shounen-hanako-kun",
+          //     "/content/AnimeUAClub/7771-houkago-shounen-hanako-kun",
           // initialLocation: "/video/UAFilmsTV/18323-utawarerumono",
           routes: [
             GoRoute(

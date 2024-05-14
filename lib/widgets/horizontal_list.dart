@@ -1,3 +1,4 @@
+import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
 
 class HorizontalList extends StatelessWidget {
@@ -14,11 +15,12 @@ class HorizontalList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final paddings = getPadding(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: paddings),
           child: Text(
             title,
             style: Theme.of(context).textTheme.titleMedium,
@@ -27,7 +29,7 @@ class HorizontalList extends StatelessWidget {
         SizedBox(
           height: 300,
           child: ListView.builder(
-            padding: const EdgeInsets.only(bottom: 8),
+            padding: EdgeInsets.only(bottom: 8, left: paddings),
             scrollDirection: Axis.horizontal,
             itemBuilder: itemBuilder,
             itemCount: itemCount,

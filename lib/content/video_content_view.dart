@@ -384,12 +384,14 @@ class _Title extends _MediaCollectionItemConsumerWidger {
       title += " - ${currentItem.currentItem + 1} / $playlistSize";
     }
 
-    return Text(
-      title,
-      style: const TextStyle(
-        height: 1.0,
-        fontSize: 22.0,
-        color: Colors.white,
+    return Flexible(
+      child: Text(
+        title,
+        style: const TextStyle(
+          height: 1.0,
+          fontSize: 22.0,
+          color: Colors.white,
+        ),
       ),
     );
   }

@@ -23,6 +23,7 @@ class ContentDetailsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final size = MediaQuery.of(context).size;
+    final mobile = isMobile(context);
 
     return Container(
       height: size.height,
@@ -30,47 +31,18 @@ class ContentDetailsView extends ConsumerWidget {
       decoration: BoxDecoration(
         image: DecorationImage(
           image: FastCachedImageProvider(contentDetails.image),
-          alignment: Alignment.centerRight,
-          fit: BoxFit.fitHeight,
+          alignment: mobile ? Alignment.topCenter : Alignment.centerRight,
+          fit: mobile ? BoxFit.fitWidth : BoxFit.fitHeight,
         ),
       ),
-      child: Stack(
-        children: [
-          _renderGradient(context),
-          SingleChildScrollView(
-            child: _renderMainInfo(context),
-          ),
-        ],
+      child: SingleChildScrollView(
+        child: _renderMainInfo(context),
       ),
     );
   }
 
-  Widget _renderGradient(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      constraints: BoxConstraints(
-        minWidth: mobileWidth,
-        maxWidth: _calcMaxWidth(context),
-      ),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          stops: const [0, 0.9, 1.0],
-          colors: [
-            theme.colorScheme.background.withOpacity(0.5),
-            theme.colorScheme.background.withOpacity(0.3),
-            theme.colorScheme.background.withOpacity(0),
-          ],
-        ),
-      ),
-    );
-  }
-
-  double _calcMaxWidth(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    var maxWidth =
-        isMobile(context) ? size.width : size.width - size.height * .85;
+  double _calcMaxWidth(Size size, bool mobile) {
+    var maxWidth = mobile ? size.width : size.width - size.height * .95;
 
     if (maxWidth < mobileWidth) {
       maxWidth = mobileWidth;
@@ -82,53 +54,90 @@ class ContentDetailsView extends ConsumerWidget {
   Widget _renderMainInfo(BuildContext context) {
     final paddings = getPadding(context);
     final mobile = isMobile(context);
+    final size = MediaQuery.of(context).size;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      padding: mobile ? EdgeInsets.all(paddings) : null,
-      constraints: BoxConstraints(
-        minWidth: mobileWidth,
-        maxWidth: _calcMaxWidth(context),
-      ),
+    final bottomPart = Container(
+      padding: mobile ? EdgeInsets.symmetric(horizontal: paddings) : null,
+      decoration: BoxDecoration(color: colorScheme.background),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: 8),
-          _renderTitile(context),
-          SizedBox(height: mobile ? 240 : paddings * 2),
           _ContentWatchButtons(contentDetails),
           _MediaCollectionItemButtons(contentDetails),
           if (contentDetails.additionalInfo.isNotEmpty)
             ..._renderAdditionalInfo(context),
           SizedBox(height: paddings),
           _renderDescription(context),
-          if (contentDetails.similar.isNotEmpty) ..._renderSimilar(context)
+          if (contentDetails.similar.isNotEmpty) ..._renderSimilar(context),
+          const SizedBox(height: 8),
         ],
+      ),
+    );
+
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Container(
+        constraints: BoxConstraints(
+          minWidth: mobileWidth,
+          maxWidth: _calcMaxWidth(size, mobile),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _renderTitile(context),
+            if (mobile) SizedBox(height: size.height * .40),
+            bottomPart
+          ],
+        ),
       ),
     );
   }
 
   Widget _renderTitile(BuildContext context) {
     final theme = Theme.of(context);
+    final mobile = isMobile(context);
 
     final title = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const SizedBox(height: 8),
         SelectableText(
           contentDetails.title,
-          style: theme.textTheme.headlineLarge?.copyWith(height: 1),
+          style: theme.textTheme.headlineLarge?.copyWith(
+            height: 1,
+            color: mobile ? Colors.white : null,
+          ),
         ),
         if (contentDetails.originalTitle != null)
           SelectableText(
             contentDetails.originalTitle!,
-            style: theme.textTheme.bodyMedium,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: mobile ? Colors.white : null,
+            ),
           ),
+        const SizedBox(height: 8),
       ],
     );
 
-    if (isMobile(context)) {
-      return Row(
-        children: [const BackNavButton(), Flexible(child: title)],
+    if (mobile) {
+      return Container(
+        padding: mobile ? const EdgeInsets.symmetric(horizontal: 8) : null,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.black54, Colors.transparent],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Row(
+          children: [
+            const BackNavButton(color: Colors.white),
+            Flexible(child: title)
+          ],
+        ),
       );
     }
 
@@ -159,10 +168,7 @@ class ContentDetailsView extends ConsumerWidget {
       trimLines: 4,
       trimCollapsedText: AppLocalizations.of(context)!.readMore,
       trimExpandedText: AppLocalizations.of(context)!.readLess,
-      style: theme.textTheme.bodyLarge?.copyWith(
-        fontWeight: FontWeight.w300,
-        inherit: true,
-      ),
+      style: theme.textTheme.bodyLarge?.copyWith(inherit: true),
     );
   }
 
@@ -178,6 +184,7 @@ class ContentDetailsView extends ConsumerWidget {
       ),
       SizedBox(height: paddings),
       Wrap(
+        runSpacing: 6,
         children: contentDetails.similar
             .map(
               (e) => ContentInfoCard(

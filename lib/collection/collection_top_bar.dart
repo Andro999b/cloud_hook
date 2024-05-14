@@ -13,6 +13,7 @@ class CollectionTopBar extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final paddings = getPadding(context);
+    final mobile = isMobile(context);
     final controller = useTextEditingController(
       text: ref.read(collectionFilterQueryProvider),
     );
@@ -22,12 +23,17 @@ class CollectionTopBar extends HookConsumerWidget {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: paddings),
+          padding: EdgeInsets.only(
+            top: 8,
+            bottom: 8,
+            right: paddings,
+            left: mobile ? 0 : paddings,
+          ),
           child: Row(
             children: [
-              if (isMobile(context))
+              if (mobile)
                 const Padding(
-                  padding: EdgeInsets.only(right: 8.0),
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
                   child: AuthIcon(),
                 ),
               Expanded(

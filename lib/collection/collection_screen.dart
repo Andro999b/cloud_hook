@@ -6,8 +6,8 @@ import 'package:cloud_hook/collection/widgets/priority_selector.dart';
 import 'package:cloud_hook/collection/widgets/status_selector.dart';
 import 'package:cloud_hook/content/content_info_card.dart';
 import 'package:cloud_hook/layouts/general_layout.dart';
-import 'package:cloud_hook/utils/visual.dart';
 import 'package:cloud_hook/widgets/horizontal_list.dart';
+import 'package:cloud_hook/widgets/use_search_hint.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -41,10 +41,17 @@ class CollectionHorizontalView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final paddings = getPadding(context);
+    final collections = ref.watch(collectionProvider).valueOrNull;
+
+    if (collections == null) {
+      return const SizedBox.shrink();
+    }
+
+    if (collections.isEmpty) {
+      return const UseSearchHint();
+    }
 
     return ListView(
-      padding: EdgeInsets.only(left: paddings),
       children:
           groupsOrder.map((e) => CollectionHorizontalGroup(status: e)).toList(),
     );

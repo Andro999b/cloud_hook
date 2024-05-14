@@ -53,14 +53,19 @@ class UAFilmsTVSupplier extends ContentSupplier {
   String get name => "UAFilmsTV";
 
   @override
-  List<String> channels = const [
+  Set<String> channels = const {
     "Новинки",
     "Фільми",
     "Серіали",
     "Мультфільми",
     "Мультсеріали",
     "Аніме"
-  ];
+  };
+
+  @override
+  Set<String> get defaultChannels => const {
+        "Новинки",
+      };
 
   @override
   Set<ContentType> get supportedTypes => const {

@@ -3,7 +3,6 @@ import 'package:cloud_hook/content/content_info_card.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/search/search_model.dart';
 import 'package:cloud_hook/search/search_provider.dart';
-import 'package:cloud_hook/utils/visual.dart';
 import 'package:cloud_hook/widgets/horizontal_list.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -27,7 +26,6 @@ class SearchResultsView extends HookConsumerWidget {
   }
 
   Widget _renderResults(BuildContext context, SearchState searchState) {
-    final paddings = getPadding(context);
     final suppliersWithResult =
         searchState.results.entries.where((r) => r.value.isNotEmpty);
 
@@ -45,7 +43,6 @@ class SearchResultsView extends HookConsumerWidget {
 
     // loading providers
     return ListView(
-      padding: EdgeInsets.only(left: paddings),
       children: [
         ...suppliersWithResult
             .map((e) => _renderSupplierResults(context, e.key, e.value)),

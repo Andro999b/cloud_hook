@@ -1,7 +1,7 @@
 {
     "home": "Головна",
     "search": "Пошук",
-    "collection": "Коллекці",
+    "collection": "Коллекція",
     "settings": "Налаштунки",
     "searchNoResults": "Нічого не знайдено по запиту",
     "readMore": "читати більше",
@@ -22,7 +22,7 @@
     "priorityTooltip": "Приоритет: {priority}",
     "settingsTheme": "Тема",
     "settingsThemeLight": "Світла",
-    "settingsThemeSystem": "Системна",
+    "settingsThemeSystem": "Авто",
     "settingsThemeDark": "Темна",
     "settingsColor": "Колір",
     "singOut": "Вийти",
