@@ -19,8 +19,6 @@ class ContentInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return HorizontalListCard(
       onTap: onTap,
       decoration: BoxDecoration(
@@ -30,23 +28,11 @@ class ContentInfoCard extends StatelessWidget {
           alignment: Alignment.topCenter,
         ),
       ),
+      corner: corner,
       child: Column(
         children: [
-          Expanded(
-            child: corner != null
-                ? Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: corner,
-                    ),
-                  )
-                : const SizedBox.shrink(),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-            ),
+          const Spacer(),
+          Material(
             child: ListTile(
               mouseCursor: SystemMouseCursors.click,
               title: Text(

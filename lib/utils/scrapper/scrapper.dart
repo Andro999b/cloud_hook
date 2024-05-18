@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_hook/utils/logger.dart';
 import 'package:cloud_hook/utils/scrapper/selectors.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
@@ -51,6 +52,8 @@ class Scrapper {
       options: Options(
         method: method,
         headers: {...defaultHeaders, ...headers},
+        sendTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
       ),
       data: form != null
           ? FormData.fromMap(form!, ListFormat.multiCompatible)
@@ -58,5 +61,17 @@ class Scrapper {
     );
 
     return resposnse.data;
+  }
+
+  static FutureOr<R?> scrapFragment<R>(
+      String text, String root, Selector<R> selector) async {
+    final rootElement = parser.parseFragment(text).querySelector(root);
+
+    if (rootElement == null) {
+      logger.w("Root element $root not found");
+      return null;
+    }
+
+    return selector.select(rootElement);
   }
 }

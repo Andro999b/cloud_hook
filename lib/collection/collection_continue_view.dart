@@ -32,7 +32,12 @@ class CollectionContinueView extends ConsumerWidget {
     }
 
     return HorizontalList(
-      title: title!,
+      title: Focus(
+        child: Text(
+          title!,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
       itemBuilder: (context, index) {
         final item = items![index];
 
@@ -49,7 +54,10 @@ class CollectionContinueView extends ConsumerWidget {
 
   Widget _renderEmptyCollection(BuildContext context) {
     return HorizontalList(
-      title: AppLocalizations.of(context)!.collectionBegin,
+      title: Text(
+        AppLocalizations.of(context)!.collectionBegin,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
       itemBuilder: (context, index) => HorizontalListCard(
         onTap: () {
           context.go("/search");

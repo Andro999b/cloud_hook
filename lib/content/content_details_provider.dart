@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'content_details_provider.g.dart';
@@ -32,7 +31,7 @@ Future<ContentDetails> details(DetailsRef ref, String supplier, String id) {
 
 @riverpod
 Future<(ContentDetails, List<ContentMediaItem>)> detailsAndMedia(
-  Ref ref,
+  DetailsAndMediaRef ref,
   String supplier,
   String id,
 ) async {

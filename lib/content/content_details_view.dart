@@ -42,7 +42,7 @@ class ContentDetailsView extends ConsumerWidget {
   }
 
   double _calcMaxWidth(Size size, bool mobile) {
-    var maxWidth = mobile ? size.width : size.width - size.height * .95;
+    var maxWidth = mobile ? size.width : size.width - size.height * .85;
 
     if (maxWidth < mobileWidth) {
       maxWidth = mobileWidth;
@@ -59,7 +59,7 @@ class ContentDetailsView extends ConsumerWidget {
 
     final bottomPart = Container(
       padding: mobile ? EdgeInsets.symmetric(horizontal: paddings) : null,
-      decoration: BoxDecoration(color: colorScheme.background),
+      decoration: mobile ? BoxDecoration(color: colorScheme.surface) : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -141,7 +141,7 @@ class ContentDetailsView extends ConsumerWidget {
       );
     }
 
-    return title;
+    return Focus(child: title);
   }
 
   List<Widget> _renderAdditionalInfo(BuildContext context) {
@@ -153,7 +153,7 @@ class ContentDetailsView extends ConsumerWidget {
         spacing: 6,
         runSpacing: 6,
         children: contentDetails.additionalInfo
-            .map((e) => Chip(label: Text(e.replaceAll('\n', ' '))))
+            .map((e) => Chip(label: Text(e)))
             .toList(),
       )
     ];
@@ -209,17 +209,28 @@ class _ContentWatchButtons extends HookWidget {
   Widget build(BuildContext context) {
     final paddings = getPadding(context);
 
-    final mediaItemsFeature = useMemoized(() => contentDetails.mediaItems);
-    final snapshot = useFuture(mediaItemsFeature);
+    final mediaItemsFuture = useMemoized(
+      () => Future.value(contentDetails.mediaItems),
+    );
+    final snapshot = useFuture(mediaItemsFuture);
 
-    if (snapshot.connectionState == ConnectionState.waiting ||
-        !snapshot.hasData) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
       return const SizedBox(
         height: 40,
         width: 40,
         child: Padding(
           padding: EdgeInsets.all(8.0),
           child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (snapshot.hasError) {
+      var theme = Theme.of(context);
+      return Text(
+        snapshot.error.toString(),
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.error,
         ),
       );
     }

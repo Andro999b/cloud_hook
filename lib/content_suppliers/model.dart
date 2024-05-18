@@ -29,7 +29,9 @@ abstract class ContentSupplier {
     Set<ContentType> type,
   ) async =>
       const [];
-  Future<SupplierChannels> loadChannels(Set<String> channels) async => const {};
+
+  Future<List<ContentInfo>> loadChannel(String channel, {int page = 0}) async =>
+      const [];
   Future<ContentDetails> detailsById(String id);
 }
 
@@ -51,7 +53,7 @@ mixin ContentMediaItem {
 
 mixin ContentMediaItemSource {
   String get description;
-  Uri get link;
+  FutureOr<Uri> get link;
   Map<String, String>? get headers;
 }
 
@@ -65,7 +67,7 @@ mixin ContentDetails {
   MediaType get mediaType;
   List<String> get additionalInfo;
   List<ContentInfo> get similar;
-  Future<Iterable<ContentMediaItem>> get mediaItems;
+  FutureOr<Iterable<ContentMediaItem>> get mediaItems;
 }
 
 @immutable
@@ -121,7 +123,7 @@ abstract class BaseContentDetails extends Equatable with ContentDetails {
   @override
   MediaType get mediaType => MediaType.video;
   @override
-  Future<Iterable<ContentMediaItem>> get mediaItems => Future.value(const []);
+  FutureOr<Iterable<ContentMediaItem>> get mediaItems => Future.value(const []);
 
   BaseContentDetails({
     required this.id,
@@ -147,6 +149,64 @@ abstract class BaseContentDetails extends Equatable with ContentDetails {
       ];
 }
 
+abstract class BasicContentMediaItem extends Equatable with ContentMediaItem {
+  @override
+  final int number;
+  @override
+  final String title;
+  @override
+  final String? section;
+  @override
+  final String? image;
+
+  const BasicContentMediaItem({
+    required this.number,
+    required this.title,
+    this.section,
+    this.image,
+  });
+
+  @override
+  List<Object?> get props => [number];
+}
+
+typedef ContentItemMediaSourceLoader = Future<List<ContentMediaItemSource>>
+    Function();
+
+// ignore: must_be_immutable
+class AsyncContentMediaItem extends BasicContentMediaItem {
+  List<ContentMediaItemSource>? _cachedSources;
+
+  @override
+  Future<List<ContentMediaItemSource>> get sources async =>
+      _cachedSources ??= await sourcesLoader();
+
+  final ContentItemMediaSourceLoader sourcesLoader;
+
+  AsyncContentMediaItem({
+    required super.number,
+    required super.title,
+    required this.sourcesLoader,
+    super.section,
+    super.image,
+  });
+}
+
+@immutable
+class SimpleContentMediaItem extends BasicContentMediaItem {
+  @override
+  final List<ContentMediaItemSource> sources;
+
+  const SimpleContentMediaItem({
+    required super.number,
+    required super.title,
+    required this.sources,
+    super.section,
+    super.image,
+  });
+}
+
+@immutable
 class SimpleContentMediaItemSource extends Equatable
     with ContentMediaItemSource {
   @override
@@ -156,39 +216,39 @@ class SimpleContentMediaItemSource extends Equatable
   @override
   final Map<String, String>? headers;
 
-  SimpleContentMediaItemSource({
+  const SimpleContentMediaItemSource({
     required this.description,
     required this.link,
     this.headers,
   });
 
   @override
-  List<Object?> get props => [description, link, headers];
+  List<Object?> get props => [link, headers];
 }
 
-@immutable
-class SimpleContentMediaItem extends Equatable with ContentMediaItem {
-  @override
-  final int number;
-  @override
-  final String title;
-  @override
-  final List<ContentMediaItemSource> sources;
-  @override
-  final String? section;
-  @override
-  final String? image;
+typedef ContentItemMediaSourceLinkLoader = Future<Uri> Function();
 
-  const SimpleContentMediaItem({
-    required this.number,
-    required this.title,
-    required this.sources,
-    this.section,
-    this.image,
+// ignore: must_be_immutable
+class AsyncContentMediaItemSource extends Equatable
+    with ContentMediaItemSource {
+  @override
+  final String description;
+  @override
+  final Map<String, String>? headers;
+
+  Uri? _linkLoader;
+
+  ContentItemMediaSourceLinkLoader linkLoader;
+
+  @override
+  Future<Uri> get link async => _linkLoader ??= await linkLoader();
+
+  AsyncContentMediaItemSource({
+    required this.description,
+    required this.linkLoader,
+    this.headers,
   });
 
   @override
-  List<Object?> get props => [number, title, sources, section, image];
+  List<Object?> get props => [link, headers];
 }
-
-typedef SupplierChannels = Map<String, List<ContentInfo>>;

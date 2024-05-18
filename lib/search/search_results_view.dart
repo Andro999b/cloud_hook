@@ -59,7 +59,10 @@ class SearchResultsView extends HookConsumerWidget {
   Widget _renderSupplierResults(
       BuildContext context, String key, List<ContentSearchResult> value) {
     return HorizontalList(
-      title: key,
+      title: Text(
+        key,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
       itemBuilder: (context, index) {
         final item = value[index];
 

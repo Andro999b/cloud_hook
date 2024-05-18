@@ -1,48 +1,38 @@
 import 'package:cloud_hook/content/content_info_card.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/home/recomendations/recomendations_provider.dart';
+import 'package:cloud_hook/settings/recomendations/recomendations_settings_provider.dart';
 import 'package:cloud_hook/utils/visual.dart';
-import 'package:cloud_hook/widgets/display_error.dart';
 import 'package:cloud_hook/widgets/horizontal_list.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class Recommendations extends ConsumerWidget {
   const Recommendations({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final recomendationsAsync = ref.watch(recomendationsProvider);
-    return recomendationsAsync.when(
-      data: (data) => _renderRecomendations(context, data),
-      error: (error, stackTrace) => DisplayError(
-        error: error,
-        stackTrace: stackTrace,
-      ),
-      loading: () => const SizedBox.shrink(),
-    );
-  }
+    final settings = ref.watch(recomendationSettingsProvider);
 
-  Widget _renderRecomendations(
-    BuildContext context,
-    Map<String, SupplierChannels> data,
-  ) {
     final theme = Theme.of(context);
     final paddings = getPadding(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: data.entries
-          .where((e) => e.value.isNotEmpty)
+      children: settings.configs.entries
+          .where((e) => e.value.enabled && e.value.channels.isNotEmpty)
           .map(
             (e) => [
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: paddings),
                 child: Text(e.key, style: theme.textTheme.titleLarge),
               ),
-              ...e.value.entries.map(
-                (channel) => _renderChannel(channel.key, channel.value),
+              ...e.value.channels.map(
+                (channel) => _RecomendationChannel(
+                  supplierName: e.key,
+                  channel: channel,
+                ),
               ),
             ],
           )
@@ -50,12 +40,49 @@ class Recommendations extends ConsumerWidget {
           .toList(),
     );
   }
+}
 
-  HorizontalList _renderChannel(String channelName, List<ContentInfo> items) {
+class _RecomendationChannel extends HookConsumerWidget {
+  final String supplierName;
+  final String channel;
+
+  const _RecomendationChannel({
+    required this.supplierName,
+    required this.channel,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    var provider = recomendationChannelProvider(supplierName, channel);
+    final state = ref.watch(provider).valueOrNull;
+
+    if (state == null) {
+      return const SizedBox.shrink();
+    }
+
+    final scrollController = useScrollController();
+
+    useEffect(() {
+      void onScroll() {
+        var position = scrollController.position;
+        if (position.pixels == scrollController.position.maxScrollExtent) {
+          ref.read(provider.notifier).loadNext();
+        }
+      }
+
+      scrollController.addListener(onScroll);
+
+      return () => scrollController.removeListener(onScroll);
+    }, [scrollController]);
+
     return HorizontalList(
-      title: channelName,
+      scrollController: scrollController,
+      title: Text(
+        channel,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
       itemBuilder: (context, index) {
-        final item = items[index];
+        final item = state.recomendations[index];
 
         return ContentInfoCard(
           contentInfo: item,
@@ -64,7 +91,7 @@ class Recommendations extends ConsumerWidget {
           },
         );
       },
-      itemCount: items.length,
+      itemCount: state.recomendations.length,
     );
   }
 }

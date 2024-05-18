@@ -57,11 +57,12 @@ class CollectionItemStatusFilter extends _$CollectionItemStatusFilter {
 
 @riverpod
 FutureOr<Map<MediaCollectionItemStatus, List<MediaCollectionItem>>> collection(
-  Ref ref,
+  CollectionRef ref,
 ) async {
   ref.watch(collectionChangesProvider);
 
   final repository = ref.watch(collectionServiceProvider);
+  // ignore: avoid_manual_providers_as_generated_provider_dependency
   final query = ref.watch(collectionFilterQueryProvider);
   final status = ref.watch(collectionItemStatusFilterProvider);
 

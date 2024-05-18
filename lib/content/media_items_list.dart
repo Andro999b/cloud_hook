@@ -121,11 +121,14 @@ class _MediaItemsListView extends StatelessWidget {
           AppLocalizations.of(context)!.episodesList,
           style: theme.textTheme.headlineMedium,
         ),
-        IconButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          icon: const Icon(Icons.close),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.close),
+          ),
         )
       ],
     );
@@ -258,10 +261,9 @@ class _MediaItemsListItem extends StatelessWidget {
 
     return Card.filled(
       clipBehavior: Clip.antiAlias,
-      color: selected
-          ? theme.colorScheme.onInverseSurface
-          : theme.colorScheme.surfaceVariant,
+      color: selected ? theme.colorScheme.onInverseSurface : null,
       child: InkWell(
+        autofocus: selected,
         mouseCursor: SystemMouseCursors.click,
         onTap: onTap,
         child: Row(
@@ -276,8 +278,9 @@ class _MediaItemsListItem extends StatelessWidget {
                         fit: BoxFit.cover,
                       )
                     : null,
-                color:
-                    image == null ? theme.colorScheme.onPrimaryContainer : null,
+                color: image == null
+                    ? theme.colorScheme.surfaceTint.withOpacity(0.5)
+                    : null,
               ),
               child: selected
                   ? const Center(
@@ -292,7 +295,11 @@ class _MediaItemsListItem extends StatelessWidget {
             Expanded(
               child: ListTile(
                 mouseCursor: SystemMouseCursors.click,
-                title: Text(title),
+                title: Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 subtitle: LinearProgressIndicator(
                   value: progress,
                 ),

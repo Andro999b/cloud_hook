@@ -34,10 +34,10 @@ class UAFilmsTVContentDetails extends BaseContentDetails {
 
   @override
   Future<Iterable<ContentMediaItem>> get mediaItems async {
-    _mediaItems ??= await Isolate.run(() => PlayerJSScrapper(
-          uri: Uri.parse(iframe),
-          convertStrategy: DubSeasonEpisodeConvertStrategy(),
-        ).scrap());
+    _mediaItems ??= await Isolate.run(
+      () => PlayerJSScrapper(uri: Uri.parse(iframe))
+          .scrap(DubSeasonEpisodeConvertStrategy()),
+    );
 
     return _mediaItems!;
   }
@@ -47,25 +47,10 @@ class UAFilmsTVContentDetails extends BaseContentDetails {
 }
 
 class UAFilmsTVSupplier extends ContentSupplier {
-  static const String baseUrl = "uafilm.pro";
+  static const String host = "uafilm.pro";
 
   @override
   String get name => "UAFilmsTV";
-
-  @override
-  Set<String> channels = const {
-    "Новинки",
-    "Фільми",
-    "Серіали",
-    "Мультфільми",
-    "Мультсеріали",
-    "Аніме"
-  };
-
-  @override
-  Set<String> get defaultChannels => const {
-        "Новинки",
-      };
 
   @override
   Set<ContentType> get supportedTypes => const {
@@ -75,19 +60,19 @@ class UAFilmsTVSupplier extends ContentSupplier {
         ContentType.anime,
       };
 
-  late final _movieItemSelector = IterateOverScope(
+  late final _contentInfoSelector = IterateOverScope(
     itemScope: ".movie-item",
     item: SelectorsToMap({
       "supplier": Const(name),
       "id": UrlId.forScope("a.movie-title"),
       "title": Text.forScope("a.movie-title"),
-      "subtitle": Concat([
+      "subtitle": ConcatSelectors([
         Text.forScope(".movie-img>span"),
         Text.forScope(".movie-img>.movie-series"),
       ]),
       "image": Image.forScope(
         ".movie-img img",
-        baseUrl,
+        host,
         attribute: "data-src",
       ),
     }),
@@ -98,7 +83,7 @@ class UAFilmsTVSupplier extends ContentSupplier {
     String query,
     Set<ContentType> type,
   ) async {
-    final uri = Uri.https(baseUrl, "/index.php", {"do": "search"});
+    final uri = Uri.https(host, "/index.php", {"do": "search"});
 
     final scrapper = Scrapper(
       uri: uri,
@@ -117,35 +102,35 @@ class UAFilmsTVSupplier extends ContentSupplier {
           "catlist": [
             if (type.contains(ContentType.movie)) "1",
             if (type.contains(ContentType.series)) "3",
-            if (type.contains(ContentType.anime)) "46",
+            if (type.contains(ContentType.anime)) "44",
             if (type.contains(ContentType.cartoon)) ...["2", "46"],
           ],
       },
     );
 
-    final results = await scrapper.scrap(_movieItemSelector);
+    final results = await scrapper.scrap(_contentInfoSelector);
 
-    return results.map((e) => ContentSearchResult.fromJson(e)).toList();
+    return results.map(ContentSearchResult.fromJson).toList();
   }
 
   @override
   Future<ContentDetails> detailsById(String id) async {
-    final scrapper = Scrapper(uri: Uri.https(baseUrl, "/$id.html"));
+    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html"));
 
     final result = await scrapper.scrap(Scope(
       scope: "#dle-content",
       item: SelectorsToMap(
         {
-          "id": Const(id),
+          "id": Const(Uri.encodeComponent(id)),
           "supplier": Const(name),
           "title": Text.forScope("h1[itemprop='name']"),
           "originalTitle":
               Text.forScope("span[itemprop='alternativeHeadline']"),
-          "image": Image.forScope(".m-img>img", baseUrl),
+          "image": Image.forScope(".m-img>img", host),
           "description": TextNodes.forScope(".m-desc"),
           "additionalInfo": IterateOverScope(
             itemScope: ".m-desc>.m-info>.m-info>.mi-item",
-            item: Concat(
+            item: ConcatSelectors(
               [Text.forScope(".mi-label-desc"), Text.forScope(".mi-desc")],
             ),
           ),
@@ -155,7 +140,7 @@ class UAFilmsTVSupplier extends ContentSupplier {
               "id": UrlId(),
               "supplier": Const(name),
               "title": Text.forScope(".rel-movie-title"),
-              "image": Image.forScope("img", baseUrl, attribute: "data-src"),
+              "image": Image.forScope("img", host, attribute: "data-src"),
             }),
           ),
           "iframe": Attribute.forScope(".player-box>iframe", "src")
@@ -166,32 +151,38 @@ class UAFilmsTVSupplier extends ContentSupplier {
     return UAFilmsTVContentDetails.fromJson(result);
   }
 
-  @override
-  Future<SupplierChannels> loadChannels(
-    Set<String> channels,
-  ) async {
-    return {
-      for (final channel in channels) channel: await _loadChannel(channel)
-    };
-  }
+  final Map<String, String> _channelsPath = {
+    "Новинки": "/year/${DateTime.now().year}/page/",
+    "Фільми": "/filmys/page/",
+    "Серіали": "/serialy/page/",
+    "Мультфільми": "/cartoons/page/",
+    "Мультсеріали": "/multserialy/page/",
+    "Аніме": "/anime/page/"
+  };
 
-  Future<List<ContentInfo>> _loadChannel(String channel) async {
-    final path = switch (channel) {
-      "Новинки" => "/year/${DateTime.now().year}/",
-      "Фільми" => "/filmys/",
-      "Серіали" => "/serialy/",
-      "Мультфільми" => "/cartoons/",
-      "Мультсеріали" => "/multserialy/",
-      "Аніме" => "/anime/",
-      _ => null
-    };
+  @override
+  Set<String> get channels => _channelsPath.keys.toSet();
+
+  @override
+  Set<String> get defaultChannels => const {"Новинки"};
+
+  @override
+  Future<List<ContentInfo>> loadChannel(String channel, {page = 1}) async {
+    final path = _channelsPath[channel];
 
     if (path == null) {
       return const [];
     }
 
-    final scrapper = Scrapper(uri: Uri.https(baseUrl, path));
-    final results = await scrapper.scrap(_movieItemSelector);
+    var tragetPath = path;
+    if (path.endsWith("/page/")) {
+      tragetPath += page.toString();
+    } else if (page > 1) {
+      return [];
+    }
+
+    final scrapper = Scrapper(uri: Uri.https(host, tragetPath));
+    final results = await scrapper.scrap(_contentInfoSelector);
 
     return results.map((e) => ContentSearchResult.fromJson(e)).toList();
   }

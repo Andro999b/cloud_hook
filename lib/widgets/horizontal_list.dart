@@ -2,8 +2,9 @@ import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
 
 class HorizontalList extends StatelessWidget {
-  final String title;
+  final Widget title;
   final NullableIndexedWidgetBuilder itemBuilder;
+  final ScrollController? scrollController;
   final int itemCount;
 
   const HorizontalList({
@@ -11,6 +12,7 @@ class HorizontalList extends StatelessWidget {
     required this.title,
     required this.itemBuilder,
     required this.itemCount,
+    this.scrollController,
   });
 
   @override
@@ -21,14 +23,12 @@ class HorizontalList extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: paddings),
-          child: Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          child: title,
         ),
         SizedBox(
           height: 300,
           child: ListView.builder(
+            controller: scrollController,
             padding: EdgeInsets.only(bottom: 8, left: paddings),
             scrollDirection: Axis.horizontal,
             itemBuilder: itemBuilder,

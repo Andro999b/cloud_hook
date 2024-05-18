@@ -2,6 +2,8 @@ import 'dart:isolate';
 
 import 'package:cloud_hook/content_suppliers/impl/animeua_club.dart';
 import 'package:cloud_hook/content_suppliers/impl/ua_films_tv.dart';
+import 'package:cloud_hook/content_suppliers/impl/uakino_club.dart';
+import 'package:cloud_hook/content_suppliers/impl/ufdub.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/logger.dart';
 
@@ -12,7 +14,9 @@ class ContentSuppliers {
 
   final List<ContentSupplier> suppliers = List.unmodifiable([
     UAFilmsTVSupplier(),
+    UAKinoClubSupplier(),
     AnimeUAClubSupplier(),
+    UFDubSupplier(),
   ]);
 
   Set<String> get suppliersName => suppliers.map((i) => i.name).toSet();
@@ -52,28 +56,19 @@ class ContentSuppliers {
     yield results;
   }
 
-  Stream<Map<String, SupplierChannels>> loadRecomendations(
-    Map<String, Set<String>> config,
-  ) async* {
-    final results = <String, SupplierChannels>{};
-    for (final MapEntry(key: supplierName, value: channels) in config.entries) {
-      final supplier = getSupplier(supplierName);
-      if (supplier != null) {
-        try {
-          results[supplierName] = await Isolate.run(
-            () => supplier.loadChannels(channels),
-          );
-        } catch (error, stackTrace) {
-          logger.e(
-            "Supplier $supplierName fail to load recomendation channels: $channels",
-            error: error,
-            stackTrace: stackTrace,
-          );
-        }
-        yield results;
-      }
+  Future<List<ContentInfo>> loadRecomendationsChannel(
+      String supplierName, String channel,
+      {page = 1}) async {
+    logger.i(
+        "Loading content supplier: $supplierName recommendations channel: $channel");
+
+    final supplier = getSupplier(supplierName);
+
+    if (supplier == null) {
+      return [];
     }
-    yield results;
+
+    return Isolate.run(() => supplier.loadChannel(channel, page: page));
   }
 
   Future<ContentDetails> detailsById(String supplierName, String id) async {

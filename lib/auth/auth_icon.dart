@@ -11,7 +11,7 @@ class AuthIcon extends ConsumerWidget {
   Widget _renderUser(BuildContext context, WidgetRef ref, User user) {
     return MenuAnchor(
       builder: (context, controller, child) {
-        return GestureDetector(
+        return InkResponse(
           onTap: () {
             if (controller.isOpen) {
               controller.close();
@@ -19,11 +19,13 @@ class AuthIcon extends ConsumerWidget {
               controller.open();
             }
           },
+          radius: 25,
           child: MouseRegion(
             cursor: SystemMouseCursors.click,
             child: Tooltip(
               message: user.name,
               child: CircleAvatar(
+                radius: 20,
                 backgroundImage:
                     user.picture != null ? NetworkImage(user.picture!) : null,
               ),
@@ -31,8 +33,7 @@ class AuthIcon extends ConsumerWidget {
           ),
         );
       },
-      style: const MenuStyle(alignment: Alignment.topRight),
-      alignmentOffset: const Offset(8, 0),
+      style: const MenuStyle(alignment: Alignment.bottomLeft),
       menuChildren: [
         MenuItemButton(
           onPressed: () => CollectionSync.run(),

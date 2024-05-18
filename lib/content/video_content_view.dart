@@ -134,6 +134,13 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
 
   @override
   Widget build(BuildContext context) {
+    // final mobileThemeData = _createMobileThemeData();
+    // return MaterialVideoControlsTheme(
+    //   normal: mobileThemeData,
+    //   fullscreen: mobileThemeData,
+    //   child: _renderVideo(),
+    // );
+
     switch (Theme.of(context).platform) {
       case TargetPlatform.android:
       case TargetPlatform.iOS:
@@ -163,6 +170,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
         controls: (state) {
           // dirty hack to catch vieo state for fullscreen
           videoState.value = state;
+          // return MaterialVideoControls(state);
           return AdaptiveVideoControls(state);
         },
       ),
@@ -213,6 +221,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
       ],
       seekGesture: true,
       seekOnDoubleTap: true,
+      seekBarAlignment: Alignment.topCenter,
     );
   }
 
@@ -232,7 +241,6 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
           playlistSize: widget.mediaItems.length,
           provider: provider,
         ),
-        const Spacer(),
         if (widget.mediaItems.length > 1)
           _PlaylistButton(
             mediaItems: widget.mediaItems,
@@ -278,15 +286,20 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
       final sourceIndex = sourceIdx >= sources.length ? 0 : sourceIdx;
       final source = sources[sourceIndex];
 
+      final link = await source.link;
+
       final media = Media(
-        source.link.toString(),
+        link.toString(),
         httpHeaders: source.headers,
         start: Duration(seconds: progress.currentPosition),
       );
 
       await player.open(media);
     } on Exception catch (e, stackTrace) {
+      // TODO: Show toast
       logger.e("Fail to play", error: e, stackTrace: stackTrace);
+      player.stop();
+      rethrow;
     }
   }
 
@@ -307,7 +320,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
   }
 
   void _setItemIdx(int itemIdx) {
-    if (_isValidItemIdx(itemIdx)) {
+    if (!_isValidItemIdx(itemIdx)) {
       return;
     }
 
@@ -384,7 +397,7 @@ class _Title extends _MediaCollectionItemConsumerWidger {
       title += " - ${currentItem.currentItem + 1} / $playlistSize";
     }
 
-    return Flexible(
+    return Expanded(
       child: Text(
         title,
         style: const TextStyle(
@@ -392,6 +405,8 @@ class _Title extends _MediaCollectionItemConsumerWidger {
           fontSize: 22.0,
           color: Colors.white,
         ),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

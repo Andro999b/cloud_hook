@@ -58,9 +58,8 @@ class MainApp extends StatelessWidget {
           navigatorKey: _rootNavigatorKey,
           // initialLocation: "/search",
           // initialLocation: "/collection",
-          // initialLocation: "/settings",
-          // initialLocation:
-          //     "/content/AnimeUAClub/7771-houkago-shounen-hanako-kun",
+          // // initialLocation: "/settings",
+          // initialLocation: "/content/UAKinoClub/franchise%2F140-shrek",
           // initialLocation: "/video/UAFilmsTV/18323-utawarerumono",
           routes: [
             GoRoute(

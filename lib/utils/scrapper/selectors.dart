@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_hook/utils/logger.dart';
 import 'package:cloud_hook/utils/url_utils.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -33,6 +34,7 @@ class Scope<R> extends Selector<R> {
     final scopedElement = element.querySelector(scope);
 
     if (scopedElement == null) {
+      logger.w("Scope not found: $scope");
       return Future.value(defaultValue);
     }
 
@@ -74,29 +76,43 @@ class Transform<T, E> extends Selector<T> {
   }
 }
 
-class Text extends Selector<String?> {
+class Text extends Selector<String> {
+  final bool inline;
+
+  Text({this.inline = false});
+
   @override
-  FutureOr<String?> select(dom.Element element) {
-    return element.text.trim();
+  FutureOr<String> select(dom.Element element) {
+    final text = element.text.trim();
+    if (inline) {
+      return text.replaceAll('\n', ' ');
+    }
+    return text;
   }
 
-  static Selector<String?> forScope(String scope) {
-    return Scope(scope: scope, item: Text(), defaultValue: "");
+  static Selector<String?> forScope(String scope, {inline = false}) {
+    return Scope(scope: scope, item: Text(inline: inline), defaultValue: "");
   }
 }
 
-class TextNodes extends Selector<String?> {
+class TextNodes extends Selector<String> {
+  final bool inline;
+
+  TextNodes({this.inline = false});
+
   @override
-  FutureOr<String?> select(dom.Element element) {
+  FutureOr<String> select(dom.Element element) {
     return element.nodes
         .where((node) => node.nodeType == dom.Node.TEXT_NODE)
         .map((node) => node.text?.trim())
         .nonNulls
-        .join("\n");
+        .join(inline ? " " : "\n")
+        .trim();
   }
 
-  static Selector<String?> forScope(String scope) {
-    return Scope(scope: scope, item: TextNodes(), defaultValue: "");
+  static Selector<String?> forScope(String scope, {inline = false}) {
+    return Scope(
+        scope: scope, item: TextNodes(inline: inline), defaultValue: "");
   }
 }
 
@@ -133,28 +149,42 @@ class Merge<R, E> extends Selector<R> {
   }
 }
 
-class Concat extends Merge<String, Object?> {
-  Concat(Iterable<Selector<Object?>> children, {separator = " "})
+class ConcatSelectors extends Merge<String, Object?> {
+  ConcatSelectors(Iterable<Selector<Object?>> children, {separator = " "})
       : super(
           merge: (result) => result.nonNulls.join(separator),
           children: children,
         );
 }
 
-class ItemsList extends Merge<List<Object?>, Object?> {
-  ItemsList(Iterable<Selector<Object?>> children, {separator = " "})
+class Join extends Merge<List<Object?>, Object?> {
+  Join(Iterable<Selector<Object?>> children)
       : super(
           merge: (result) => result,
           children: children,
         );
 }
 
-class JoinList extends Merge<List<Object?>, List<Object?>> {
-  JoinList(Iterable<Selector<List<Object?>>> children, {separator = " "})
+class Expand extends Merge<List<Object?>, List<Object?>> {
+  Expand(Iterable<Selector<List<Object?>>> children, {separator = " "})
       : super(
           merge: (result) => result.expand((e) => e).toList(),
           children: children,
         );
+}
+
+class Concat extends Selector<String> {
+  final Selector<List<String?>> selector;
+  final String separator;
+
+  Concat(this.selector, {this.separator = ""});
+
+  @override
+  FutureOr<String> select(dom.Element element) async {
+    final res = await selector.select(element);
+
+    return res.nonNulls.where((e) => e.isNotEmpty).join(separator);
+  }
 }
 
 class Image extends Transform<String, String?> {

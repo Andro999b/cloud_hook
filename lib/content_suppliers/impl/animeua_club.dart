@@ -34,17 +34,18 @@ class AnimeUAClubContentDetails extends BaseContentDetails {
 
   @override
   Future<Iterable<ContentMediaItem>> get mediaItems async {
-    _mediaItems ??= await Isolate.run(() => PlayerJSScrapper(
-          uri: Uri.parse(iframe),
-          convertStrategy: DubSeasonEpisodeConvertStrategy(),
-        ).scrap());
+    _mediaItems ??= await Isolate.run(
+      () => PlayerJSScrapper(
+        uri: Uri.parse(iframe),
+      ).scrap(DubSeasonEpisodeConvertStrategy()),
+    );
 
     return _mediaItems!;
   }
 }
 
 class AnimeUAClubSupplier extends ContentSupplier {
-  static const String baseUrl = "animeua.club";
+  static const String host = "animeua.club";
 
   @override
   String get name => "AnimeUAClub";
@@ -52,21 +53,7 @@ class AnimeUAClubSupplier extends ContentSupplier {
   @override
   Set<ContentType> get supportedTypes => const {ContentType.anime};
 
-  @override
-  Set<String> get channels => const {
-        "Новинки",
-        "ТОП 100",
-        "Повнометражки",
-        "Аніме серіали",
-      };
-
-  @override
-  Set<String> get defaultChannels => const {
-        "Новинки",
-        "ТОП 100",
-      };
-
-  late final _movieItemSelector = IterateOverScope(
+  late final _contentInfoSelector = IterateOverScope(
     itemScope: ".grid-item",
     item: SelectorsToMap({
       "supplier": Const(name),
@@ -75,7 +62,7 @@ class AnimeUAClubSupplier extends ContentSupplier {
       "subtitle": Text.forScope(".poster__subtitle"),
       "image": Image.forScope(
         ".poster__img img",
-        baseUrl,
+        host,
         attribute: "data-src",
       ),
     }),
@@ -84,7 +71,7 @@ class AnimeUAClubSupplier extends ContentSupplier {
   @override
   Future<List<ContentSearchResult>> search(
       String query, Set<ContentType> type) async {
-    final uri = Uri.https(baseUrl, "/index.php", {"do": "search"});
+    final uri = Uri.https(host, "/index.php", {"do": "search"});
     final scrapper = Scrapper(
       uri: uri,
       method: "post",
@@ -103,35 +90,39 @@ class AnimeUAClubSupplier extends ContentSupplier {
       },
     );
 
-    final results = await scrapper.scrap(_movieItemSelector);
+    final results = await scrapper.scrap(_contentInfoSelector);
 
-    return results.map((e) => ContentSearchResult.fromJson(e)).toList();
+    return results.map(ContentSearchResult.fromJson).toList();
   }
 
   @override
   Future<ContentDetails> detailsById(String id) async {
-    final scrapper = Scrapper(uri: Uri.https(baseUrl, "/$id.html"));
+    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html"));
 
     final result = await scrapper.scrap(Scope(
       scope: "#dle-content",
       item: SelectorsToMap(
         {
-          "id": Const(id),
+          "id": Const(Uri.encodeComponent(id)),
           "supplier": Const(name),
           "title": Text.forScope(".page__subcol-main > h1"),
           "originalTitle":
               Text.forScope(".page__subcol-main > .pmovie__original-title"),
           "image": Image.forScope(
-              ".pmovie__poster > img", attribute: "data-src", baseUrl),
+              ".pmovie__poster > img", attribute: "data-src", host),
           "description": Text.forScope(".page__text"),
-          "additionalInfo": JoinList([
-            ItemsList([
+          "additionalInfo": Expand([
+            Join([
               Text.forScope(".page__subcol-main > .pmovie__year"),
               Text.forScope(".page__subcol-main > .pmovie__genres"),
             ]),
-            IterateOverScope(itemScope: ".page__subcol-side2 li", item: Text())
+            IterateOverScope(
+              itemScope: ".page__subcol-side2 li",
+              item: Text(inline: true),
+            )
           ]),
-          "similar": Scope(scope: ".pmovie__related", item: _movieItemSelector),
+          "similar":
+              Scope(scope: ".pmovie__related", item: _contentInfoSelector),
           "iframe": Attribute.forScope(
             ".pmovie__player .video-inside iframe",
             "data-src",
@@ -143,30 +134,36 @@ class AnimeUAClubSupplier extends ContentSupplier {
     return AnimeUAClubContentDetails.fromJson(result);
   }
 
-  @override
-  Future<SupplierChannels> loadChannels(
-    Set<String> channels,
-  ) async {
-    return {
-      for (final channel in channels) channel: await _loadChannel(channel)
-    };
-  }
+  final Map<String, String> _channelsPath = const {
+    "Новинки": "/page/",
+    "ТОП 100": "/top.html",
+    "Повнометражки": "/film/page/",
+    "Аніме серіали": "/anime/page/"
+  };
 
-  Future<List<ContentInfo>> _loadChannel(String channel) async {
-    final path = switch (channel) {
-      "Новинки" => "",
-      "ТОП 100" => "/top.html",
-      "Повнометражки" => "/film/",
-      "Аніме серіали" => "/anime/",
-      _ => null
-    };
+  @override
+  Set<String> get channels => _channelsPath.keys.toSet();
+
+  @override
+  Set<String> get defaultChannels => const {"Новинки", "ТОП 100"};
+
+  @override
+  Future<List<ContentInfo>> loadChannel(String channel, {page = 1}) async {
+    final path = _channelsPath[channel];
 
     if (path == null) {
       return const [];
     }
 
-    final scrapper = Scrapper(uri: Uri.https(baseUrl, path));
-    final results = await scrapper.scrap(_movieItemSelector);
+    var tragetPath = path;
+    if (path.endsWith("/page/")) {
+      tragetPath += page.toString();
+    } else if (page > 1) {
+      return [];
+    }
+
+    final scrapper = Scrapper(uri: Uri.https(host, tragetPath));
+    final results = await scrapper.scrap(_contentInfoSelector);
 
     return results.map((e) => ContentSearchResult.fromJson(e)).toList();
   }

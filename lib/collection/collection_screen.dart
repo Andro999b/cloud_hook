@@ -74,7 +74,10 @@ class CollectionHorizontalGroup extends ConsumerWidget {
     }
 
     return HorizontalList(
-      title: statusLabel(context, status),
+      title: Text(
+        statusLabel(context, status),
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
       itemBuilder: (context, index) {
         return _renderInfoCard(context, ref, group[index]);
       },

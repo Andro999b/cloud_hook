@@ -68,7 +68,10 @@ class RecomendationSettings extends _$RecomendationSettings {
       for (final supplier in defaultSuppliers) supplier.name: supplier
     };
 
-    final supplierNames = ContentSuppliers.instance.suppliersName;
+    final supplierNames = ContentSuppliers.instance.suppliers
+        .where((s) => s.channels.isNotEmpty)
+        .map((s) => s.name)
+        .toSet();
 
     Set<String> suppliersOrder;
     final savedOrder = AppPreferences.recomendationsOrder;

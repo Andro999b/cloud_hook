@@ -35,12 +35,14 @@ class ColorSwitcher extends ConsumerWidget {
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      child: GestureDetector(
+      child: InkResponse(
         onTap: () {
           ref.read(colorSettingsProvider.notifier).select(color);
         },
+        radius: 22,
         child: CircleAvatar(
           backgroundColor: color,
+          radius: 15,
           child: icon,
         ),
       ),
