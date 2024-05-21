@@ -139,13 +139,18 @@ int _isarMediaCollectionItemEstimateSize(
   }
   bytesCount += 3 + object.id.length * 3;
   bytesCount += 3 + object.image.length * 3;
-  bytesCount += 3 + object.positions.length * 3;
   {
-    final offsets = allOffsets[IsarMediaItemPosition]!;
-    for (var i = 0; i < object.positions.length; i++) {
-      final value = object.positions[i];
-      bytesCount +=
-          IsarMediaItemPositionSchema.estimateSize(value, offsets, allOffsets);
+    final list = object.positions;
+    if (list != null) {
+      bytesCount += 3 + list.length * 3;
+      {
+        final offsets = allOffsets[IsarMediaItemPosition]!;
+        for (var i = 0; i < list.length; i++) {
+          final value = list[i];
+          bytesCount += IsarMediaItemPositionSchema.estimateSize(
+              value, offsets, allOffsets);
+        }
+      }
     }
   }
   bytesCount += 3 + object.supplier.length * 3;
@@ -184,20 +189,19 @@ IsarMediaCollectionItem _isarMediaCollectionItemDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = IsarMediaCollectionItem(
-    currentItem: reader.readLong(offsets[0]),
-    currentSource: reader.readLong(offsets[1]),
+    currentItem: reader.readLongOrNull(offsets[0]),
+    currentSource: reader.readLongOrNull(offsets[1]),
     id: reader.readString(offsets[3]),
     image: reader.readString(offsets[4]),
     isarId: id,
     lastSeen: reader.readDateTimeOrNull(offsets[5]),
     positions: reader.readObjectList<IsarMediaItemPosition>(
-          offsets[6],
-          IsarMediaItemPositionSchema.deserialize,
-          allOffsets,
-          IsarMediaItemPosition(),
-        ) ??
-        [],
-    priority: reader.readLong(offsets[7]),
+      offsets[6],
+      IsarMediaItemPositionSchema.deserialize,
+      allOffsets,
+      IsarMediaItemPosition(),
+    ),
+    priority: reader.readLongOrNull(offsets[7]),
     status: _IsarMediaCollectionItemstatusValueEnumMap[
             reader.readByteOrNull(offsets[8])] ??
         MediaCollectionItemStatus.none,
@@ -215,9 +219,9 @@ P _isarMediaCollectionItemDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readLong(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 1:
-      return (reader.readLong(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 2:
       return (reader.readStringList(offset) ?? []) as P;
     case 3:
@@ -228,14 +232,13 @@ P _isarMediaCollectionItemDeserializeProp<P>(
       return (reader.readDateTimeOrNull(offset)) as P;
     case 6:
       return (reader.readObjectList<IsarMediaItemPosition>(
-            offset,
-            IsarMediaItemPositionSchema.deserialize,
-            allOffsets,
-            IsarMediaItemPosition(),
-          ) ??
-          []) as P;
+        offset,
+        IsarMediaItemPositionSchema.deserialize,
+        allOffsets,
+        IsarMediaItemPosition(),
+      )) as P;
     case 7:
-      return (reader.readLong(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 8:
       return (_IsarMediaCollectionItemstatusValueEnumMap[
               reader.readByteOrNull(offset)] ??
@@ -692,7 +695,25 @@ extension IsarMediaCollectionItemQueryWhere on QueryBuilder<
 extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
     IsarMediaCollectionItem, IsarMediaCollectionItem, QFilterCondition> {
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentItemEqualTo(int value) {
+      QAfterFilterCondition> currentItemIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'currentItem',
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentItemIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'currentItem',
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentItemEqualTo(int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'currentItem',
@@ -703,7 +724,7 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
       QAfterFilterCondition> currentItemGreaterThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -717,7 +738,7 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
       QAfterFilterCondition> currentItemLessThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -731,8 +752,8 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
       QAfterFilterCondition> currentItemBetween(
-    int lower,
-    int upper, {
+    int? lower,
+    int? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -748,7 +769,25 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSourceEqualTo(int value) {
+      QAfterFilterCondition> currentSourceIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'currentSource',
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentSourceIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'currentSource',
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentSourceEqualTo(int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'currentSource',
@@ -759,7 +798,7 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
       QAfterFilterCondition> currentSourceGreaterThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -773,7 +812,7 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
       QAfterFilterCondition> currentSourceLessThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -787,8 +826,8 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
       QAfterFilterCondition> currentSourceBetween(
-    int lower,
-    int upper, {
+    int? lower,
+    int? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -1455,6 +1494,24 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> positionsIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'positions',
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> positionsIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'positions',
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
       QAfterFilterCondition> positionsLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
@@ -1544,7 +1601,25 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> priorityEqualTo(int value) {
+      QAfterFilterCondition> priorityIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'priority',
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> priorityIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'priority',
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> priorityEqualTo(int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'priority',
@@ -1555,7 +1630,7 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
       QAfterFilterCondition> priorityGreaterThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1569,7 +1644,7 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
       QAfterFilterCondition> priorityLessThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1583,8 +1658,8 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
       QAfterFilterCondition> priorityBetween(
-    int lower,
-    int upper, {
+    int? lower,
+    int? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -2300,14 +2375,14 @@ extension IsarMediaCollectionItemQueryProperty on QueryBuilder<
     });
   }
 
-  QueryBuilder<IsarMediaCollectionItem, int, QQueryOperations>
+  QueryBuilder<IsarMediaCollectionItem, int?, QQueryOperations>
       currentItemProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'currentItem');
     });
   }
 
-  QueryBuilder<IsarMediaCollectionItem, int, QQueryOperations>
+  QueryBuilder<IsarMediaCollectionItem, int?, QQueryOperations>
       currentSourceProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'currentSource');
@@ -2341,14 +2416,14 @@ extension IsarMediaCollectionItemQueryProperty on QueryBuilder<
     });
   }
 
-  QueryBuilder<IsarMediaCollectionItem, List<IsarMediaItemPosition>,
+  QueryBuilder<IsarMediaCollectionItem, List<IsarMediaItemPosition>?,
       QQueryOperations> positionsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'positions');
     });
   }
 
-  QueryBuilder<IsarMediaCollectionItem, int, QQueryOperations>
+  QueryBuilder<IsarMediaCollectionItem, int?, QQueryOperations>
       priorityProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'priority');

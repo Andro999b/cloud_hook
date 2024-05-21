@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_provider.dart';
@@ -8,7 +10,9 @@ import 'package:cloud_hook/content/content_info_card.dart';
 import 'package:cloud_hook/layouts/general_layout.dart';
 import 'package:cloud_hook/widgets/horizontal_list.dart';
 import 'package:cloud_hook/widgets/use_search_hint.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -52,24 +56,30 @@ class CollectionHorizontalView extends ConsumerWidget {
     }
 
     return ListView(
-      children:
-          groupsOrder.map((e) => CollectionHorizontalGroup(status: e)).toList(),
+      children: groupsOrder.mapIndexed((groupIdx, e) {
+        return CollectionHorizontalGroup(groupIdx: groupIdx, status: e);
+      }).toList(),
     );
   }
 }
 
 class CollectionHorizontalGroup extends ConsumerWidget {
   final MediaCollectionItemStatus status;
+  final int groupIdx;
 
-  const CollectionHorizontalGroup({super.key, required this.status});
+  const CollectionHorizontalGroup({
+    super.key,
+    required this.groupIdx,
+    required this.status,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final group = ref.watch(
+    final groupItems = ref.watch(
       collectionProvider.select((value) => value.valueOrNull?[status]),
     );
 
-    if (group == null) {
+    if (groupItems == null) {
       return const SizedBox.shrink();
     }
 
@@ -79,53 +89,85 @@ class CollectionHorizontalGroup extends ConsumerWidget {
         style: Theme.of(context).textTheme.titleMedium,
       ),
       itemBuilder: (context, index) {
-        return _renderInfoCard(context, ref, group[index]);
+        return CollectionHorizontalListItem(
+          autofocuse: groupIdx == 0 && index == 0,
+          item: groupItems[index],
+        );
       },
-      itemCount: group.length,
+      itemCount: groupItems.length,
     );
   }
+}
 
-  Widget _renderInfoCard(
-    BuildContext context,
-    WidgetRef ref,
-    MediaCollectionItem item,
-  ) {
+class CollectionHorizontalListItem extends HookConsumerWidget {
+  final MediaCollectionItem item;
+  final bool autofocuse;
+
+  const CollectionHorizontalListItem({
+    super.key,
+    required this.autofocuse,
+    required this.item,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final isDesktop = Platform.isWindows || Platform.isLinux;
+
+    final cornerVisible = useState(false);
+
     return ContentInfoCard(
+      autofocus: autofocuse,
       contentInfo: item,
       onTap: () {
         context.push("/content/${item.supplier}/${item.id}");
       },
-      corner: Container(
-        decoration: BoxDecoration(
-            color: theme.colorScheme.secondaryContainer,
-            borderRadius: BorderRadius.circular(40)),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CollectionItemPrioritySelector(
-              collectionItem: item,
-              onSelect: (priority) {
-                ref.read(collectionServiceProvider).save(
-                      item.copyWith(
-                        priority: priority,
-                      ),
-                    );
+      onHover: (value) {
+        cornerVisible.value = value;
+      },
+      corner: isDesktop
+          ? ValueListenableBuilder(
+              valueListenable: cornerVisible,
+              builder: (context, value, child) {
+                return AnimatedOpacity(
+                  curve: Curves.easeInOut,
+                  opacity: value ? 1.0 : 0,
+                  duration: const Duration(milliseconds: 150),
+                  child: child,
+                );
               },
-            ),
-            CollectionItemStatusSelector.iconButton(
-              collectionItem: item,
-              onSelect: (status) {
-                ref.read(collectionServiceProvider).save(
-                      item.copyWith(
-                        status: status,
-                      ),
-                    );
-              },
-            ),
-          ],
-        ),
-      ),
+              child: Container(
+                decoration: BoxDecoration(
+                    color: theme.colorScheme.secondaryContainer,
+                    borderRadius: BorderRadius.circular(40)),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CollectionItemPrioritySelector(
+                      collectionItem: item,
+                      onSelect: (priority) {
+                        ref.read(collectionServiceProvider).save(
+                              item.copyWith(
+                                priority: priority,
+                              ),
+                            );
+                      },
+                    ),
+                    CollectionItemStatusSelector.iconButton(
+                      collectionItem: item,
+                      onSelect: (status) {
+                        ref.read(collectionServiceProvider).save(
+                              item.copyWith(
+                                status: status,
+                              ),
+                            );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : null,
     );
   }
 }

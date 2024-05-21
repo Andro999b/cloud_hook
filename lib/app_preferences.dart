@@ -36,7 +36,7 @@ class AppPreferences {
 
   static set themeBrightness(Brightness? brightness) => brightness != null
       ? instance.setString("theme_brightness", brightness.name)
-      : instance.remove("brightness");
+      : instance.remove("theme_brightness");
 
   static Brightness? get themeBrightness => Brightness.values
       .where(

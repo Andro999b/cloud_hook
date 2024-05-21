@@ -4,7 +4,10 @@ import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/search/search_provider.dart';
 import 'package:cloud_hook/search/search_top_bar/search_suggestion_model.dart';
 import 'package:cloud_hook/search/search_top_bar/search_suggestion_provider.dart';
+import 'package:cloud_hook/utils/visual.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -20,6 +23,7 @@ class SearchTopBar extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final searchController = useSearchController();
     final showFilter = useState(false);
+    final mobile = isMobile(context);
 
     useEffect(() {
       final query = ref.read(searchProvider).query ?? "";
@@ -29,55 +33,76 @@ class SearchTopBar extends HookConsumerWidget {
 
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          child: SearchAnchor(
-            searchController: searchController,
-            viewOnChanged: (value) {
-              ref.read(suggestionsProvider.notifier).suggest(value);
-            },
-            viewOnSubmitted: (value) {
-              _search(ref, value);
-              if (searchController.isOpen) {
-                searchController.closeView(value);
-              }
-            },
-            builder: (context, controller) {
-              return SearchBar(
-                padding: const MaterialStatePropertyAll<EdgeInsets>(
-                    EdgeInsets.only(left: 16.0, right: 8.0)),
-                autoFocus: true,
-                leading: const Icon(Icons.search),
-                trailing: [
-                  IconButton(
-                    onPressed: () {
-                      showFilter.value = !showFilter.value;
-                    },
-                    icon: const Icon(Icons.filter_list),
-                  )
-                ],
-                controller: controller,
-                onTap: () {
-                  controller.openView();
-                },
-                onChanged: (value) {
-                  controller.openView();
-                },
-                onSubmitted: (value) {
-                  _search(ref, value);
-                  // controller.clear();
-                },
-              );
-            },
-            viewBuilder: (suggestions) => _TopSearchSuggestions(
-              searchController: searchController,
-              onSelect: (value) => _search(ref, value),
+        Row(
+          children: [
+            if (!mobile) const SizedBox(width: 48),
+            Expanded(
+              child: _renderSearchBar(searchController, ref),
             ),
-            suggestionsBuilder: (context, controller) => [],
-          ), // do nothing
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: IconButton(
+                onPressed: () {
+                  showFilter.value = !showFilter.value;
+                },
+                icon: const Icon(Icons.tune),
+              ),
+            )
+          ],
         ),
         if (showFilter.value) const _FilterSelectors(),
       ],
+    );
+  }
+
+  Widget _renderSearchBar(SearchController searchController, WidgetRef ref) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: SearchAnchor(
+          searchController: searchController,
+          viewOnChanged: (value) {
+            ref.read(suggestionsProvider.notifier).suggest(value);
+          },
+          viewOnSubmitted: (value) {
+            _search(ref, value);
+            if (searchController.isOpen) {
+              searchController.closeView(value);
+            }
+          },
+          builder: (context, controller) {
+            return SearchBar(
+              padding: const MaterialStatePropertyAll<EdgeInsets>(
+                  EdgeInsets.only(left: 16.0, right: 8.0)),
+              autoFocus: true,
+              leading: const Icon(Icons.search),
+              // trailing: [
+              //   IconButton(
+              //     onPressed: () {
+              //       showFilter.value = !showFilter.value;
+              //     },
+              //     icon: const Icon(Icons.filter_list),
+              //   )
+              // ],
+              controller: controller,
+              onTap: () {
+                controller.openView();
+              },
+              onChanged: (value) {
+                controller.openView();
+              },
+              onSubmitted: (value) {
+                _search(ref, value);
+              },
+            );
+          },
+          viewBuilder: (suggestions) => _TopSearchSuggestions(
+            searchController: searchController,
+            onSelect: (value) => _search(ref, value),
+          ),
+          suggestionsBuilder: (context, controller) => [],
+        ), // do nothing
+      ),
     );
   }
 }

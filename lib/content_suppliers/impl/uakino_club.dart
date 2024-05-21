@@ -106,7 +106,7 @@ class UAKinoClubSupplier extends ContentSupplier {
           "image": Image.forScope(".film-poster img", host),
           "description": Text.forScope("div[itemprop=description]"),
           "additionalInfo": IterateOverScope(
-            itemScope: ".film-info > .fi-item",
+            itemScope: ".film-info > *",
             item: ConcatSelectors(
               [Text.forScope(".fi-label"), Text.forScope(".fi-desc")],
             ),

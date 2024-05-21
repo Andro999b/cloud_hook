@@ -40,6 +40,7 @@ class ColorSwitcher extends ConsumerWidget {
           ref.read(colorSettingsProvider.notifier).select(color);
         },
         radius: 22,
+        autofocus: color.value == selected.value,
         child: CircleAvatar(
           backgroundColor: color,
           radius: 15,

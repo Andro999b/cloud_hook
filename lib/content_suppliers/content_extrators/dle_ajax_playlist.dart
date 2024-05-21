@@ -55,8 +55,9 @@ class DLEAjaxPlaylistScrapper {
       return [];
     }
 
-    final groupedById =
-        playlistItems.map(_AjaxPlaylistItem.fromJson).groupListsBy((e) => e.id);
+    final groupedById = playlistItems
+        .map(_AjaxPlaylistItem.fromJson)
+        .groupListsBy((e) => e.text);
 
     if (groupedById.length == 1) {
       return [
@@ -81,7 +82,7 @@ class DLEAjaxPlaylistScrapper {
     return AsyncContentMediaItemSource(
       description: item.voice?.isNotEmpty == true ? item.voice! : "Default",
       linkLoader: () async {
-        final playerLink = Uri.parse(item.link);
+        final playerLink = Uri.parse(item.link).replace(scheme: "https");
         final fileUrl =
             await PlayerJSScrapper(uri: playerLink).loadPlayerJsFile();
 

@@ -30,7 +30,6 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
-  # firebase_dart_flutter: ^1.1.4
   firebase_dart: ^1.1.4
   dio: ^5.4.3+1
   http: ^1.2.1
@@ -41,6 +40,7 @@ dependencies:
   hooks_riverpod: ^2.5.1
   flutter_hooks: ^0.20.5
   flutter_riverpod: ^2.5.1
+  device_info_plus: ^10.1.0
 
 dependency_overrides:
   analyzer:

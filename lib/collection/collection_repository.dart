@@ -17,11 +17,11 @@ class IsarMediaCollectionItem {
     required this.supplier,
     required this.title,
     required this.image,
-    required this.currentItem,
-    required this.currentSource,
-    required this.positions,
     required this.status,
-    required this.priority,
+    this.currentItem,
+    this.currentSource,
+    this.positions,
+    this.priority,
     this.lastSeen,
     this.isarId,
   });
@@ -37,14 +37,14 @@ class IsarMediaCollectionItem {
   final String supplier;
   final String title;
   final String image;
-  final int currentItem;
-  final int currentSource;
-  final List<IsarMediaItemPosition> positions;
+  int? currentItem;
+  int? currentSource;
+  List<IsarMediaItemPosition>? positions;
 
   @Enumerated(EnumType.ordinal)
   MediaCollectionItemStatus status;
 
-  final int priority;
+  int? priority;
   DateTime? lastSeen;
 
   @Index(type: IndexType.value, caseSensitive: false)
@@ -81,21 +81,22 @@ class IsarMediaCollectionItem {
       supplier: supplier,
       title: title,
       image: image,
-      currentItem: currentItem,
-      currentSource: currentSource,
+      currentItem: currentItem ?? 0,
+      currentSource: currentSource ?? 0,
       positions: Map.fromEntries(
-        positions.map(
-          (e) => MapEntry(
-            e.number,
-            MediaItemPosition(
-              position: e.position,
-              length: e.length,
-            ),
-          ),
-        ),
+        positions?.map(
+              (e) => MapEntry(
+                e.number,
+                MediaItemPosition(
+                  position: e.position,
+                  length: e.length,
+                ),
+              ),
+            ) ??
+            {},
       ),
       status: status,
-      priority: priority,
+      priority: priority ?? 0,
       lastSeen: lastSeen,
       internalId: isarId,
     );

@@ -21,7 +21,7 @@ final collectionServiceProvider = Provider<CollectionService>.internal(
 );
 
 typedef CollectionServiceRef = ProviderRef<CollectionService>;
-String _$collectionHash() => r'75c3457e751fd68bf9ad2d90c64d2ef0a29e9740';
+String _$collectionHash() => r'38b550ea11947f30d00dbf40fbebd5c21faf7222';
 
 /// See also [collection].
 @ProviderFor(collection)

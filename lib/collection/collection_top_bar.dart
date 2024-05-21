@@ -22,73 +22,77 @@ class CollectionTopBar extends HookConsumerWidget {
 
     return Column(
       children: [
-        Container(
-          padding: EdgeInsets.only(
-            top: 8,
-            bottom: 8,
-            right: paddings,
-            left: mobile ? 0 : paddings,
-          ),
-          child: Row(
-            children: [
-              if (mobile)
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: AuthIcon(),
-                ),
-              Expanded(
-                child: Center(
-                  child: SearchBar(
-                    controller: controller,
-                    padding: const MaterialStatePropertyAll<EdgeInsets>(
-                      EdgeInsets.only(left: 16.0, right: 8.0),
-                    ),
-                    focusNode: focusNode,
-                    leading: const Icon(Icons.search),
-                    trailing: [
-                      _renderTrailingIcon(ref, controller, showFilter)
-                    ],
-                    onSubmitted: (value) {
-                      ref.read(collectionFilterQueryProvider.notifier).state =
-                          value;
-                      focusNode.requestFocus();
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
+        Row(
+          children: [
+            mobile
+                ? const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    child: AuthIcon(),
+                  )
+                : const SizedBox(width: 48),
+            Expanded(
+              child: _renderSearhBar(ref, controller, focusNode),
+            ),
+            _renderSettingsIcon(ref, controller, showFilter)
+          ],
         ),
         if (showFilter.value) _StatusFilter(),
       ],
     );
   }
 
-  Widget _renderTrailingIcon(
+  Center _renderSearhBar(
+    WidgetRef ref,
+    TextEditingController controller,
+    FocusNode focusNode,
+  ) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SearchBar(
+          controller: controller,
+          padding: const MaterialStatePropertyAll<EdgeInsets>(
+            EdgeInsets.only(left: 16.0, right: 8.0),
+          ),
+          focusNode: focusNode,
+          leading: const Icon(Icons.search),
+          onSubmitted: (value) {
+            ref.read(collectionFilterQueryProvider.notifier).state = value;
+            focusNode.requestFocus();
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _renderSettingsIcon(
     WidgetRef ref,
     TextEditingController controller,
     ValueNotifier<bool> showFilter,
   ) {
-    return ValueListenableBuilder(
-      valueListenable: controller,
-      builder: (context, value, child) {
-        if (value.text.isNotEmpty) {
-          return IconButton(
-            onPressed: () {
-              ref.read(collectionFilterQueryProvider.notifier).state = "";
-              controller.clear();
-            },
-            icon: const Icon(Icons.close),
-          );
-        } else {
-          return IconButton(
-            onPressed: () {
-              showFilter.value = !showFilter.value;
-            },
-            icon: const Icon(Icons.filter_list),
-          );
-        }
-      },
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: ValueListenableBuilder(
+        valueListenable: controller,
+        builder: (context, value, child) {
+          if (value.text.isNotEmpty) {
+            return IconButton(
+              onPressed: () {
+                ref.read(collectionFilterQueryProvider.notifier).state = "";
+                controller.clear();
+              },
+              icon: const Icon(Icons.close),
+            );
+          } else {
+            return IconButton(
+              onPressed: () {
+                showFilter.value = !showFilter.value;
+              },
+              icon: const Icon(Icons.tune),
+            );
+          }
+        },
+      ),
     );
   }
 }

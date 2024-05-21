@@ -42,6 +42,7 @@ class CollectionContinueView extends ConsumerWidget {
         final item = items![index];
 
         return ContentInfoCard(
+          autofocus: index == 0,
           contentInfo: item,
           onTap: () {
             context.push("/content/${item.supplier}/${item.id}");

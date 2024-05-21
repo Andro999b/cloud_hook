@@ -3,6 +3,7 @@ import 'package:cloud_hook/home/recomendations/recomendations_provider.dart';
 import 'package:cloud_hook/settings/recomendations/recomendations_settings_provider.dart';
 import 'package:cloud_hook/utils/visual.dart';
 import 'package:cloud_hook/widgets/horizontal_list.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -15,21 +16,15 @@ class Recommendations extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(recomendationSettingsProvider);
 
-    final theme = Theme.of(context);
-    final paddings = getPadding(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: settings.configs.entries
           .where((e) => e.value.enabled && e.value.channels.isNotEmpty)
-          .map(
-            (e) => [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: paddings),
-                child: Text(e.key, style: theme.textTheme.titleLarge),
-              ),
-              ...e.value.channels.map(
-                (channel) => _RecomendationChannel(
+          .mapIndexed(
+            (groupIdx, e) => [
+              ...e.value.channels.mapIndexed(
+                (channelIdx, channel) => _RecomendationChannel(
+                  channelIdx: channelIdx,
                   supplierName: e.key,
                   channel: channel,
                 ),
@@ -43,17 +38,19 @@ class Recommendations extends ConsumerWidget {
 }
 
 class _RecomendationChannel extends HookConsumerWidget {
+  final int channelIdx;
   final String supplierName;
   final String channel;
 
   const _RecomendationChannel({
+    required this.channelIdx,
     required this.supplierName,
     required this.channel,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var provider = recomendationChannelProvider(supplierName, channel);
+    final provider = recomendationChannelProvider(supplierName, channel);
     final state = ref.watch(provider).valueOrNull;
 
     if (state == null) {
@@ -75,7 +72,7 @@ class _RecomendationChannel extends HookConsumerWidget {
       return () => scrollController.removeListener(onScroll);
     }, [scrollController]);
 
-    return HorizontalList(
+    final list = HorizontalList(
       scrollController: scrollController,
       title: Text(
         channel,
@@ -93,5 +90,23 @@ class _RecomendationChannel extends HookConsumerWidget {
       },
       itemCount: state.recomendations.length,
     );
+
+    if (channelIdx == 0) {
+      final theme = Theme.of(context);
+      final paddings = getPadding(context);
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: paddings),
+            child: Text(supplierName, style: theme.textTheme.titleLarge),
+          ),
+          list
+        ],
+      );
+    }
+
+    return list;
   }
 }

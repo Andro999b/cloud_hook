@@ -26,7 +26,7 @@ class HorizontalList extends StatelessWidget {
           child: title,
         ),
         SizedBox(
-          height: 300,
+          height: 260,
           child: ListView.builder(
             controller: scrollController,
             padding: EdgeInsets.only(bottom: 8, left: paddings),

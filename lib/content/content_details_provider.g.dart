@@ -171,7 +171,7 @@ class _DetailsProviderElement
   String get id => (origin as DetailsProvider).id;
 }
 
-String _$detailsAndMediaHash() => r'dd29ca13ecfcd9d1e9db95e8cce7a6f9acdb2a1a';
+String _$detailsAndMediaHash() => r'34d185c783c6b502ba73c53b06491fb8280fffb6';
 
 /// See also [detailsAndMedia].
 @ProviderFor(detailsAndMedia)

@@ -1,6 +1,7 @@
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/layouts/bottom_navigation_layout.dart';
 import 'package:cloud_hook/layouts/side_navigation_layout.dart';
+import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +31,7 @@ class GeneralLayout extends StatelessWidget {
             } else {
               return SideNavigationLayout(
                 selectedIndex: selectedIndex,
-                showBackButton: showBackButton,
+                showBackButton: AndroidTVDetector.isTV ? false : showBackButton,
                 child: child,
               );
             }

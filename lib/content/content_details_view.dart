@@ -6,6 +6,7 @@ import 'package:cloud_hook/collection/widgets/status_selector.dart';
 import 'package:cloud_hook/content/content_info_card.dart';
 import 'package:cloud_hook/content/media_items_list.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/visual.dart';
 import 'package:cloud_hook/widgets/back_nav_button.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
@@ -42,7 +43,7 @@ class ContentDetailsView extends ConsumerWidget {
   }
 
   double _calcMaxWidth(Size size, bool mobile) {
-    var maxWidth = mobile ? size.width : size.width - size.height * .85;
+    var maxWidth = mobile ? size.width : size.width * .5 - 80;
 
     if (maxWidth < mobileWidth) {
       maxWidth = mobileWidth;
@@ -88,7 +89,7 @@ class ContentDetailsView extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _renderTitile(context),
-            if (mobile) SizedBox(height: size.height * .40),
+            if (mobile) SizedBox(height: size.height * .5),
             bottomPart
           ],
         ),
@@ -161,6 +162,15 @@ class ContentDetailsView extends ConsumerWidget {
 
   Widget _renderDescription(BuildContext context) {
     final theme = Theme.of(context);
+
+    if (AndroidTVDetector.isTV) {
+      return Focus(
+        child: Text(
+          contentDetails.description,
+          style: theme.textTheme.bodyLarge,
+        ),
+      );
+    }
 
     return ReadMoreText(
       contentDetails.description,
@@ -258,6 +268,7 @@ class _ContentWatchButtons extends HookWidget {
 
   FilledButton _renderWatchButton(BuildContext context) {
     return FilledButton.tonalIcon(
+      autofocus: true,
       onPressed: () {
         context.push("/video/${contentDetails.supplier}/${contentDetails.id}");
       },

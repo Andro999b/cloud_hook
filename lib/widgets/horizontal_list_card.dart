@@ -6,16 +6,22 @@ const maxImageWidth = 320.0;
 
 class HorizontalListCard extends HookWidget {
   final GestureTapCallback onTap;
+  final ValueChanged<bool>? onHover;
+  final GestureLongPressCallback? onLongPress;
   final Decoration? decoration;
   final Widget? child;
   final Widget? corner;
+  final bool autofocus;
 
   const HorizontalListCard({
     super.key,
     required this.onTap,
+    this.onHover,
+    this.onLongPress,
     this.decoration,
     this.child,
     this.corner,
+    this.autofocus = false,
   });
 
   @override
@@ -48,22 +54,24 @@ class HorizontalListCard extends HookWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
+                autofocus: autofocus,
                 mouseCursor: SystemMouseCursors.click,
                 onTap: onTap,
+                onHover: onHover,
+                onLongPress: onLongPress,
                 onFocusChange: (value) => focused.value = value,
+                child: corner != null
+                    ? Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: corner,
+                        ),
+                      )
+                    : null,
               ),
             ),
           ),
-          if (corner != null)
-            Positioned.fill(
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child: corner,
-                ),
-              ),
-            )
         ],
       ),
     );

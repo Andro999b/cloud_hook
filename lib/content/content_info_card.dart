@@ -6,11 +6,19 @@ import 'package:flutter/material.dart';
 const maxImageWidth = 320.0;
 
 class ContentInfoCard extends StatelessWidget {
+  final bool autofocus;
+
+  final ValueChanged<bool>? onHover;
+  final GestureLongPressCallback? onLongPress;
+
   const ContentInfoCard({
     super.key,
     required this.contentInfo,
     this.corner,
     required this.onTap,
+    this.onHover,
+    this.onLongPress,
+    this.autofocus = false,
   });
 
   final Widget? corner;
@@ -19,8 +27,12 @@ class ContentInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context).textTheme.;
     return HorizontalListCard(
+      autofocus: autofocus,
       onTap: onTap,
+      onHover: onHover,
+      onLongPress: onLongPress,
       decoration: BoxDecoration(
         image: DecorationImage(
           image: FastCachedImageProvider(contentInfo.image),
@@ -32,19 +44,32 @@ class ContentInfoCard extends StatelessWidget {
       child: Column(
         children: [
           const Spacer(),
-          Material(
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.black54, Colors.transparent],
+                stops: [.5, 1.0],
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+              ),
+            ),
             child: ListTile(
               mouseCursor: SystemMouseCursors.click,
               title: Text(
                 contentInfo.title,
                 overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.white, inherit: true),
                 maxLines: 2,
               ),
-              subtitle: Text(
-                contentInfo.subtitle ?? "",
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
+              subtitle: contentInfo.subtitle == null
+                  ? null
+                  : Text(
+                      contentInfo.subtitle!,
+                      overflow: TextOverflow.ellipsis,
+                      style:
+                          const TextStyle(color: Colors.white, inherit: true),
+                      maxLines: 2,
+                    ),
             ),
           )
         ],

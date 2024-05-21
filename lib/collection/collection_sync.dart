@@ -74,12 +74,14 @@ class CollectionSync {
     MediaCollectionItem remoteItem,
     IsarMediaCollectionItem localItem,
   ) {
-    for (final localPosition in localItem.positions) {
-      if (!remoteItem.positions.containsKey(localPosition.number)) {
-        remoteItem.positions[localPosition.number] = MediaItemPosition(
-          position: localPosition.position,
-          length: localPosition.length,
-        );
+    if (localItem.positions != null) {
+      for (final localPosition in localItem.positions!) {
+        if (!remoteItem.positions.containsKey(localPosition.number)) {
+          remoteItem.positions[localPosition.number] = MediaItemPosition(
+            position: localPosition.position,
+            length: localPosition.length,
+          );
+        }
       }
     }
   }
