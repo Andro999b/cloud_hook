@@ -45,7 +45,7 @@ class VideoContentTVView extends StatelessWidget {
   }
 }
 
-const seekTransitionDuration = Duration(milliseconds: 1000);
+const seekTransitionDuration = Duration(milliseconds: 500);
 
 class AndroidTVControls extends StatefulWidget {
   const AndroidTVControls({
@@ -74,13 +74,9 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
   FocusNode playPauseFocusNode = FocusNode();
   final List<StreamSubscription> subscriptions = [];
 
-  bool seekBackwardVisible = false;
-  int seekBackward = 0;
-  Timer? _seekBackwardTimer;
-
-  bool seekForwardVisible = false;
-  int seekForward = 0;
-  Timer? _seekForwardTimer;
+  bool seekVisible = false;
+  int seekPosition = 0;
+  Timer? _seekTimer;
 
   @override
   void setState(VoidCallback fn) {
@@ -110,8 +106,8 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
     for (final subscription in subscriptions) {
       subscription.cancel();
     }
-    _seekBackwardTimer?.cancel();
-    _seekForwardTimer?.cancel();
+    _seekTimer?.cancel();
+    playPauseFocusNode.dispose();
     super.dispose();
   }
 
@@ -129,32 +125,30 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
     });
   }
 
-  void onSeekBackward() {
-    setState(() {
-      seekBackward += 10;
-      seekBackwardVisible = true;
-    });
-    _seekBackwardTimer?.cancel();
-    _seekBackwardTimer = Timer(seekTransitionDuration, () {
-      setState(() => seekBackwardVisible = false);
-    });
-    widget.player.safeSeek(
-      widget.player.state.position - const Duration(seconds: 10),
-    );
-  }
+  void seek(int sec) {
+    var playerState = widget.player.state;
+    int targetPosition =
+        seekVisible ? seekPosition : playerState.position.inSeconds;
+    targetPosition += sec;
 
-  void onSeekForward() {
+    if (targetPosition < 0) {
+      targetPosition = 0;
+    } else if (targetPosition > playerState.duration.inSeconds) {
+      targetPosition = playerState.duration.inSeconds;
+    }
+
     setState(() {
-      seekForward += 10;
-      seekForwardVisible = true;
+      seekVisible = true;
+      seekPosition = targetPosition;
     });
-    _seekForwardTimer?.cancel();
-    _seekForwardTimer = Timer(seekTransitionDuration, () {
-      setState(() => seekForwardVisible = false);
+
+    _seekTimer?.cancel();
+    _seekTimer = Timer(seekTransitionDuration, () {
+      setState(() {
+        seekVisible = false;
+      });
+      widget.player.safeSeek(Duration(seconds: seekPosition));
     });
-    widget.player.safeSeek(
-      widget.player.state.position + const Duration(seconds: 10),
-    );
   }
 
   void onBack() {
@@ -174,49 +168,57 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
         if (!mount) ...{
           const SingleActivator(LogicalKeyboardKey.arrowDown): onEnter,
           const SingleActivator(LogicalKeyboardKey.arrowUp): onEnter,
-          const SingleActivator(LogicalKeyboardKey.arrowLeft): onSeekBackward,
-          const SingleActivator(LogicalKeyboardKey.arrowRight): onSeekForward,
+          const SingleActivator(LogicalKeyboardKey.arrowLeft): () => seek(-10),
+          const SingleActivator(LogicalKeyboardKey.arrowRight): () => seek(10),
           const SingleActivator(LogicalKeyboardKey.select): onPlayPause,
         } else ...{
           const SingleActivator(LogicalKeyboardKey.arrowDown): onBack,
           const SingleActivator(LogicalKeyboardKey.arrowUp): onBack,
         }
       },
-      child: Focus(
-        autofocus: true,
-        child: Stack(
-          children: [
-            AnimatedOpacity(
-              curve: Curves.easeInOut,
-              opacity: visible ? 1.0 : 0.0,
-              duration: const Duration(microseconds: 150),
-              onEnd: () {
-                if (!visible) {
-                  setState(() {
-                    mount = false;
-                  });
-                }
-              },
-              child: mount
-                  ? Column(
-                      children: [
-                        // top bar
-                        _renderTopBar(),
-                        const Spacer(),
-                        // bottom bar
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16.0),
-                          child: MaterialSeekBar(),
-                        ),
-                        _renderBottomBar()
-                      ],
-                    )
-                  : const SizedBox.shrink(),
-            ),
-            Positioned.fill(child: _renderBufferedIndicator()),
-            Positioned.fill(child: _renderSeekBackward()),
-            Positioned.fill(child: _renderSeekForward()),
-          ],
+      child: BackButtonListener(
+        onBackButtonPressed: () async {
+          if (mount) {
+            onExit();
+            return true;
+          }
+          return false;
+        },
+        child: Focus(
+          autofocus: true,
+          child: Stack(
+            children: [
+              AnimatedOpacity(
+                curve: Curves.easeInOut,
+                opacity: visible ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 150),
+                onEnd: () {
+                  if (!visible) {
+                    setState(() {
+                      mount = false;
+                    });
+                  }
+                },
+                child: mount
+                    ? Column(
+                        children: [
+                          // top bar
+                          _renderTopBar(),
+                          const Spacer(),
+                          // bottom bar
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: MaterialSeekBar(),
+                          ),
+                          _renderBottomBar()
+                        ],
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              Positioned.fill(child: _renderBufferedIndicator()),
+              Positioned.fill(child: _renderSeekPosition()),
+            ],
+          ),
         ),
       ),
     );
@@ -280,6 +282,7 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
   }
 
   Widget _renderBottomBar() {
+    var canSkipNext = widget.playlistController.canSkipNext;
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -302,10 +305,13 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
             const MaterialDesktopPositionIndicator(),
             const Spacer(),
             SkipPrevButton(provider: widget.provider),
-            AndroidTVPlayOrPauseButton(focusNode: playPauseFocusNode),
+            AndroidTVPlayOrPauseButton(
+              focusNode: canSkipNext ? null : playPauseFocusNode,
+            ),
             SkipNextButton(
               provider: widget.provider,
-              playlistSize: widget.playlistController.mediaItems.length,
+              enabled: canSkipNext,
+              focusNode: canSkipNext ? playPauseFocusNode : null,
             ),
             const Spacer(),
             SourceSelector(
@@ -323,48 +329,26 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
     );
   }
 
-  Widget _renderSeekBackward() {
+  _renderSeekPosition() {
     return Padding(
-      padding: const EdgeInsets.all(96.0),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: AnimatedOpacity(
-          curve: Curves.easeInBack,
-          opacity: seekBackwardVisible ? 1.0 : 0,
-          duration: const Duration(milliseconds: 150),
-          child:
-              _renderSeekText("- ${Duration(seconds: seekBackward).label()}"),
-          onEnd: () {
-            if (!seekBackwardVisible) {
-              setState(() {
-                seekBackward = 0;
-              });
-            }
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _renderSeekForward() {
-    return Padding(
-      padding: const EdgeInsets.all(96.0),
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: AnimatedOpacity(
-          curve: Curves.easeIn,
-          opacity: seekForwardVisible ? 1.0 : 0,
-          duration: const Duration(milliseconds: 150),
-          child: _renderSeekText("+ ${Duration(seconds: seekForward).label()}"),
-          onEnd: () {
-            if (!seekForwardVisible) {
-              setState(() {
-                seekForward = 0;
-              });
-            }
-          },
-        ),
-      ),
+      padding: const EdgeInsets.only(bottom: 96),
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            AnimatedOpacity(
+              opacity: seekVisible ? 1.0 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: _renderSeekText(Duration(seconds: seekPosition).label()),
+              onEnd: () {
+                if (!seekVisible) {
+                  setState(() {
+                    seekPosition = 0;
+                  });
+                }
+              },
+            )
+          ]),
     );
   }
 

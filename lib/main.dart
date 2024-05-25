@@ -64,7 +64,7 @@ class MainApp extends StatelessWidget {
         routerConfig: GoRouter(
             navigatorKey: rootNavigatorKey,
             // initialLocation: "/search",
-            initialLocation: "/collection",
+            // initialLocation: "/collection",
             // // initialLocation: "/settings",
             // initialLocation:
             //     "/content/UAKinoClub/animeukr%2Fanime-series%2F21505-puppo-1-sezon",

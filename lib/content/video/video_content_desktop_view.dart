@@ -112,7 +112,7 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
 
   MaterialDesktopVideoControlsThemeData _createThemeData() {
     const marging = EdgeInsets.symmetric(horizontal: 20.0);
-    var playlistController = widget.playlistController;
+    final playlistController = widget.playlistController;
 
     return MaterialDesktopVideoControlsThemeData(
       buttonBarButtonColor: Colors.white,
@@ -137,7 +137,7 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
         const MaterialDesktopPlayOrPauseButton(),
         SkipNextButton(
           provider: widget.provider,
-          playlistSize: playlistController.mediaItems.length,
+          enabled: widget.playlistController.canSkipNext,
         ),
         const MaterialDesktopVolumeButton(),
         const MaterialDesktopPositionIndicator(),

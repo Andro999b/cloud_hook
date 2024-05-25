@@ -42,8 +42,7 @@ class CollectionItem extends _$CollectionItem {
     final value = state.requireValue;
     final currentItemPosition = value.currentItemPosition;
 
-    if (position < length - 60 &&
-        (currentItemPosition.position - position).abs() > 10) {
+    if ((currentItemPosition.position - position).abs() > 10) {
       final newValue = value.copyWith(
         positions: {
           value.currentItem: currentItemPosition.copyWith(

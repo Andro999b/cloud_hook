@@ -27,6 +27,12 @@ class _CollectionItemPrioritySelectorState
   final _focusNode = FocusNode();
 
   @override
+  void dispose() {
+    super.dispose();
+    _focusNode.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MenuAnchor(
       controller: _menuController,

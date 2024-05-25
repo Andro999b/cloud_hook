@@ -64,7 +64,7 @@ class VideoContentMobileView extends StatelessWidget {
         const Spacer(),
         SkipNextButton(
           provider: provider,
-          playlistSize: playlistController.mediaItems.length,
+          enabled: playlistController.canSkipNext,
           iconSize: 36.0,
         ),
         const Spacer(flex: 2),

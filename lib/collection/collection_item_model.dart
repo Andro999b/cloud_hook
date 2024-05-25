@@ -40,6 +40,7 @@ class MediaCollectionItem with ContentInfo, ContentProgress {
   final String title;
   @override
   final String image;
+  final MediaType mediaType;
   @override
   String? get subtitle => null;
   @override
@@ -63,6 +64,7 @@ class MediaCollectionItem with ContentInfo, ContentProgress {
     required this.supplier,
     required this.title,
     required this.image,
+    required this.mediaType,
     this.currentItem = 0,
     this.currentSource = 0,
     this.positions = const {},
@@ -78,6 +80,7 @@ class MediaCollectionItem with ContentInfo, ContentProgress {
         supplier: details.supplier,
         image: details.image,
         title: details.title,
+        mediaType: details.mediaType,
       );
 
   MediaCollectionItem copyWith({
@@ -94,6 +97,7 @@ class MediaCollectionItem with ContentInfo, ContentProgress {
       supplier: supplier,
       title: title ?? this.title,
       image: image ?? this.image,
+      mediaType: mediaType,
       currentItem: currentItem ?? this.currentItem,
       currentSource: currentSource ?? this.currentSource,
       positions: positions != null

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:cloud_hook/app_preferences.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
@@ -30,6 +31,9 @@ class PlaylistController {
   final List<ContentMediaItem> mediaItems;
   final WidgetRef ref;
 
+  var _canSkipPrev = false;
+  var _canSkipNext = false;
+
   PlaylistController({
     required this.provider,
     required this.player,
@@ -37,10 +41,16 @@ class PlaylistController {
     required this.ref,
   });
 
+  bool get canSkipPrev => _canSkipPrev;
+  bool get canSkipNext => _canSkipNext;
+
   Future<void> play(ContentProgress progress) async {
     try {
       final itemIdx = progress.currentItem;
       final sourceIdx = progress.currentSource;
+
+      _canSkipPrev = itemIdx > 0;
+      _canSkipNext = itemIdx < mediaItems.length - 1;
 
       final item = mediaItems[itemIdx];
       final sources = await item.sources;
@@ -50,12 +60,22 @@ class PlaylistController {
 
       final link = await source.link;
 
+      Duration? start;
+      if (progress.currentPosition > 10) {
+        var currentItemPosition = progress.currentItemPosition;
+        if (currentItemPosition.length - currentItemPosition.position < 60) {
+          start = Duration(seconds: currentItemPosition.length - 60);
+        } else {
+          start = Duration(seconds: progress.currentPosition);
+        }
+      }
+
+      inspect(start);
+
       final media = Media(
         link.toString(),
         httpHeaders: source.headers,
-        start: progress.currentPosition > 0
-            ? Duration(seconds: progress.currentPosition)
-            : null,
+        start: start,
       );
 
       await player.open(media);

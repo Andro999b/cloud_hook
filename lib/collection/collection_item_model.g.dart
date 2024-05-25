@@ -12,6 +12,7 @@ MediaCollectionItem _$MediaCollectionItemFromJson(Map<String, dynamic> json) =>
       supplier: json['supplier'] as String,
       title: json['title'] as String,
       image: json['image'] as String,
+      mediaType: $enumDecode(_$MediaTypeEnumMap, json['mediaType']),
       currentItem: (json['currentItem'] as num?)?.toInt() ?? 0,
       currentSource: (json['currentSource'] as num?)?.toInt() ?? 0,
       positions: (json['positions'] as Map<String, dynamic>?)?.map(
@@ -33,6 +34,7 @@ Map<String, dynamic> _$MediaCollectionItemToJson(
       'supplier': instance.supplier,
       'title': instance.title,
       'image': instance.image,
+      'mediaType': _$MediaTypeEnumMap[instance.mediaType]!,
       'currentItem': instance.currentItem,
       'currentSource': instance.currentSource,
       'positions': instance.positions.map((k, e) => MapEntry(k.toString(), e)),
@@ -40,6 +42,11 @@ Map<String, dynamic> _$MediaCollectionItemToJson(
       'priority': instance.priority,
       'lastSeen': _dateTimeToMilli(instance.lastSeen),
     };
+
+const _$MediaTypeEnumMap = {
+  MediaType.video: 'video',
+  MediaType.manga: 'manga',
+};
 
 const _$MediaCollectionItemStatusEnumMap = {
   MediaCollectionItemStatus.none: 'none',

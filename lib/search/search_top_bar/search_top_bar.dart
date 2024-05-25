@@ -76,14 +76,6 @@ class SearchTopBar extends HookConsumerWidget {
                   EdgeInsets.only(left: 16.0, right: 8.0)),
               autoFocus: true,
               leading: const Icon(Icons.search),
-              // trailing: [
-              //   IconButton(
-              //     onPressed: () {
-              //       showFilter.value = !showFilter.value;
-              //     },
-              //     icon: const Icon(Icons.filter_list),
-              //   )
-              // ],
               controller: controller,
               onTap: () {
                 controller.openView();
@@ -200,19 +192,31 @@ class _TopSearchSuggestions extends HookConsumerWidget {
   }
 
   Widget _renderSuggestion(SearchSuggestion suggestion, WidgetRef ref) {
-    return ListTile(
-      contentPadding: const EdgeInsets.only(left: 16.0, right: 8.0),
-      title: Text(suggestion.text),
-      trailing: IconButton(
-        icon: const Icon(Icons.delete),
-        onPressed: () {
-          ref.read(suggestionsProvider.notifier).deleteSuggestion(suggestion);
-        },
-      ),
-      onTap: () {
-        onSelect(suggestion.text);
-        searchController.closeView(suggestion.text);
-      },
+    return Stack(
+      children: [
+        ListTile(
+          contentPadding: const EdgeInsets.only(left: 16.0, right: 56.0),
+          title: Text(suggestion.text),
+          onTap: () {
+            onSelect(suggestion.text);
+            searchController.closeView(suggestion.text);
+          },
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () {
+                ref
+                    .read(suggestionsProvider.notifier)
+                    .deleteSuggestion(suggestion);
+              },
+            ),
+          ),
+        )
+      ],
     );
   }
 }

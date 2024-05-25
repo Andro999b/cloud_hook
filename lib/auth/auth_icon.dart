@@ -46,6 +46,12 @@ class _AuthUserMenuState extends ConsumerState<_AuthUserMenu> {
   final FocusNode _focusNode = FocusNode();
 
   @override
+  void dispose() {
+    super.dispose();
+    _focusNode.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider).requireValue!;
 

@@ -4,12 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final colors = [
   Colors.deepOrange,
+  Colors.orange,
   Colors.amber,
+  Colors.yellow,
   Colors.lime,
   Colors.lightGreen,
   Colors.green,
   Colors.teal,
-  Colors.blueGrey,
+  Colors.cyan,
   Colors.blue,
   Colors.indigo,
   Colors.purple,

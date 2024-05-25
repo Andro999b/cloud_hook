@@ -21,8 +21,10 @@ class SearchState extends Equatable {
   )   : isLoading = true,
         results = const {};
 
-  SearchState copyWith(
-      {Map<String, List<ContentSearchResult>>? results, bool? isLoading}) {
+  SearchState copyWith({
+    Map<String, List<ContentSearchResult>>? results,
+    bool? isLoading,
+  }) {
     return SearchState(
       results: results ?? this.results,
       isLoading: isLoading ?? this.isLoading,

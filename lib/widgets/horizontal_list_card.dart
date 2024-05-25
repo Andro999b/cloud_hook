@@ -1,3 +1,4 @@
+import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -26,6 +27,7 @@ class HorizontalListCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final focused = useState(false);
 
     var imageWidth =
@@ -40,6 +42,15 @@ class HorizontalListCard extends HookWidget {
     return Card(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       elevation: focused.value ? 5 : 1,
+      shape: RoundedRectangleBorder(
+        side: focused.value && AndroidTVDetector.isTV
+            ? BorderSide(
+                color: theme.colorScheme.primaryContainer,
+                width: 2,
+              )
+            : BorderSide.none,
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Stack(
         children: [
           Container(

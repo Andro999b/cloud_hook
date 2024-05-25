@@ -12,7 +12,6 @@ class CollectionTopBar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final paddings = getPadding(context);
     final mobile = isMobile(context);
     final controller = useTextEditingController(
       text: ref.read(collectionFilterQueryProvider),
@@ -33,7 +32,7 @@ class CollectionTopBar extends HookConsumerWidget {
             Expanded(
               child: _renderSearhBar(ref, controller, focusNode),
             ),
-            _renderSettingsIcon(ref, controller, showFilter)
+            _renderSettingsIcon(ref, showFilter)
           ],
         ),
         if (showFilter.value) _StatusFilter(),
@@ -67,31 +66,15 @@ class CollectionTopBar extends HookConsumerWidget {
 
   Widget _renderSettingsIcon(
     WidgetRef ref,
-    TextEditingController controller,
     ValueNotifier<bool> showFilter,
   ) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
-      child: ValueListenableBuilder(
-        valueListenable: controller,
-        builder: (context, value, child) {
-          if (value.text.isNotEmpty) {
-            return IconButton(
-              onPressed: () {
-                ref.read(collectionFilterQueryProvider.notifier).state = "";
-                controller.clear();
-              },
-              icon: const Icon(Icons.close),
-            );
-          } else {
-            return IconButton(
-              onPressed: () {
-                showFilter.value = !showFilter.value;
-              },
-              icon: const Icon(Icons.tune),
-            );
-          }
+      child: IconButton(
+        onPressed: () {
+          showFilter.value = !showFilter.value;
         },
+        icon: const Icon(Icons.tune),
       ),
     );
   }

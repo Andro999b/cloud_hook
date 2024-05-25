@@ -4,6 +4,7 @@ import 'package:cloud_hook/app_database.dart';
 import 'package:cloud_hook/auth/auth.dart' as auth;
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_sync.dart';
+import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:firebase_dart/firebase_dart.dart';
 import 'package:isar/isar.dart';
 
@@ -18,6 +19,7 @@ class IsarMediaCollectionItem {
     required this.title,
     required this.image,
     required this.status,
+    required this.mediaType,
     this.currentItem,
     this.currentSource,
     this.positions,
@@ -37,6 +39,8 @@ class IsarMediaCollectionItem {
   final String supplier;
   final String title;
   final String image;
+  @Enumerated(EnumType.ordinal)
+  MediaType mediaType;
   int? currentItem;
   int? currentSource;
   List<IsarMediaItemPosition>? positions;
@@ -58,6 +62,7 @@ class IsarMediaCollectionItem {
       supplier: collectionItem.supplier,
       title: collectionItem.title,
       image: collectionItem.image,
+      mediaType: collectionItem.mediaType,
       currentItem: collectionItem.currentItem,
       currentSource: collectionItem.currentSource,
       positions: collectionItem.positions.entries
@@ -81,6 +86,7 @@ class IsarMediaCollectionItem {
       supplier: supplier,
       title: title,
       image: image,
+      mediaType: mediaType,
       currentItem: currentItem ?? 0,
       currentSource: currentSource ?? 0,
       positions: Map.fromEntries(

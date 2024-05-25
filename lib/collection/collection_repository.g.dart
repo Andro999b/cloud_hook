@@ -48,30 +48,36 @@ const IsarMediaCollectionItemSchema = CollectionSchema(
       name: r'lastSeen',
       type: IsarType.dateTime,
     ),
-    r'positions': PropertySchema(
+    r'mediaType': PropertySchema(
       id: 6,
+      name: r'mediaType',
+      type: IsarType.byte,
+      enumMap: _IsarMediaCollectionItemmediaTypeEnumValueMap,
+    ),
+    r'positions': PropertySchema(
+      id: 7,
       name: r'positions',
       type: IsarType.objectList,
       target: r'IsarMediaCollectionItemPosition',
     ),
     r'priority': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'priority',
       type: IsarType.long,
     ),
     r'status': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'status',
       type: IsarType.byte,
       enumMap: _IsarMediaCollectionItemstatusEnumValueMap,
     ),
     r'supplier': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'supplier',
       type: IsarType.string,
     ),
     r'title': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'title',
       type: IsarType.string,
     )
@@ -170,16 +176,17 @@ void _isarMediaCollectionItemSerialize(
   writer.writeString(offsets[3], object.id);
   writer.writeString(offsets[4], object.image);
   writer.writeDateTime(offsets[5], object.lastSeen);
+  writer.writeByte(offsets[6], object.mediaType.index);
   writer.writeObjectList<IsarMediaItemPosition>(
-    offsets[6],
+    offsets[7],
     allOffsets,
     IsarMediaItemPositionSchema.serialize,
     object.positions,
   );
-  writer.writeLong(offsets[7], object.priority);
-  writer.writeByte(offsets[8], object.status.index);
-  writer.writeString(offsets[9], object.supplier);
-  writer.writeString(offsets[10], object.title);
+  writer.writeLong(offsets[8], object.priority);
+  writer.writeByte(offsets[9], object.status.index);
+  writer.writeString(offsets[10], object.supplier);
+  writer.writeString(offsets[11], object.title);
 }
 
 IsarMediaCollectionItem _isarMediaCollectionItemDeserialize(
@@ -195,18 +202,21 @@ IsarMediaCollectionItem _isarMediaCollectionItemDeserialize(
     image: reader.readString(offsets[4]),
     isarId: id,
     lastSeen: reader.readDateTimeOrNull(offsets[5]),
+    mediaType: _IsarMediaCollectionItemmediaTypeValueEnumMap[
+            reader.readByteOrNull(offsets[6])] ??
+        MediaType.video,
     positions: reader.readObjectList<IsarMediaItemPosition>(
-      offsets[6],
+      offsets[7],
       IsarMediaItemPositionSchema.deserialize,
       allOffsets,
       IsarMediaItemPosition(),
     ),
-    priority: reader.readLongOrNull(offsets[7]),
+    priority: reader.readLongOrNull(offsets[8]),
     status: _IsarMediaCollectionItemstatusValueEnumMap[
-            reader.readByteOrNull(offsets[8])] ??
+            reader.readByteOrNull(offsets[9])] ??
         MediaCollectionItemStatus.none,
-    supplier: reader.readString(offsets[9]),
-    title: reader.readString(offsets[10]),
+    supplier: reader.readString(offsets[10]),
+    title: reader.readString(offsets[11]),
   );
   return object;
 }
@@ -231,27 +241,39 @@ P _isarMediaCollectionItemDeserializeProp<P>(
     case 5:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 6:
+      return (_IsarMediaCollectionItemmediaTypeValueEnumMap[
+              reader.readByteOrNull(offset)] ??
+          MediaType.video) as P;
+    case 7:
       return (reader.readObjectList<IsarMediaItemPosition>(
         offset,
         IsarMediaItemPositionSchema.deserialize,
         allOffsets,
         IsarMediaItemPosition(),
       )) as P;
-    case 7:
-      return (reader.readLongOrNull(offset)) as P;
     case 8:
+      return (reader.readLongOrNull(offset)) as P;
+    case 9:
       return (_IsarMediaCollectionItemstatusValueEnumMap[
               reader.readByteOrNull(offset)] ??
           MediaCollectionItemStatus.none) as P;
-    case 9:
-      return (reader.readString(offset)) as P;
     case 10:
+      return (reader.readString(offset)) as P;
+    case 11:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
 }
 
+const _IsarMediaCollectionItemmediaTypeEnumValueMap = {
+  'video': 0,
+  'manga': 1,
+};
+const _IsarMediaCollectionItemmediaTypeValueEnumMap = {
+  0: MediaType.video,
+  1: MediaType.manga,
+};
 const _IsarMediaCollectionItemstatusEnumValueMap = {
   'none': 0,
   'latter': 1,
@@ -1494,6 +1516,62 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> mediaTypeEqualTo(MediaType value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'mediaType',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> mediaTypeGreaterThan(
+    MediaType value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'mediaType',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> mediaTypeLessThan(
+    MediaType value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'mediaType',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> mediaTypeBetween(
+    MediaType lower,
+    MediaType upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'mediaType',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
       QAfterFilterCondition> positionsIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -2094,6 +2172,20 @@ extension IsarMediaCollectionItemQuerySortBy
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
+      sortByMediaType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'mediaType', Sort.asc);
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
+      sortByMediaTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'mediaType', Sort.desc);
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
       sortByPriority() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'priority', Sort.asc);
@@ -2237,6 +2329,20 @@ extension IsarMediaCollectionItemQuerySortThenBy on QueryBuilder<
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
+      thenByMediaType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'mediaType', Sort.asc);
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
+      thenByMediaTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'mediaType', Sort.desc);
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
       thenByPriority() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'priority', Sort.asc);
@@ -2338,6 +2444,13 @@ extension IsarMediaCollectionItemQueryWhereDistinct on QueryBuilder<
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QDistinct>
+      distinctByMediaType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'mediaType');
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QDistinct>
       distinctByPriority() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'priority');
@@ -2413,6 +2526,13 @@ extension IsarMediaCollectionItemQueryProperty on QueryBuilder<
       lastSeenProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'lastSeen');
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, MediaType, QQueryOperations>
+      mediaTypeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'mediaType');
     });
   }
 

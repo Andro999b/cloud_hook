@@ -247,14 +247,16 @@ class SkipPrevButton extends _MediaCollectionItemConsumerWidger {
 }
 
 class SkipNextButton extends _MediaCollectionItemConsumerWidger {
-  final int playlistSize;
+  final bool enabled;
   final double? iconSize;
+  final FocusNode? focusNode;
 
   const SkipNextButton({
     super.key,
-    required this.playlistSize,
+    this.enabled = true,
     required super.provider,
     this.iconSize,
+    this.focusNode,
   });
 
   @override
@@ -264,7 +266,7 @@ class SkipNextButton extends _MediaCollectionItemConsumerWidger {
     MediaCollectionItem collectionItem,
   ) {
     return IconButton(
-      onPressed: collectionItem.currentItem < playlistSize - 1
+      onPressed: enabled
           ? () {
               ref
                   .read(provider.notifier)
@@ -276,6 +278,7 @@ class SkipNextButton extends _MediaCollectionItemConsumerWidger {
       iconSize: iconSize,
       color: Colors.white,
       disabledColor: Colors.white.withOpacity(0.7),
+      focusNode: focusNode,
     );
   }
 }
