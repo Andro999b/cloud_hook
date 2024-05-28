@@ -103,7 +103,7 @@ class AnimeUAClubSupplier extends ContentSupplier {
       scope: "#dle-content",
       item: SelectorsToMap(
         {
-          "id": Const(Uri.encodeComponent(id)),
+          "id": Const(id),
           "supplier": Const(name),
           "title": Text.forScope(".page__subcol-main > h1"),
           "originalTitle":
@@ -111,16 +111,17 @@ class AnimeUAClubSupplier extends ContentSupplier {
           "image": Image.forScope(
               ".pmovie__poster > img", attribute: "data-src", host),
           "description": Text.forScope(".page__text"),
-          "additionalInfo": Expand([
-            Join([
+          "additionalInfo": PrependAll(
+            [
+              Text.forScope(".page__subcol-main .pmovie__subrating--site"),
               Text.forScope(".page__subcol-main > .pmovie__year"),
               Text.forScope(".page__subcol-main > .pmovie__genres"),
-            ]),
+            ],
             IterateOverScope(
               itemScope: ".page__subcol-side2 li",
               item: Text(inline: true),
-            )
-          ]),
+            ),
+          ),
           "similar":
               Scope(scope: ".pmovie__related", item: _contentInfoSelector),
           "iframe": Attribute.forScope(

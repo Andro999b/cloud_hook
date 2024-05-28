@@ -29,8 +29,7 @@ class VideoContentDesktopView extends StatefulWidget {
 }
 
 class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
-  //dirty hack to catch video state for fullscren shortcuts
-  final videoState = ValueNotifier<VideoState?>(null);
+  late final GlobalKey<VideoState> videoStateKey = GlobalKey<VideoState>();
 
   late final _keyboardShortcuts = {
     const SingleActivator(LogicalKeyboardKey.mediaPlay): () =>
@@ -79,11 +78,11 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
     },
     // dirty hack with video state...
     const SingleActivator(LogicalKeyboardKey.keyF): () =>
-        _toggleFullsreen(videoState.value!),
+        videoStateKey.currentState?.toggleFullscreen(),
     const SingleActivator(LogicalKeyboardKey.enter): () =>
-        _toggleFullsreen(videoState.value!),
+        videoStateKey.currentState?.toggleFullscreen(),
     const SingleActivator(LogicalKeyboardKey.escape): () =>
-        videoState.value!.exitFullscreen()
+        videoStateKey.currentState?.exitFullscreen()
   };
 
   void _toggleFullsreen(VideoState videoState) {
@@ -101,11 +100,9 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
       normal: desktopThemeData,
       fullscreen: desktopThemeData,
       child: Video(
+        key: videoStateKey,
         controller: widget.videoController,
-        controls: (state) {
-          videoState.value = state;
-          return MaterialDesktopVideoControls(state);
-        },
+        controls: (state) => MaterialDesktopVideoControls(state),
       ),
     );
   }

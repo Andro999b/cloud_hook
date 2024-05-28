@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:cloud_hook/app_preferences.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
@@ -69,8 +68,6 @@ class PlaylistController {
           start = Duration(seconds: progress.currentPosition);
         }
       }
-
-      inspect(start);
 
       final media = Media(
         link.toString(),
@@ -212,7 +209,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
       _ => _renderDesktopView()
     };
 
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery.sizeOf(context);
 
     return Container(
       height: size.height,

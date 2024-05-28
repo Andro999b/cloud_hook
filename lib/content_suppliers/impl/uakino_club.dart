@@ -99,17 +99,20 @@ class UAKinoClubSupplier extends ContentSupplier {
       scope: "#dle-content",
       item: SelectorsToMap(
         {
-          "id": Const(Uri.encodeComponent(id)),
+          "id": Const(id),
           "supplier": Const(name),
           "title": Text.forScope(".solototle"),
           "originalTitle": Text.forScope(".origintitle"),
           "image": Image.forScope(".film-poster img", host),
           "description": Text.forScope("div[itemprop=description]"),
-          "additionalInfo": IterateOverScope(
-            itemScope: ".film-info > *",
-            item: ConcatSelectors(
-              [Text.forScope(".fi-label"), Text.forScope(".fi-desc")],
+          "additionalInfo": Filter(
+            IterateOverScope(
+              itemScope: ".film-info > *",
+              item: ConcatSelectors(
+                [Text.forScope(".fi-label"), Text.forScope(".fi-desc")],
+              ),
             ),
+            filter: (text) => !text.startsWith("Доступно"),
           ),
           "similar": IterateOverScope(
             itemScope: ".related-items > .related-item > a",

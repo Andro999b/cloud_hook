@@ -2,35 +2,36 @@ import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/widgets/horizontal_list_card.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
-
-const maxImageWidth = 320.0;
+import 'package:go_router/go_router.dart';
 
 class ContentInfoCard extends StatelessWidget {
   final bool autofocus;
 
   final ValueChanged<bool>? onHover;
   final GestureLongPressCallback? onLongPress;
+  final Widget? corner;
+  final ContentInfo contentInfo;
+  final GestureTapCallback? onTap;
 
   const ContentInfoCard({
     super.key,
     required this.contentInfo,
     this.corner,
-    required this.onTap,
+    this.onTap,
     this.onHover,
     this.onLongPress,
     this.autofocus = false,
   });
 
-  final Widget? corner;
-  final ContentInfo contentInfo;
-  final GestureTapCallback onTap;
-
   @override
   Widget build(BuildContext context) {
-    // final theme = Theme.of(context).textTheme.;
     return HorizontalListCard(
       autofocus: autofocus,
-      onTap: onTap,
+      onTap: onTap ??
+          () {
+            context.push(
+                "/content/${contentInfo.supplier}/${Uri.encodeComponent(contentInfo.id)}");
+          },
       onHover: onHover,
       onLongPress: onLongPress,
       decoration: BoxDecoration(

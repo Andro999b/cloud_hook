@@ -252,7 +252,8 @@ class FirebaseRepository extends CollectionRepository {
       return;
     }
 
-    final itemId = "${collectionItem.supplier}${collectionItem.id}";
+    final itemId =
+        "${collectionItem.supplier}${collectionItem.id.replaceAll("/", "|")}";
     final ref = database.reference().child("collection/${user!.id}/$itemId");
 
     await ref.set(collectionItem.toJson());

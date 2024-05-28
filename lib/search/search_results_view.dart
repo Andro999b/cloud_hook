@@ -5,7 +5,6 @@ import 'package:cloud_hook/search/search_model.dart';
 import 'package:cloud_hook/search/search_provider.dart';
 import 'package:cloud_hook/widgets/horizontal_list.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SearchResultsView extends HookConsumerWidget {
@@ -68,9 +67,6 @@ class SearchResultsView extends HookConsumerWidget {
 
         return ContentInfoCard(
           contentInfo: item,
-          onTap: () {
-            context.push("/content/${item.supplier}/${item.id}");
-          },
         );
       },
       itemCount: value.length,

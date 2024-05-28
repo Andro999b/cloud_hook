@@ -65,7 +65,7 @@ class MainApp extends StatelessWidget {
             navigatorKey: rootNavigatorKey,
             // initialLocation: "/search",
             // initialLocation: "/collection",
-            // // initialLocation: "/settings",
+            // // // initialLocation: "/settings",
             // initialLocation:
             //     "/content/UAKinoClub/animeukr%2Fanime-series%2F21505-puppo-1-sezon",
             // initialLocation: "/video/UAFilmsTV/18323-utawarerumono",

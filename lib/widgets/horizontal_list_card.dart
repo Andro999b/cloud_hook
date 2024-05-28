@@ -1,9 +1,6 @@
 import 'package:cloud_hook/utils/android_tv.dart';
-import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-
-const maxImageWidth = 320.0;
 
 class HorizontalListCard extends HookWidget {
   final GestureTapCallback onTap;
@@ -30,13 +27,7 @@ class HorizontalListCard extends HookWidget {
     final theme = Theme.of(context);
     final focused = useState(false);
 
-    var imageWidth =
-        isMobile(context) ? MediaQuery.of(context).size.width * .45 : 200.0;
-
-    if (imageWidth > maxImageWidth) {
-      imageWidth = maxImageWidth;
-    }
-
+    var imageWidth = 195.0;
     final imageHeight = imageWidth * 1.5;
 
     return Card(

@@ -157,20 +157,38 @@ class ConcatSelectors extends Merge<String, Object?> {
         );
 }
 
-class Join extends Merge<List<Object?>, Object?> {
-  Join(Iterable<Selector<Object?>> children)
+class Join<R> extends Merge<List<R?>, R?> {
+  Join(Iterable<Selector<R?>> children)
       : super(
           merge: (result) => result,
           children: children,
         );
 }
 
-class Expand extends Merge<List<Object?>, List<Object?>> {
-  Expand(Iterable<Selector<List<Object?>>> children, {separator = " "})
+class Expand<R> extends Merge<List<R?>, List<R?>> {
+  Expand(Iterable<Selector<List<R?>>> children, {separator = " "})
       : super(
           merge: (result) => result.expand((e) => e).toList(),
           children: children,
         );
+}
+
+class PrependAll<R> extends Selector<List<R?>> {
+  final Selector<List<R?>> listSelector;
+  final List<Selector<R?>> prependItems;
+
+  PrependAll(this.prependItems, this.listSelector);
+
+  @override
+  FutureOr<List<R?>> select(dom.Element element) async {
+    final a = await Stream.fromIterable(prependItems)
+        .asyncMap((item) => item.select(element))
+        .toList();
+
+    final b = await listSelector.select(element);
+
+    return a + b;
+  }
 }
 
 class Concat extends Selector<String> {
@@ -184,6 +202,20 @@ class Concat extends Selector<String> {
     final res = await selector.select(element);
 
     return res.nonNulls.where((e) => e.isNotEmpty).join(separator);
+  }
+}
+
+class Filter<R> extends Selector<List<R>> {
+  final Selector<List<R>> selector;
+  final bool Function(R) filter;
+
+  Filter(this.selector, {required this.filter});
+
+  @override
+  FutureOr<List<R>> select(dom.Element element) async {
+    final res = await selector.select(element);
+
+    return res.where(filter).toList();
   }
 }
 

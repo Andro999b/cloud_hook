@@ -5,11 +5,11 @@ import 'package:isar/isar.dart';
 const mobileWidth = 450.0;
 
 bool isMobile(BuildContext context) {
-  return MediaQuery.of(context).size.width < mobileWidth;
+  return MediaQuery.sizeOf(context).width < mobileWidth;
 }
 
 float getPadding(BuildContext context) {
-  return MediaQuery.of(context).size.width < mobileWidth ? 8.0 : 16.0;
+  return MediaQuery.sizeOf(context).width < mobileWidth ? 8.0 : 16.0;
 }
 
 Future<bool> isAndroidTV() async {

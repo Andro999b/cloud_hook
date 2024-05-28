@@ -13,7 +13,6 @@ import 'package:cloud_hook/widgets/use_search_hint.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class CollectionScreen extends StatelessWidget {
@@ -119,9 +118,6 @@ class CollectionHorizontalListItem extends HookConsumerWidget {
     return ContentInfoCard(
       autofocus: autofocuse,
       contentInfo: item,
-      onTap: () {
-        context.push("/content/${item.supplier}/${item.id}");
-      },
       onHover: (value) {
         cornerVisible.value = value;
       },

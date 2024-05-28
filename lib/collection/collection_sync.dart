@@ -38,7 +38,7 @@ class CollectionSync {
       return;
     }
 
-    isar.writeTxn(() async {
+    await isar.writeTxn(() async {
       // iterate remote items
       for (final remoteItemJson in remoteCollection.values) {
         var remoteItem = MediaCollectionItem.fromJson(remoteItemJson);

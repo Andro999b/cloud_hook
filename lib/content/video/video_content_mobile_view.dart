@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
-class VideoContentMobileView extends StatelessWidget {
+class VideoContentMobileView extends StatefulWidget {
   final CollectionItemProvider provider;
   final ContentDetails details;
   final Player player;
@@ -23,13 +23,30 @@ class VideoContentMobileView extends StatelessWidget {
   });
 
   @override
+  State<VideoContentMobileView> createState() => _VideoContentMobileViewState();
+}
+
+class _VideoContentMobileViewState extends State<VideoContentMobileView> {
+  late final GlobalKey<VideoState> videoStateKey = GlobalKey<VideoState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      videoStateKey.currentState?.enterFullscreen();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final themeData = _createThemeData();
     return MaterialVideoControlsTheme(
       normal: themeData,
       fullscreen: themeData,
       child: Video(
-        controller: videoController,
+        key: videoStateKey,
+        pauseUponEnteringBackgroundMode: false,
+        controller: widget.videoController,
         controls: (state) => MaterialVideoControls(state),
       ),
     );
@@ -42,29 +59,29 @@ class VideoContentMobileView extends StatelessWidget {
         const ExitButton(),
         const SizedBox(width: 8),
         MediaTitle(
-          details: details,
-          playlistSize: playlistController.mediaItems.length,
-          provider: provider,
+          details: widget.details,
+          playlistSize: widget.playlistController.mediaItems.length,
+          provider: widget.provider,
         ),
         const Spacer(),
-        if (playlistController.mediaItems.length > 1)
+        if (widget.playlistController.mediaItems.length > 1)
           PlaylistButton(
-            playlistController: playlistController,
-            provider: provider,
+            playlistController: widget.playlistController,
+            provider: widget.provider,
           )
       ],
       primaryButtonBar: [
         const Spacer(flex: 2),
         SkipPrevButton(
-          provider: provider,
+          provider: widget.provider,
           iconSize: 36.0,
         ),
         const Spacer(),
         const MaterialPlayOrPauseButton(iconSize: 48.0),
         const Spacer(),
         SkipNextButton(
-          provider: provider,
-          enabled: playlistController.canSkipNext,
+          provider: widget.provider,
+          enabled: widget.playlistController.canSkipNext,
           iconSize: 36.0,
         ),
         const Spacer(flex: 2),
@@ -73,14 +90,15 @@ class VideoContentMobileView extends StatelessWidget {
         const MaterialPositionIndicator(),
         const Spacer(),
         SourceSelector(
-          mediaItems: playlistController.mediaItems,
-          provider: provider,
+          mediaItems: widget.playlistController.mediaItems,
+          provider: widget.provider,
         ),
         const MaterialFullscreenButton(),
       ],
       bottomButtonBarMargin: const EdgeInsets.symmetric(horizontal: 16),
       seekGesture: true,
       seekOnDoubleTap: true,
+      volumeGesture: true,
     );
   }
 }

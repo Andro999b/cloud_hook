@@ -6,7 +6,6 @@ import 'package:cloud_hook/widgets/horizontal_list.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class Recommendations extends ConsumerWidget {
@@ -83,9 +82,6 @@ class _RecomendationChannel extends HookConsumerWidget {
 
         return ContentInfoCard(
           contentInfo: item,
-          onTap: () {
-            context.push("/content/${item.supplier}/${item.id}");
-          },
         );
       },
       itemCount: state.recomendations.length,

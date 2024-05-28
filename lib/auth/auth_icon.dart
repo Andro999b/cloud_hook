@@ -2,9 +2,7 @@ import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/auth/auth.dart';
 import 'package:cloud_hook/auth/auth_provider.dart';
 import 'package:cloud_hook/collection/collection_sync.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -27,7 +25,7 @@ class AuthIcon extends ConsumerWidget {
 
     return user.maybeWhen(
       data: (user) {
-        return user != null ? _AuthUserMenu() : _renderLogin(ref);
+        return user != null ? const _AuthUserMenu() : _renderLogin(ref);
       },
       orElse: () => _renderLogin(ref),
     );

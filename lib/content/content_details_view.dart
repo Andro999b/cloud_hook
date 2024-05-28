@@ -23,76 +23,78 @@ class ContentDetailsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final size = MediaQuery.of(context).size;
     final mobile = isMobile(context);
 
-    return Container(
-      height: size.height,
-      width: size.width,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: FastCachedImageProvider(contentDetails.image),
-          alignment: mobile ? Alignment.topCenter : Alignment.centerRight,
-          fit: mobile ? BoxFit.fitWidth : BoxFit.fitHeight,
-        ),
-      ),
-      child: SingleChildScrollView(
-        child: _renderMainInfo(context),
-      ),
-    );
-  }
+    const imageRatio = .45;
 
-  double _calcMaxWidth(Size size, bool mobile) {
-    var maxWidth = mobile ? size.width : size.width * .5 - 80;
-
-    if (maxWidth < mobileWidth) {
-      maxWidth = mobileWidth;
-    }
-
-    return maxWidth;
-  }
-
-  Widget _renderMainInfo(BuildContext context) {
-    final paddings = getPadding(context);
-    final mobile = isMobile(context);
-    final size = MediaQuery.of(context).size;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    final bottomPart = Container(
-      padding: mobile ? EdgeInsets.symmetric(horizontal: paddings) : null,
-      decoration: mobile ? BoxDecoration(color: colorScheme.surface) : null,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return LayoutBuilder(
+      builder: (context, constraints) => Stack(
         children: [
-          const SizedBox(height: 8),
-          _ContentWatchButtons(contentDetails),
-          _MediaCollectionItemButtons(contentDetails),
-          if (contentDetails.additionalInfo.isNotEmpty)
-            ..._renderAdditionalInfo(context),
-          SizedBox(height: paddings),
-          _renderDescription(context),
-          if (contentDetails.similar.isNotEmpty) ..._renderSimilar(context),
-          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.topRight,
+            child: Container(
+              width: mobile
+                  ? constraints.maxWidth
+                  : constraints.maxWidth * imageRatio,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: FastCachedImageProvider(contentDetails.image),
+                  fit: mobile ? BoxFit.fitWidth : BoxFit.contain,
+                  alignment: Alignment.topRight,
+                ),
+              ),
+            ),
+          ),
+          SingleChildScrollView(
+            child: _renderMainInfo(
+              context,
+              mobile
+                  ? constraints.maxWidth
+                  : constraints.maxWidth * (1 - imageRatio),
+            ),
+          )
         ],
       ),
     );
+  }
 
-    return Align(
-      alignment: Alignment.topLeft,
-      child: Container(
-        constraints: BoxConstraints(
-          minWidth: mobileWidth,
-          maxWidth: _calcMaxWidth(size, mobile),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _renderTitile(context),
-            if (mobile) SizedBox(height: size.height * .5),
-            bottomPart
-          ],
-        ),
+  Widget _renderMainInfo(BuildContext context, double width) {
+    final paddings = getPadding(context);
+    final mobile = isMobile(context);
+    final theme = Theme.of(context);
+    final size = MediaQuery.sizeOf(context);
+
+    return SizedBox(
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _renderTitile(context),
+          if (mobile) SizedBox(height: size.height * .5),
+          Container(
+            padding: mobile
+                ? EdgeInsets.symmetric(horizontal: paddings)
+                : EdgeInsets.only(right: paddings),
+            decoration: BoxDecoration(
+              color: mobile ? theme.colorScheme.background : Colors.transparent,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 8),
+                _ContentWatchButtons(contentDetails),
+                _MediaCollectionItemButtons(contentDetails),
+                if (contentDetails.additionalInfo.isNotEmpty)
+                  ..._renderAdditionalInfo(context),
+                SizedBox(height: paddings),
+                _renderDescription(context),
+                if (contentDetails.similar.isNotEmpty)
+                  ..._renderSimilar(context),
+                const SizedBox(height: 8),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
@@ -153,9 +155,22 @@ class ContentDetailsView extends ConsumerWidget {
       Wrap(
         spacing: 6,
         runSpacing: 6,
-        children: contentDetails.additionalInfo
-            .map((e) => Chip(label: Text(e)))
-            .toList(),
+        children: [
+          Card.filled(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(contentDetails.supplier),
+            ),
+          ),
+          ...contentDetails.additionalInfo.map(
+            (e) => Card.outlined(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(e),
+              ),
+            ),
+          ),
+        ],
       )
     ];
   }
@@ -199,9 +214,6 @@ class ContentDetailsView extends ConsumerWidget {
             .map(
               (e) => ContentInfoCard(
                 contentInfo: e,
-                onTap: () {
-                  context.push("/content/${e.supplier}/${e.id}");
-                },
               ),
             )
             .toList(),
@@ -270,7 +282,8 @@ class _ContentWatchButtons extends HookWidget {
     return FilledButton.tonalIcon(
       autofocus: true,
       onPressed: () {
-        context.push("/video/${contentDetails.supplier}/${contentDetails.id}");
+        context.push(
+            "/${contentDetails.mediaType.name}/${contentDetails.supplier}/${Uri.encodeComponent(contentDetails.id)}");
       },
       icon: const Icon(Icons.play_arrow_outlined),
       label: Text(AppLocalizations.of(context)!.watchButton),
@@ -313,7 +326,7 @@ class _ContentPlaylistButton extends ConsumerWidget {
             onSelect: (item) {
               ref.read(provider.notifier).setCurrentItem(item.number);
               context.push(
-                  "/video/${contentDetails.supplier}/${contentDetails.id}");
+                  "/${contentDetails.mediaType.name}/${contentDetails.supplier}/${Uri.encodeComponent(contentDetails.id)}");
             },
           ),
         );

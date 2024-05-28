@@ -14,5 +14,5 @@ String extractIdFromUrl(String url, {RegExp? regexp}) {
     throw Exception("id not found in url: $url");
   }
 
-  return Uri.encodeComponent(id);
+  return id;
 }

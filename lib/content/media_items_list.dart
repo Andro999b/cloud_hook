@@ -44,17 +44,23 @@ class MediaItemsListRoute<T> extends PopupRoute<T> {
 
     return SlideTransition(
       position: animation.drive(tween),
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: AppTheme(
-          child: SafeArea(
-            child: _MediaItemsListView(
-              mediaItems: mediaItems,
-              contentProgress: contentProgress,
-              onSelect: (item) {
-                Navigator.of(context).pop();
-                onSelect(item);
-              },
+      child: BackButtonListener(
+        onBackButtonPressed: () async {
+          Navigator.of(context).maybePop();
+          return true;
+        },
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: AppTheme(
+            child: SafeArea(
+              child: _MediaItemsListView(
+                mediaItems: mediaItems,
+                contentProgress: contentProgress,
+                onSelect: (item) {
+                  Navigator.of(context).pop();
+                  onSelect(item);
+                },
+              ),
             ),
           ),
         ),
@@ -76,7 +82,7 @@ class _MediaItemsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery.sizeOf(context);
     final theme = Theme.of(context);
     final mobile = isMobile(context);
 

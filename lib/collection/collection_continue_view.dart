@@ -44,9 +44,6 @@ class CollectionContinueView extends ConsumerWidget {
         return ContentInfoCard(
           autofocus: index == 0,
           contentInfo: item,
-          onTap: () {
-            context.push("/content/${item.supplier}/${item.id}");
-          },
         );
       },
       itemCount: items.length,

@@ -121,7 +121,7 @@ class UFDubSupplier extends ContentSupplier {
       scope: "div.cols",
       item: SelectorsToMap(
         {
-          "id": Const(Uri.encodeComponent(id)),
+          "id": Const(id),
           "supplier": Const(name),
           "title": TextNodes.forScope("article .full-title > h1"),
           "originalTitle":

@@ -121,19 +121,23 @@ class UAFilmsTVSupplier extends ContentSupplier {
       scope: "#dle-content",
       item: SelectorsToMap(
         {
-          "id": Const(Uri.encodeComponent(id)),
+          "id": Const(id),
           "supplier": Const(name),
           "title": Text.forScope("h1[itemprop='name']"),
           "originalTitle":
               Text.forScope("span[itemprop='alternativeHeadline']"),
           "image": Image.forScope(".m-img>img", host),
           "description": TextNodes.forScope(".m-desc"),
-          "additionalInfo": IterateOverScope(
-            itemScope: ".m-desc>.m-info>.m-info>.mi-item",
-            item: ConcatSelectors(
-              [Text.forScope(".mi-label-desc"), Text.forScope(".mi-desc")],
-            ),
-          ),
+          "additionalInfo": PrependAll(
+              [
+                Text.forScope(".m-ratings > .mr-item-rate > b"),
+              ],
+              IterateOverScope(
+                itemScope: ".m-desc>.m-info>.m-info>.mi-item",
+                item: ConcatSelectors(
+                  [Text.forScope(".mi-label-desc"), Text.forScope(".mi-desc")],
+                ),
+              )),
           "similar": IterateOverScope(
             itemScope: "#owl-rel a",
             item: SelectorsToMap({
