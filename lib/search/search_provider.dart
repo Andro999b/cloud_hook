@@ -45,7 +45,7 @@ class SelectedSupplier extends _$SelectedSupplier {
   Set<String> build() {
     final enabledSuppliers = ref.watch(enabledSuppliersProvider);
     var selectedContentSuppliers =
-        AppPreferences.selectedContentSuppliers ?? <String>{};
+        AppPreferences.selectedContentSuppliers ?? enabledSuppliers;
 
     return selectedContentSuppliers.intersection(enabledSuppliers);
   }

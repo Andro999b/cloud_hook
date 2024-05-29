@@ -146,28 +146,30 @@ class _RecomendationsSettingsItem extends ConsumerWidget {
   ) {
     final channels = ContentSuppliers.instance.getSupplier(supplier)!.channels;
 
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      children: channels
-          .map(
-            (channel) => ChoiceChip(
-              selected: config.channels.contains(channel),
-              label: Text(channel),
-              onSelected: (value) {
-                if (value) {
-                  ref
-                      .read(suppliersSettingsProvider.notifier)
-                      .enableChannel(supplier, channel);
-                } else {
-                  ref
-                      .read(suppliersSettingsProvider.notifier)
-                      .disableChannel(supplier, channel);
-                }
-              },
-            ),
-          )
-          .toList(),
-    );
+    return channels.isEmpty
+        ? const SizedBox.shrink()
+        : Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: channels
+                .map(
+                  (channel) => ChoiceChip(
+                    selected: config.channels.contains(channel),
+                    label: Text(channel),
+                    onSelected: (value) {
+                      if (value) {
+                        ref
+                            .read(suppliersSettingsProvider.notifier)
+                            .enableChannel(supplier, channel);
+                      } else {
+                        ref
+                            .read(suppliersSettingsProvider.notifier)
+                            .disableChannel(supplier, channel);
+                      }
+                    },
+                  ),
+                )
+                .toList(),
+          );
   }
 }
