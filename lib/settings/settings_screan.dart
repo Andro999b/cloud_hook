@@ -1,6 +1,6 @@
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/layouts/general_layout.dart';
-import 'package:cloud_hook/settings/recomendations/recomendations_settings.dart';
+import 'package:cloud_hook/settings/suppliers/suppliers_settings.dart';
 import 'package:cloud_hook/settings/theme/brightnes_switcher.dart';
 import 'package:cloud_hook/settings/theme/color_switcher.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +44,7 @@ class _SettingsView extends StatelessWidget {
                   AppLocalizations.of(context)!.settingsColor,
                   const ColorSwitcher(),
                 ),
-                const RecomendationsSettingsSection()
+                const SuppliersSettingsSection()
               ],
             ),
           )

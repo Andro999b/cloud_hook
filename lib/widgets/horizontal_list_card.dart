@@ -1,4 +1,5 @@
 import 'package:cloud_hook/utils/android_tv.dart';
+import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -27,7 +28,7 @@ class HorizontalListCard extends HookWidget {
     final theme = Theme.of(context);
     final focused = useState(false);
 
-    var imageWidth = 195.0;
+    var imageWidth = isMobile(context) ? 160.0 : 195.0;
     final imageHeight = imageWidth * 1.5;
 
     return Card(

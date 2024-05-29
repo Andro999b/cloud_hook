@@ -85,14 +85,6 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
         videoStateKey.currentState?.exitFullscreen()
   };
 
-  void _toggleFullsreen(VideoState videoState) {
-    if (videoState.isFullscreen()) {
-      videoState.exitFullscreen();
-    } else {
-      videoState.enterFullscreen();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final desktopThemeData = _createThemeData();

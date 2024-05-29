@@ -153,8 +153,6 @@ class ContentDetailsView extends ConsumerWidget {
     return [
       SizedBox(height: paddings),
       Wrap(
-        spacing: 6,
-        runSpacing: 6,
         children: [
           Card.filled(
             child: Padding(
@@ -209,7 +207,6 @@ class ContentDetailsView extends ConsumerWidget {
       ),
       SizedBox(height: paddings),
       Wrap(
-        runSpacing: 6,
         children: contentDetails.similar
             .map(
               (e) => ContentInfoCard(

@@ -1,9 +1,10 @@
 import 'dart:isolate';
 
-import 'package:cloud_hook/content_suppliers/impl/animeua_club.dart';
-import 'package:cloud_hook/content_suppliers/impl/ua_films_tv.dart';
-import 'package:cloud_hook/content_suppliers/impl/uakino_club.dart';
-import 'package:cloud_hook/content_suppliers/impl/ufdub.dart';
+import 'package:cloud_hook/content_suppliers/impl/animeua/animeua.dart';
+import 'package:cloud_hook/content_suppliers/impl/eneyida/eneyida.dart';
+import 'package:cloud_hook/content_suppliers/impl/uafilms/uafilms.dart';
+import 'package:cloud_hook/content_suppliers/impl/uakinoclub/uakinoclub.dart';
+import 'package:cloud_hook/content_suppliers/impl/ufdub/ufdub.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/logger.dart';
 
@@ -13,9 +14,10 @@ class ContentSuppliers {
   static final ContentSuppliers instance = ContentSuppliers._();
 
   final List<ContentSupplier> suppliers = List.unmodifiable([
-    UAFilmsTVSupplier(),
     UAKinoClubSupplier(),
-    AnimeUAClubSupplier(),
+    EneyidaSupplier(),
+    AnimeUASupplier(),
+    UAFilmsSupplier(),
     UFDubSupplier(),
   ]);
 
@@ -34,12 +36,8 @@ class ContentSuppliers {
   ) async* {
     final results = <String, List<ContentSearchResult>>{};
     for (var s in suppliers) {
-      if (contentSuppliers.isNotEmpty && !contentSuppliers.contains(s.name)) {
-        continue;
-      }
-
-      if (contentTypes.isNotEmpty &&
-          s.supportedTypes.where((e) => contentTypes.contains(e)).isEmpty) {
+      if (!contentSuppliers.contains(s.name) ||
+          s.supportedTypes.intersection(contentTypes).isEmpty) {
         continue;
       }
 

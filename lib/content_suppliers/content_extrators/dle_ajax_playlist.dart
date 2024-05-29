@@ -26,6 +26,8 @@ class _AjaxPlaylistItem {
 
   factory _AjaxPlaylistItem.fromJson(Map<String, dynamic> data) =>
       _$AjaxPlaylistItemFromJson(data);
+
+  toJson() => _$AjaxPlaylistItemToJson(this);
 }
 
 class DLEAjaxPlaylistScrapper {

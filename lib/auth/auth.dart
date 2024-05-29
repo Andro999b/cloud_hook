@@ -90,10 +90,10 @@ class Auth {
           name: event.displayName,
           picture: event.photoURL,
         );
-        _userStreamController.add(_currentUser);
       } else {
         _currentUser = null;
       }
+      _userStreamController.add(_currentUser);
     });
 
     restore();
@@ -124,9 +124,10 @@ class Auth {
   }
 
   Future<void> singOut() async {
-    _tokenStore.delete();
-    _currentUser = null;
-    _userStreamController.add(null);
+    if (Platform.isLinux || Platform.isWindows) {
+      await _tokenStore.delete();
+    }
+    await FirebaseAuth.instance.signOut();
   }
 
   static Future<ClientId> _loadDesktopClientId() async {

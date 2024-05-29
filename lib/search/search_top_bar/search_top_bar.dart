@@ -1,9 +1,9 @@
 import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/search/search_provider.dart';
 import 'package:cloud_hook/search/search_top_bar/search_suggestion_model.dart';
 import 'package:cloud_hook/search/search_top_bar/search_suggestion_provider.dart';
+import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
 import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -110,6 +110,7 @@ class _FilterSelectors extends ConsumerWidget {
 
   Widget _renderSuppliers(WidgetRef ref) {
     final selectedSuppliers = ref.watch(selectedSupplierProvider);
+    final enabledSuppliers = ref.watch(enabledSuppliersProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8),
@@ -117,7 +118,7 @@ class _FilterSelectors extends ConsumerWidget {
         spacing: 6,
         runSpacing: 6,
         children: [
-          ...ContentSuppliers.instance.suppliersName.map(
+          ...enabledSuppliers.map(
             (name) => FilterChip(
               selected: selectedSuppliers.contains(name),
               label: Text(name),

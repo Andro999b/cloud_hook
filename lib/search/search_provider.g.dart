@@ -6,7 +6,7 @@ part of 'search_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$searchHash() => r'fe234bef6fc5d0d5ea15f0a49b339f1084ca40d0';
+String _$searchHash() => r'0e98517654ab14c85d32eaf948333062d830f6ae';
 
 /// See also [Search].
 @ProviderFor(Search)
@@ -20,7 +20,7 @@ final searchProvider = NotifierProvider<Search, SearchState>.internal(
 );
 
 typedef _$Search = Notifier<SearchState>;
-String _$selectedSupplierHash() => r'7f9c8bcb87f4e5114ea81cb473c0c82f821688c9';
+String _$selectedSupplierHash() => r'189550672ce93fd86c86031b6f2b49e6a50ebb89';
 
 /// See also [SelectedSupplier].
 @ProviderFor(SelectedSupplier)

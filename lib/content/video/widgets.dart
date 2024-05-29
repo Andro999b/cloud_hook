@@ -169,42 +169,48 @@ class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
   @override
   render(BuildContext context, WidgetRef ref, MediaCollectionItem data) {
     return AppTheme(
-      child: Center(
-        child: Card(
-          clipBehavior: Clip.antiAlias,
-          child: SizedBox(
-            width: 300,
-            child: FutureBuilder(
-              future: Future.value(mediaItems[data.currentItem].sources),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+      child: BackButtonListener(
+        onBackButtonPressed: () async {
+          Navigator.of(context).maybePop();
+          return true;
+        },
+        child: Center(
+          child: Card(
+            clipBehavior: Clip.antiAlias,
+            child: SizedBox(
+              width: 300,
+              child: FutureBuilder(
+                future: Future.value(mediaItems[data.currentItem].sources),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                if (snapshot.hasError) {
-                  return Center(child: Text(snapshot.error!.toString()));
-                }
+                  if (snapshot.hasError) {
+                    return Center(child: Text(snapshot.error!.toString()));
+                  }
 
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: snapshot.data!
-                      .mapIndexed(
-                        (idx, e) => MenuItemButton(
-                          trailingIcon: data.currentSource == idx
-                              ? const Icon(Icons.check)
-                              : null,
-                          onPressed: () {
-                            context.pop();
-                            final notifier = ref.read(provider.notifier);
-                            notifier.setCurrentSource(idx);
-                          },
-                          child: Text(e.description),
-                        ),
-                      )
-                      .toList(),
-                );
-              },
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: snapshot.data!
+                        .mapIndexed(
+                          (idx, e) => MenuItemButton(
+                            trailingIcon: data.currentSource == idx
+                                ? const Icon(Icons.check)
+                                : null,
+                            onPressed: () {
+                              context.pop();
+                              final notifier = ref.read(provider.notifier);
+                              notifier.setCurrentSource(idx);
+                            },
+                            child: Text(e.description),
+                          ),
+                        )
+                        .toList(),
+                  );
+                },
+              ),
             ),
           ),
         ),

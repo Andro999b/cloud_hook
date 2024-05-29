@@ -81,32 +81,32 @@ class AppPreferences {
 
   static set volume(double value) => instance.setDouble("volume", value);
 
-  static List<String>? get recomendationsOrder =>
-      instance.getStringList("recomendations_order");
+  static List<String>? get suppliersOrder =>
+      instance.getStringList("suppliers_order");
 
-  static set recomendationsOrder(List<String>? value) =>
-      instance.setStringList("recomendations_order", value ?? []);
+  static set suppliersOrder(List<String>? value) =>
+      instance.setStringList("suppliers_order", value ?? []);
 
-  static void setRecomendationSupplierEnabled(
+  static void setSupplierEnabled(
     String supplierName,
     bool enabled,
   ) {
-    instance.setBool("recomendations.$supplierName.enabled", enabled);
+    instance.setBool("suppliers.$supplierName.enabled", enabled);
   }
 
-  static bool? getRecomendationSupplierEnabled(String supplierName) =>
-      instance.getBool("recomendations.$supplierName.enabled");
+  static bool? getSupplierEnabled(String supplierName) =>
+      instance.getBool("suppliers.$supplierName.enabled");
 
-  static void setRecomendationSupplierChannels(
+  static void setSupplierChannels(
     String supplierName,
     Set<String> channels,
   ) {
     instance.setStringList(
-      "recomendations.$supplierName.channels",
+      "suppliers.$supplierName.channels",
       channels.toList(),
     );
   }
 
-  static Set<String>? getRecomendationSupplierChannels(String supplierName) =>
-      instance.getStringList("recomendations.$supplierName.channels")?.toSet();
+  static Set<String>? getSupplierChannels(String supplierName) =>
+      instance.getStringList("suppliers.$supplierName.channels")?.toSet();
 }

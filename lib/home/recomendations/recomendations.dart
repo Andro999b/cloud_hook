@@ -1,6 +1,6 @@
 import 'package:cloud_hook/content/content_info_card.dart';
 import 'package:cloud_hook/home/recomendations/recomendations_provider.dart';
-import 'package:cloud_hook/settings/recomendations/recomendations_settings_provider.dart';
+import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
 import 'package:cloud_hook/utils/visual.dart';
 import 'package:cloud_hook/widgets/horizontal_list.dart';
 import 'package:collection/collection.dart';
@@ -13,7 +13,7 @@ class Recommendations extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(recomendationSettingsProvider);
+    final settings = ref.watch(suppliersSettingsProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

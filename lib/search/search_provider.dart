@@ -2,12 +2,11 @@ import 'package:cloud_hook/app_preferences.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
 import 'package:cloud_hook/search/search_model.dart';
+import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
 import 'package:cloud_hook/utils/text.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search_provider.g.dart';
-
-final contentProviders = ContentSuppliers.instance;
 
 @Riverpod(keepAlive: true)
 class Search extends _$Search {
@@ -27,7 +26,7 @@ class Search extends _$Search {
     final contentTypes = ref.read(selectedContentProvider);
 
     final stream =
-        contentProviders.search(query, contentSuppliers, contentTypes);
+        ContentSuppliers.instance.search(query, contentSuppliers, contentTypes);
 
     final subscription = stream.listen((event) {
       state = state.copyWith(results: event);
@@ -44,11 +43,11 @@ class Search extends _$Search {
 class SelectedSupplier extends _$SelectedSupplier {
   @override
   Set<String> build() {
-    var selectedContentSuppliers = AppPreferences.selectedContentSuppliers;
+    final enabledSuppliers = ref.watch(enabledSuppliersProvider);
+    var selectedContentSuppliers =
+        AppPreferences.selectedContentSuppliers ?? <String>{};
 
-    selectedContentSuppliers ??= ContentSuppliers.instance.suppliersName;
-
-    return Set.unmodifiable(selectedContentSuppliers);
+    return selectedContentSuppliers.intersection(enabledSuppliers);
   }
 
   void select(String supplier) async {

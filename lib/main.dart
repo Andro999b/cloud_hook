@@ -66,8 +66,7 @@ class MainApp extends StatelessWidget {
             // initialLocation: "/search",
             // initialLocation: "/collection",
             // // // initialLocation: "/settings",
-            // initialLocation:
-            //     "/content/UAKinoClub/animeukr%2Fanime-series%2F21505-puppo-1-sezon",
+            // initialLocation: "/content/EneyidaTV/6037-chetvertyj",
             // initialLocation: "/video/UAFilmsTV/18323-utawarerumono",
             routes: [
               GoRoute(

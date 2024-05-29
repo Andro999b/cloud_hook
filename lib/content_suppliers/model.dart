@@ -14,6 +14,11 @@ enum ContentType {
   manga,
 }
 
+enum ContentLanguage {
+  english,
+  ukrainian,
+}
+
 enum MediaType {
   video,
   manga,
@@ -24,6 +29,7 @@ abstract class ContentSupplier {
   Set<String> get channels => const {};
   Set<String> get defaultChannels => const {};
   Set<ContentType> get supportedTypes => const {};
+  Set<ContentLanguage> get supportedLanguages => const {};
   Future<List<ContentSearchResult>> search(
     String query,
     Set<ContentType> type,
@@ -122,8 +128,6 @@ abstract class BaseContentDetails extends Equatable with ContentDetails {
   final List<ContentSearchResult> similar;
   @override
   MediaType get mediaType => MediaType.video;
-  @override
-  FutureOr<Iterable<ContentMediaItem>> get mediaItems => Future.value(const []);
 
   BaseContentDetails({
     required this.id,
