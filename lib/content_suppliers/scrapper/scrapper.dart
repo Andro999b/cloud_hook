@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_hook/utils/logger.dart';
-import 'package:cloud_hook/utils/scrapper/selectors.dart';
+import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;

@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:cloud_hook/content_suppliers/content_extrators/extractor.dart';
+import 'package:cloud_hook/content_suppliers/media_extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
-import 'package:cloud_hook/utils/scrapper/scrapper.dart';
+import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 

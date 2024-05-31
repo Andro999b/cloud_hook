@@ -1,14 +1,15 @@
 import 'package:cloud_hook/content_suppliers/impl/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
-import 'package:cloud_hook/utils/scrapper/scrapper.dart';
-import 'package:cloud_hook/utils/scrapper/selectors.dart';
+import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
+import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'animeua.g.dart';
 
 @JsonSerializable()
 // ignore: must_be_immutable
-class AnimeUAContentDetails extends BaseContentDetails with PlayerJSIframe {
+class AnimeUAContentDetails extends BaseContentDetails
+    with PLayerJSIframe, AsyncIframe {
   AnimeUAContentDetails({
     required super.id,
     required super.supplier,

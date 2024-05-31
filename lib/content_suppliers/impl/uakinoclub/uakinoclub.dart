@@ -1,9 +1,9 @@
 import 'package:cloud_hook/content_suppliers/impl/uakinoclub/dle_ajax_playlist.dart';
-import 'package:cloud_hook/content_suppliers/content_extrators/playerjs.dart';
+import 'package:cloud_hook/content_suppliers/media_extrators/playerjs.dart';
 import 'package:cloud_hook/content_suppliers/impl/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
-import 'package:cloud_hook/utils/scrapper/scrapper.dart';
-import 'package:cloud_hook/utils/scrapper/selectors.dart';
+import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
+import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 

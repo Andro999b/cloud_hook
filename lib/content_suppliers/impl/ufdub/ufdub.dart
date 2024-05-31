@@ -1,18 +1,16 @@
-import 'dart:isolate';
-
+import 'package:cloud_hook/content_suppliers/media_extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/impl/ufdub/ufdub_extractor.dart';
 import 'package:cloud_hook/content_suppliers/impl/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
-import 'package:cloud_hook/utils/logger.dart';
-import 'package:cloud_hook/utils/scrapper/scrapper.dart';
-import 'package:cloud_hook/utils/scrapper/selectors.dart';
+import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
+import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'ufdub.g.dart';
 
 @JsonSerializable()
 // ignore: must_be_immutable
-class UFDubContentDetails extends BaseContentDetails {
+class UFDubContentDetails extends BaseContentDetails with AsyncIframe {
   UFDubContentDetails({
     required super.id,
     required super.supplier,
@@ -25,6 +23,7 @@ class UFDubContentDetails extends BaseContentDetails {
     required this.iframe,
   });
 
+  @override
   final String iframe;
 
   factory UFDubContentDetails.fromJson(Map<String, dynamic> json) =>
@@ -33,21 +32,7 @@ class UFDubContentDetails extends BaseContentDetails {
   Map<String, dynamic> toJson() => _$UFDubContentDetailsToJson(this);
 
   @override
-  MediaType get mediaType => MediaType.video;
-
-  Iterable<ContentMediaItem>? _mediaItems;
-
-  @override
-  Future<Iterable<ContentMediaItem>> get mediaItems async {
-    try {
-      _mediaItems ??=
-          await Isolate.run(() => UFDubMediaExtractor().extract(iframe));
-    } catch (e, staclTrace) {
-      logger.e("UFDub mediaitems error: $e", stackTrace: staclTrace);
-    }
-
-    return _mediaItems!;
-  }
+  MediaExtractor get mediaExtractor => UFDubMediaExtractor();
 }
 
 class UFDubSupplier extends ContentSupplier with DLEChannelsLoader {

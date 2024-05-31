@@ -1,18 +1,27 @@
 import 'dart:isolate';
 
-import 'package:cloud_hook/content_suppliers/content_extrators/playerjs.dart';
+import 'package:cloud_hook/content_suppliers/media_extrators/extractor.dart';
+import 'package:cloud_hook/content_suppliers/media_extrators/playerjs.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
-import 'package:cloud_hook/utils/scrapper/scrapper.dart';
-import 'package:cloud_hook/utils/scrapper/selectors.dart';
+import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
+import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-mixin PlayerJSIframe on ContentDetails {
+mixin PLayerJSIframe {
   @JsonKey(
     includeFromJson: false,
     includeToJson: false,
   )
-  PlaylistConvertStrategy<ContentMediaItem> get convertStrategy =>
-      DubSeasonEpisodeConvertStrategy();
+  MediaExtractor get mediaExtractor =>
+      PlayerJSExtractor(DubSeasonEpisodeConvertStrategy());
+}
+
+mixin AsyncIframe on ContentDetails {
+  @JsonKey(
+    includeFromJson: false,
+    includeToJson: false,
+  )
+  MediaExtractor get mediaExtractor;
 
   String get iframe;
 
@@ -21,7 +30,7 @@ mixin PlayerJSIframe on ContentDetails {
   @override
   Future<Iterable<ContentMediaItem>> get mediaItems async {
     _mediaItems ??= await Isolate.run(
-      () => PlayerJSExtractor(convertStrategy).extract(iframe),
+      () => mediaExtractor.extract(iframe),
     );
 
     return _mediaItems!;

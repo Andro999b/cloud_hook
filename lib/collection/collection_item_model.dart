@@ -25,7 +25,7 @@ int? _dateTimeToMilli(DateTime? value) {
 }
 
 @JsonSerializable()
-class MediaCollectionItem with ContentInfo, ContentProgress {
+class MediaCollectionItem with ContentProgress implements ContentInfo {
   @JsonKey(
     includeFromJson: false,
     includeToJson: false,

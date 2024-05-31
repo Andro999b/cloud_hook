@@ -1,9 +1,9 @@
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:cloud_hook/content_suppliers/content_extrators/extractor.dart';
+import 'package:cloud_hook/content_suppliers/media_extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
-import 'package:cloud_hook/utils/scrapper/scrapper.dart';
+import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/utils/text.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:http/http.dart' as http;

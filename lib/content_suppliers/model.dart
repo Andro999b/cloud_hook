@@ -48,7 +48,7 @@ abstract class ContentSupplier {
   Future<ContentDetails> detailsById(String id);
 }
 
-mixin ContentInfo {
+abstract interface class ContentInfo {
   String get id;
   String get supplier;
   String get title;
@@ -56,7 +56,7 @@ mixin ContentInfo {
   String get image;
 }
 
-mixin ContentMediaItem {
+abstract interface class ContentMediaItem {
   int get number;
   String get title;
   FutureOr<List<ContentMediaItemSource>> get sources;
@@ -64,13 +64,13 @@ mixin ContentMediaItem {
   String? get image;
 }
 
-mixin ContentMediaItemSource {
+abstract interface class ContentMediaItemSource {
   String get description;
   FutureOr<Uri> get link;
   Map<String, String>? get headers;
 }
 
-mixin ContentDetails {
+abstract interface class ContentDetails {
   String get id;
   String get supplier;
   String get title;
@@ -85,7 +85,7 @@ mixin ContentDetails {
 
 @immutable
 @JsonSerializable()
-class ContentSearchResult extends Equatable with ContentInfo {
+class ContentSearchResult extends Equatable implements ContentInfo {
   @override
   final String id;
   @override
@@ -114,7 +114,7 @@ class ContentSearchResult extends Equatable with ContentInfo {
   List<Object?> get props => [id, supplier, image, title, subtitle];
 }
 
-abstract class BaseContentDetails extends Equatable with ContentDetails {
+abstract class BaseContentDetails extends Equatable implements ContentDetails {
   @override
   final String id;
   @override
@@ -136,7 +136,7 @@ abstract class BaseContentDetails extends Equatable with ContentDetails {
   @override
   MediaType get mediaType => MediaType.video;
 
-  BaseContentDetails({
+  const BaseContentDetails({
     required this.id,
     required this.supplier,
     required this.title,
@@ -160,7 +160,8 @@ abstract class BaseContentDetails extends Equatable with ContentDetails {
       ];
 }
 
-abstract class BasicContentMediaItem extends Equatable with ContentMediaItem {
+abstract class BasicContentMediaItem extends Equatable
+    implements ContentMediaItem {
   @override
   final int number;
   @override
@@ -219,7 +220,7 @@ class SimpleContentMediaItem extends BasicContentMediaItem {
 
 @immutable
 class SimpleContentMediaItemSource extends Equatable
-    with ContentMediaItemSource {
+    implements ContentMediaItemSource {
   @override
   final String description;
   @override
@@ -241,7 +242,7 @@ typedef ContentItemMediaSourceLinkLoader = Future<Uri> Function();
 
 // ignore: must_be_immutable
 class AsyncContentMediaItemSource extends Equatable
-    with ContentMediaItemSource {
+    implements ContentMediaItemSource {
   @override
   final String description;
   @override
