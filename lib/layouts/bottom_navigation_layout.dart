@@ -6,10 +6,12 @@ class BottomNavigationLayout extends StatelessWidget {
   const BottomNavigationLayout({
     super.key,
     this.selectedIndex,
+    this.floatingActionButton,
     required this.child,
   });
 
   final int? selectedIndex;
+  final Widget? floatingActionButton;
   final Widget child;
 
   @override
@@ -29,7 +31,7 @@ class BottomNavigationLayout extends StatelessWidget {
         onDestinationSelected: (index) =>
             context.go(NavigationRoute.routes[index].path),
       ),
-      // floatingActionButton: AuthIcon(),
+      floatingActionButton: floatingActionButton,
     );
   }
 }

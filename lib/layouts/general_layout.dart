@@ -10,11 +10,13 @@ class GeneralLayout extends StatelessWidget {
     super.key,
     this.showBackButton = false,
     this.selectedIndex,
+    this.floatingActionButton,
     required this.child,
   });
 
   final bool showBackButton;
   final int? selectedIndex;
+  final Widget? floatingActionButton;
   final Widget child;
 
   @override
@@ -26,6 +28,7 @@ class GeneralLayout extends StatelessWidget {
             if (constraints.maxWidth < mobileWidth) {
               return BottomNavigationLayout(
                 selectedIndex: selectedIndex,
+                floatingActionButton: floatingActionButton,
                 child: child,
               );
             } else {

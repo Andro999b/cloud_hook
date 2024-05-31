@@ -1,3 +1,4 @@
+import 'package:cloud_hook/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class UseSearchHint extends StatelessWidget {
@@ -5,15 +6,15 @@ class UseSearchHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
+        const Icon(
           Icons.search,
           size: 96,
         ),
         Text(
-          "Ваша колекція порожня.\nСкористайтесь пошуком.",
+          AppLocalizations.of(context)!.useSearchHint,
           textAlign: TextAlign.center,
         )
       ],

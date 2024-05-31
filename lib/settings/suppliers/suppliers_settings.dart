@@ -1,5 +1,6 @@
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
+import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
 import 'package:cloud_hook/utils/visual.dart';
 import 'package:collection/collection.dart';
@@ -51,7 +52,7 @@ class _RecomendationsSettingsList extends ConsumerWidget {
               (index, supplier) => Container(
                 key: ValueKey(supplier),
                 child: _RecomendationsSettingsItem(
-                  supplier: supplier,
+                  supplierName: supplier,
                   index: index,
                 ),
               ),
@@ -74,18 +75,23 @@ class _RecomendationsSettingsList extends ConsumerWidget {
 
 class _RecomendationsSettingsItem extends ConsumerWidget {
   final int index;
-  final String supplier;
+  final String supplierName;
 
   const _RecomendationsSettingsItem({
     required this.index,
-    required this.supplier,
+    required this.supplierName,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final padding = getPadding(context);
     final config = ref.watch(
-        suppliersSettingsProvider.select((value) => value.getConfig(supplier)));
+      suppliersSettingsProvider.select(
+        (value) => value.getConfig(supplierName),
+      ),
+    );
+
+    final supplier = ContentSuppliers.instance.getSupplier(supplierName)!;
 
     return Card.outlined(
       child: Padding(
@@ -93,9 +99,9 @@ class _RecomendationsSettingsItem extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _renderTtitle(context, ref, config),
+            _renderTtitle(context, ref, supplier, config),
             const SizedBox(height: 8),
-            _renderChannels(context, ref, config),
+            _renderChannels(context, ref, supplier, config),
           ],
         ),
       ),
@@ -105,32 +111,48 @@ class _RecomendationsSettingsItem extends ConsumerWidget {
   Row _renderTtitle(
     BuildContext context,
     WidgetRef ref,
+    ContentSupplier supplier,
     SuppliersConfig config,
   ) {
     final theme = Theme.of(context);
 
     return Row(
       children: [
+        // enable checkbox
         Checkbox(
           value: config.enabled,
           onChanged: (value) {
             if (value == true) {
               ref
                   .read(suppliersSettingsProvider.notifier)
-                  .enableSupplier(supplier);
+                  .enableSupplier(supplierName);
             } else {
               ref
                   .read(suppliersSettingsProvider.notifier)
-                  .disableSupplier(supplier);
+                  .disableSupplier(supplierName);
             }
           },
         ),
         const SizedBox(width: 8),
+        // supplier name
         Text(
-          supplier,
+          supplierName,
           style: theme.textTheme.titleMedium,
         ),
+        const SizedBox(width: 8),
+        // supplier languages
+        ...supplier.supportedLanguages.map(
+          (e) => Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: Badge(
+              backgroundColor: theme.colorScheme.primary,
+              textColor: theme.colorScheme.onPrimary,
+              label: Text(e.code),
+            ),
+          ),
+        ),
         const Spacer(),
+        // drag handle
         ReorderableDragStartListener(
           index: index,
           child: const Icon(Icons.drag_handle),
@@ -142,9 +164,10 @@ class _RecomendationsSettingsItem extends ConsumerWidget {
   Widget _renderChannels(
     BuildContext context,
     WidgetRef ref,
+    ContentSupplier supplier,
     SuppliersConfig config,
   ) {
-    final channels = ContentSuppliers.instance.getSupplier(supplier)!.channels;
+    final channels = supplier.channels;
 
     return channels.isEmpty
         ? const SizedBox.shrink()
@@ -160,11 +183,11 @@ class _RecomendationsSettingsItem extends ConsumerWidget {
                       if (value) {
                         ref
                             .read(suppliersSettingsProvider.notifier)
-                            .enableChannel(supplier, channel);
+                            .enableChannel(supplierName, channel);
                       } else {
                         ref
                             .read(suppliersSettingsProvider.notifier)
-                            .disableChannel(supplier, channel);
+                            .disableChannel(supplierName, channel);
                       }
                     },
                   ),

@@ -20,7 +20,7 @@ final searchProvider = NotifierProvider<Search, SearchState>.internal(
 );
 
 typedef _$Search = Notifier<SearchState>;
-String _$selectedSupplierHash() => r'189550672ce93fd86c86031b6f2b49e6a50ebb89';
+String _$selectedSupplierHash() => r'056bf9940e4675cfb5797e1cca7577478ba29fc9';
 
 /// See also [SelectedSupplier].
 @ProviderFor(SelectedSupplier)

@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:cloud_hook/content_suppliers/content_extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/scrapper/scrapper.dart';
 import 'package:cloud_hook/utils/text.dart';
@@ -174,5 +175,16 @@ class PlayerJSScrapper {
     }
 
     return fileEncodedJson;
+  }
+}
+
+class PlayerJSExtractor with MediaExtractor {
+  final PlaylistConvertStrategy<ContentMediaItem> convertStrategy;
+
+  PlayerJSExtractor(this.convertStrategy);
+
+  @override
+  Future<List<ContentMediaItem>> extract(String iframe) {
+    return PlayerJSScrapper(uri: Uri.parse(iframe)).scrap(convertStrategy);
   }
 }

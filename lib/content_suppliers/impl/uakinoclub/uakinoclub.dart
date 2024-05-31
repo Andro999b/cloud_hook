@@ -1,4 +1,4 @@
-import 'package:cloud_hook/content_suppliers/content_extrators/dle_ajax_playlist.dart';
+import 'package:cloud_hook/content_suppliers/impl/uakinoclub/dle_ajax_playlist.dart';
 import 'package:cloud_hook/content_suppliers/content_extrators/playerjs.dart';
 import 'package:cloud_hook/content_suppliers/impl/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
@@ -173,7 +173,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
   final Map<String, String> channelsPath = {
     "Новинки": "/page/",
     "Фільми": "/filmy/page/",
-    "Серіали": "/seriesss/page/",
+    "Серіали": "/series/page/",
     "Аніме": "/animeukr/page/",
     "Мультфільми": "/cartoon/page/",
     "Мультсеріали": "/cartoon/cartoonseries/page/"

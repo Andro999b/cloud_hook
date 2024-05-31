@@ -65,7 +65,7 @@ class MainApp extends StatelessWidget {
             navigatorKey: rootNavigatorKey,
             // initialLocation: "/search",
             // initialLocation: "/collection",
-            // // // initialLocation: "/settings",
+            // initialLocation: "/settings",
             // initialLocation: "/content/EneyidaTV/6037-chetvertyj",
             // initialLocation: "/video/UAFilmsTV/18323-utawarerumono",
             routes: [

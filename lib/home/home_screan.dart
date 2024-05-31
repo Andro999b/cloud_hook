@@ -1,4 +1,4 @@
-import 'package:cloud_hook/collection/collection_continue_view.dart';
+import 'package:cloud_hook/collection/active_collection_items_view.dart';
 import 'package:cloud_hook/home/recomendations/recomendations.dart';
 import 'package:cloud_hook/layouts/general_layout.dart';
 import 'package:cloud_hook/utils/visual.dart';
@@ -16,7 +16,7 @@ class HomeScrean extends StatelessWidget {
       selectedIndex: 0,
       child: ListView(
         padding: EdgeInsets.only(top: paddings),
-        children: const [CollectionContinueView(), Recommendations()],
+        children: const [ActiveCollectionItemsView(), Recommendations()],
       ),
     );
   }

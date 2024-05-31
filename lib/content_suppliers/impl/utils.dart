@@ -21,7 +21,7 @@ mixin PlayerJSIframe on ContentDetails {
   @override
   Future<Iterable<ContentMediaItem>> get mediaItems async {
     _mediaItems ??= await Isolate.run(
-      () => PlayerJSScrapper(uri: Uri.parse(iframe)).scrap(convertStrategy),
+      () => PlayerJSExtractor(convertStrategy).extract(iframe),
     );
 
     return _mediaItems!;

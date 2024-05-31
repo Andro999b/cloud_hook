@@ -15,8 +15,12 @@ enum ContentType {
 }
 
 enum ContentLanguage {
-  english,
-  ukrainian,
+  english("en"),
+  ukrainian("uk");
+
+  final String code;
+
+  const ContentLanguage(this.code);
 }
 
 enum MediaType {
@@ -36,7 +40,10 @@ abstract class ContentSupplier {
   ) async =>
       const [];
 
-  Future<List<ContentInfo>> loadChannel(String channel, {int page = 0}) async =>
+  Future<List<ContentInfo>> loadChannel(
+    String channel, {
+    int page = 0,
+  }) async =>
       const [];
   Future<ContentDetails> detailsById(String id);
 }

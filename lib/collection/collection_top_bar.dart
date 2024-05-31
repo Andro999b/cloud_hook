@@ -1,8 +1,6 @@
 import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/auth/auth_icon.dart';
 import 'package:cloud_hook/collection/collection_provider.dart';
 import 'package:cloud_hook/collection/collection_screen.dart';
-import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -12,7 +10,6 @@ class CollectionTopBar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mobile = isMobile(context);
     final controller = useTextEditingController(
       text: ref.read(collectionFilterQueryProvider),
     );
@@ -21,29 +18,17 @@ class CollectionTopBar extends HookConsumerWidget {
 
     return Column(
       children: [
-        Row(
-          children: [
-            mobile
-                ? const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: AuthIcon(),
-                  )
-                : const SizedBox(width: 48),
-            Expanded(
-              child: _renderSearhBar(ref, controller, focusNode),
-            ),
-            _renderSettingsIcon(ref, showFilter)
-          ],
-        ),
+        _renderSearhBar(controller, showFilter, focusNode, ref),
         if (showFilter.value) _StatusFilter(),
       ],
     );
   }
 
   Center _renderSearhBar(
-    WidgetRef ref,
     TextEditingController controller,
+    ValueNotifier<bool> showFilter,
     FocusNode focusNode,
+    WidgetRef ref,
   ) {
     return Center(
       child: Padding(
@@ -55,26 +40,19 @@ class CollectionTopBar extends HookConsumerWidget {
           ),
           focusNode: focusNode,
           leading: const Icon(Icons.search),
+          trailing: [
+            IconButton(
+              onPressed: () {
+                showFilter.value = !showFilter.value;
+              },
+              icon: const Icon(Icons.tune),
+            ),
+          ],
           onSubmitted: (value) {
             ref.read(collectionFilterQueryProvider.notifier).state = value;
             focusNode.requestFocus();
           },
         ),
-      ),
-    );
-  }
-
-  Widget _renderSettingsIcon(
-    WidgetRef ref,
-    ValueNotifier<bool> showFilter,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: IconButton(
-        onPressed: () {
-          showFilter.value = !showFilter.value;
-        },
-        icon: const Icon(Icons.tune),
       ),
     );
   }

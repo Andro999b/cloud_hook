@@ -14,17 +14,19 @@ class Recommendations extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(suppliersSettingsProvider);
+    final enabledSuppliers = ref.watch(enabledSuppliersProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: settings.configs.entries
-          .where((e) => e.value.enabled && e.value.channels.isNotEmpty)
+      children: enabledSuppliers
+          .map((s) => (s, settings.getConfig(s)))
+          .where((e) => e.$2.channels.isNotEmpty)
           .mapIndexed(
             (groupIdx, e) => [
-              ...e.value.channels.mapIndexed(
+              ...e.$2.channels.mapIndexed(
                 (channelIdx, channel) => _RecomendationChannel(
                   channelIdx: channelIdx,
-                  supplierName: e.key,
+                  supplierName: e.$1,
                   channel: channel,
                 ),
               ),

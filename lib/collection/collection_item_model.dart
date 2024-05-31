@@ -40,6 +40,7 @@ class MediaCollectionItem with ContentInfo, ContentProgress {
   final String title;
   @override
   final String image;
+  @JsonKey(defaultValue: MediaType.video)
   final MediaType mediaType;
   @override
   String? get subtitle => null;

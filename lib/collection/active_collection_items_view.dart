@@ -9,12 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class CollectionContinueView extends ConsumerWidget {
-  const CollectionContinueView({super.key});
+class ActiveCollectionItemsView extends ConsumerWidget {
+  const ActiveCollectionItemsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final groups = ref.watch(collectionProvider).valueOrNull ?? {};
+    final groups = ref.watch(collectionActiveItemsProvider).valueOrNull ?? {};
 
     List<MediaCollectionItem>? items;
     String? title;

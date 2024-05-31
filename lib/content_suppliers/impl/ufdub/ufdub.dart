@@ -1,13 +1,12 @@
 import 'dart:isolate';
 
+import 'package:cloud_hook/content_suppliers/impl/ufdub/ufdub_extractor.dart';
 import 'package:cloud_hook/content_suppliers/impl/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:cloud_hook/utils/scrapper/scrapper.dart';
 import 'package:cloud_hook/utils/scrapper/selectors.dart';
-import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:http/http.dart' as http;
 
 part 'ufdub.g.dart';
 
@@ -41,38 +40,13 @@ class UFDubContentDetails extends BaseContentDetails {
   @override
   Future<Iterable<ContentMediaItem>> get mediaItems async {
     try {
-      _mediaItems ??= await Isolate.run(() => _extractMediaItems(iframe));
+      _mediaItems ??=
+          await Isolate.run(() => UFDubMediaExtractor().extract(iframe));
     } catch (e, staclTrace) {
       logger.e("UFDub mediaitems error: $e", stackTrace: staclTrace);
     }
 
     return _mediaItems!;
-  }
-
-  static final _episodeUrlRegExp =
-      // ignore: unnecessary_string_escapes
-      RegExp("https:\/\/ufdub.com\/video\/VIDEOS\.php\?(.*?)'");
-
-  Future<List<ContentMediaItem>> _extractMediaItems(String iframe) async {
-    final iframeRes =
-        await http.get(Uri.parse(iframe), headers: defaultHeaders);
-    final iframeContent = iframeRes.body;
-
-    final matches = _episodeUrlRegExp.allMatches(iframeContent);
-
-    final episodesUrls =
-        matches.map((e) => e.group(0)!).where((e) => !e.contains("Трейлер"));
-
-    return episodesUrls.mapIndexed((index, e) {
-      final uri = Uri.parse(e);
-      return SimpleContentMediaItem(
-        number: index,
-        title: uri.queryParameters["Seriya"] ?? "",
-        sources: [
-          SimpleContentMediaItemSource(description: "UFDub", link: uri)
-        ],
-      );
-    }).toList();
   }
 }
 

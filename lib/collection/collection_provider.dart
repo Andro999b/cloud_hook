@@ -70,3 +70,18 @@ FutureOr<Map<MediaCollectionItemStatus, List<MediaCollectionItem>>> collection(
 
   return Future.value(collectionItems.groupListsBy((e) => e.status));
 }
+
+@riverpod
+FutureOr<Map<MediaCollectionItemStatus, List<MediaCollectionItem>>>
+    collectionActiveItems(
+  CollectionActiveItemsRef ref,
+) async {
+  final repository = ref.watch(collectionServiceProvider);
+
+  final collectionItems = await repository.search(status: {
+    MediaCollectionItemStatus.inProgress,
+    MediaCollectionItemStatus.latter,
+  });
+
+  return Future.value(collectionItems.groupListsBy((e) => e.status));
+}

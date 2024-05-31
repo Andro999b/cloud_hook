@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/app_preferences.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
@@ -77,7 +78,6 @@ class PlaylistController {
 
       await player.open(media);
     } on Exception catch (e, stackTrace) {
-      // TODO: Show toast
       logger.e("Fail to play", error: e, stackTrace: stackTrace);
       player.stop();
       rethrow;
@@ -159,6 +159,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
 
     final notifier = ref.read(provider.notifier);
 
+    // track current episode
     subscription = ref.listenManual<AsyncValue<MediaCollectionItem>>(
       provider,
       (previous, next) async {
@@ -168,18 +169,31 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
         if (nextValue != null &&
             (previousValue?.currentItem != nextValue.currentItem ||
                 previousValue?.currentSource != nextValue.currentSource)) {
-          await playlistController.play(nextValue);
+          try {
+            await playlistController.play(nextValue);
+          } catch (_) {
+            // show error snackbar
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.videSourceFailed),
+                ),
+              );
+            }
+          }
         }
       },
       fireImmediately: true,
     );
 
+    // track video end
     player.stream.completed.listen((event) {
       if (event) {
         playlistController.nextItem();
       }
     });
 
+    // track video position and duration
     player.stream.position.listen((event) {
       final position = event.inSeconds;
       final duration = player.state.duration.inSeconds;

@@ -1,4 +1,5 @@
 import 'package:cloud_hook/app_localizations.dart';
+import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/search/search_provider.dart';
 import 'package:cloud_hook/search/search_top_bar/search_suggestion_model.dart';
@@ -21,7 +22,6 @@ class SearchTopBar extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final searchController = useSearchController();
     final showFilter = useState(false);
-    final mobile = isMobile(context);
 
     useEffect(() {
       final query = ref.read(searchProvider).query ?? "";
@@ -31,33 +31,23 @@ class SearchTopBar extends HookConsumerWidget {
 
     return Column(
       children: [
-        Row(
-          children: [
-            if (!mobile) const SizedBox(width: 48),
-            Expanded(
-              child: _renderSearchBar(searchController, ref),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: IconButton(
-                onPressed: () {
-                  showFilter.value = !showFilter.value;
-                },
-                icon: const Icon(Icons.tune),
-              ),
-            )
-          ],
-        ),
+        _renderSearchBar(searchController, showFilter, context, ref),
         if (showFilter.value) const _FilterSelectors(),
       ],
     );
   }
 
-  Widget _renderSearchBar(SearchController searchController, WidgetRef ref) {
+  Widget _renderSearchBar(
+    SearchController searchController,
+    ValueNotifier<bool> showFilter,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: SearchAnchor(
+          isFullScreen: isMobile(context),
           searchController: searchController,
           viewOnChanged: (value) {
             ref.read(suggestionsProvider.notifier).suggest(value);
@@ -71,7 +61,8 @@ class SearchTopBar extends HookConsumerWidget {
           builder: (context, controller) {
             return SearchBar(
               padding: const MaterialStatePropertyAll<EdgeInsets>(
-                  EdgeInsets.only(left: 16.0, right: 8.0)),
+                EdgeInsets.only(left: 16.0, right: 8.0),
+              ),
               autoFocus: true,
               leading: const Icon(Icons.search),
               controller: controller,
@@ -84,6 +75,14 @@ class SearchTopBar extends HookConsumerWidget {
               onSubmitted: (value) {
                 _search(ref, value);
               },
+              trailing: [
+                IconButton(
+                  onPressed: () {
+                    showFilter.value = !showFilter.value;
+                  },
+                  icon: const Icon(Icons.tune),
+                )
+              ],
             );
           },
           viewBuilder: (suggestions) => _TopSearchSuggestions(
@@ -102,48 +101,24 @@ class _FilterSelectors extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(children: [
-      _renderSuppliers(ref),
-      _renderContentType(context, ref),
+    return const Column(children: [
+      _ContentTypeSelector(),
+      _SuppliersSelector(),
     ]);
   }
+}
 
-  Widget _renderSuppliers(WidgetRef ref) {
-    final selectedSuppliers = ref.watch(selectedSupplierProvider);
-    final enabledSuppliers = ref.watch(enabledSuppliersProvider);
+class _ContentTypeSelector extends ConsumerWidget {
+  const _ContentTypeSelector();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8),
-      child: Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        children: [
-          ...enabledSuppliers.map(
-            (name) => FilterChip(
-              selected: selectedSuppliers.contains(name),
-              label: Text(name),
-              onSelected: (value) {
-                final notifier = ref.read(selectedSupplierProvider.notifier);
-                if (value) {
-                  notifier.select(name);
-                } else {
-                  notifier.unselect(name);
-                }
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _renderContentType(BuildContext context, WidgetRef ref) {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final selectedContentType = ref.watch(selectedContentProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8),
       child: Wrap(
-        alignment: WrapAlignment.spaceEvenly,
+        alignment: WrapAlignment.center,
         spacing: 6,
         runSpacing: 6,
         children: [
@@ -163,6 +138,62 @@ class _FilterSelectors extends ConsumerWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class _SuppliersSelector extends ConsumerWidget {
+  const _SuppliersSelector();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedSuppliers = ref.watch(selectedSupplierProvider);
+    final enabledSuppliers = ref.watch(enabledSuppliersProvider);
+    final selectedContentType = ref.watch(selectedContentProvider);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 6,
+        runSpacing: 6,
+        children: [
+          ...enabledSuppliers.map(
+            (name) => _renderOption(
+              selectedSuppliers,
+              selectedContentType,
+              name,
+              ref,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _renderOption(
+    Set<String> selectedSuppliers,
+    Set<ContentType> selectedContentType,
+    String name,
+    WidgetRef ref,
+  ) {
+    final supplier = ContentSuppliers.instance.getSupplier(name)!;
+    final enabled =
+        supplier.supportedTypes.intersection(selectedContentType).isNotEmpty;
+
+    return FilterChip(
+      selected: selectedSuppliers.contains(name),
+      label: Text(name),
+      onSelected: enabled
+          ? (value) {
+              final notifier = ref.read(selectedSupplierProvider.notifier);
+              if (value) {
+                notifier.select(name);
+              } else {
+                notifier.unselect(name);
+              }
+            }
+          : null,
     );
   }
 }

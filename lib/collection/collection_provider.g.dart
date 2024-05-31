@@ -37,6 +37,24 @@ final collectionProvider = AutoDisposeFutureProvider<
 
 typedef CollectionRef = AutoDisposeFutureProviderRef<
     Map<MediaCollectionItemStatus, List<MediaCollectionItem>>>;
+String _$collectionActiveItemsHash() =>
+    r'90c36a8d4a33c8f8dd5b4927e7dd2ec826283fd3';
+
+/// See also [collectionActiveItems].
+@ProviderFor(collectionActiveItems)
+final collectionActiveItemsProvider = AutoDisposeFutureProvider<
+    Map<MediaCollectionItemStatus, List<MediaCollectionItem>>>.internal(
+  collectionActiveItems,
+  name: r'collectionActiveItemsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$collectionActiveItemsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef CollectionActiveItemsRef = AutoDisposeFutureProviderRef<
+    Map<MediaCollectionItemStatus, List<MediaCollectionItem>>>;
 String _$collectionChangesHash() => r'9cdbf00aee59ae6661f58a392677e0a6aa07d663';
 
 /// See also [CollectionChanges].

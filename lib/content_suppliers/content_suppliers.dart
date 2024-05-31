@@ -13,20 +13,20 @@ class ContentSuppliers {
 
   static final ContentSuppliers instance = ContentSuppliers._();
 
-  final List<ContentSupplier> suppliers = List.unmodifiable([
+  final List<ContentSupplier> _suppliers = [
     UAKinoClubSupplier(),
     EneyidaSupplier(),
     AnimeUASupplier(),
     UAFilmsSupplier(),
     UFDubSupplier(),
-  ]);
+  ];
 
-  Set<String> get suppliersName => suppliers.map((i) => i.name).toSet();
+  late final _suppliersByName = {for (var s in _suppliers) s.name: s};
+
+  Set<String> get suppliersName => _suppliersByName.keys.toSet();
 
   ContentSupplier? getSupplier(String supplierName) {
-    return suppliers
-        .where((element) => element.name == supplierName)
-        .firstOrNull;
+    return _suppliersByName[supplierName];
   }
 
   Stream<Map<String, List<ContentSearchResult>>> search(
@@ -35,18 +35,22 @@ class ContentSuppliers {
     Set<ContentType> contentTypes,
   ) async* {
     final results = <String, List<ContentSearchResult>>{};
-    for (var s in suppliers) {
-      if (!contentSuppliers.contains(s.name) ||
-          s.supportedTypes.intersection(contentTypes).isEmpty) {
+    for (var supplierName in contentSuppliers) {
+      final supplier = getSupplier(supplierName);
+
+      if (supplier == null ||
+          supplier.supportedTypes.intersection(contentTypes).isEmpty) {
         continue;
       }
 
       try {
-        final res = await Isolate.run(() => s.search(query, contentTypes));
-        results[s.name] = res;
+        final res = await Isolate.run(
+          () => supplier.search(query, contentTypes),
+        );
+        results[supplier.name] = res;
         yield results;
       } catch (error, stackTrace) {
-        logger.e("Supplier ${s.name} fail",
+        logger.e("Supplier ${supplier.name} fail",
             error: error, stackTrace: stackTrace);
       }
     }
@@ -72,7 +76,7 @@ class ContentSuppliers {
   Future<ContentDetails> detailsById(String supplierName, String id) async {
     logger.i("Load content details supplier: $supplierName id: $id");
 
-    final supplier = suppliers.where((e) => e.name == supplierName).first;
+    final supplier = _suppliers.where((e) => e.name == supplierName).first;
 
     try {
       return await Isolate.run(() => supplier.detailsById(id));

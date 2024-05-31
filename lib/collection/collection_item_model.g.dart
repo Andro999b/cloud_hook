@@ -12,7 +12,8 @@ MediaCollectionItem _$MediaCollectionItemFromJson(Map<String, dynamic> json) =>
       supplier: json['supplier'] as String,
       title: json['title'] as String,
       image: json['image'] as String,
-      mediaType: $enumDecode(_$MediaTypeEnumMap, json['mediaType']),
+      mediaType: $enumDecodeNullable(_$MediaTypeEnumMap, json['mediaType']) ??
+          MediaType.video,
       currentItem: (json['currentItem'] as num?)?.toInt() ?? 0,
       currentSource: (json['currentSource'] as num?)?.toInt() ?? 0,
       positions: (json['positions'] as Map<String, dynamic>?)?.map(

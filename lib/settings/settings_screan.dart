@@ -22,33 +22,36 @@ class _SettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppLocalizations.of(context)!.settings,
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          Expanded(
-            child: ListView(
-              children: [
-                _renderSection(
-                  context,
-                  AppLocalizations.of(context)!.settingsTheme,
-                  const BrightnesSwitcher(),
-                ),
-                _renderSection(
-                  context,
-                  AppLocalizations.of(context)!.settingsColor,
-                  const ColorSwitcher(),
-                ),
-                const SuppliersSettingsSection()
-              ],
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 800),
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.settings,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
-          )
-        ],
+            Expanded(
+              child: ListView(
+                children: [
+                  _renderSection(
+                    context,
+                    AppLocalizations.of(context)!.settingsTheme,
+                    const BrightnesSwitcher(),
+                  ),
+                  _renderSection(
+                    context,
+                    AppLocalizations.of(context)!.settingsColor,
+                    const ColorSwitcher(),
+                  ),
+                  const SuppliersSettingsSection()
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

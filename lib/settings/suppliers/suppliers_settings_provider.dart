@@ -60,12 +60,8 @@ class SuppliersSettingsModel extends Equatable {
 class SuppliersSettings extends _$SuppliersSettings {
   @override
   SuppliersSettingsModel build() {
-    final suppliersByName = {
-      for (final supplier in ContentSuppliers.instance.suppliers)
-        supplier.name: supplier
-    };
-
-    final supplierNames = ContentSuppliers.instance.suppliersName;
+    final contentSuppliers = ContentSuppliers.instance;
+    final supplierNames = contentSuppliers.suppliersName;
 
     Set<String> suppliersOrder;
     final savedOrder = AppPreferences.suppliersOrder;
@@ -85,7 +81,7 @@ class SuppliersSettings extends _$SuppliersSettings {
           supplierName: SuppliersConfig(
             enabled: AppPreferences.getSupplierEnabled(supplierName) ?? true,
             channels: AppPreferences.getSupplierChannels(supplierName) ??
-                suppliersByName[supplierName]?.defaultChannels ??
+                contentSuppliers.getSupplier(supplierName)?.defaultChannels ??
                 const {},
           )
       },
@@ -150,11 +146,8 @@ class SuppliersSettings extends _$SuppliersSettings {
 
 @Riverpod(keepAlive: true)
 Set<String> enabledSuppliers(EnabledSuppliersRef ref) {
-  return ref
-      .watch(suppliersSettingsProvider)
-      .configs
-      .entries
-      .where((e) => e.value.enabled)
-      .map((e) => e.key)
+  final suppliersSettings = ref.watch(suppliersSettingsProvider);
+  return suppliersSettings.suppliersOrder
+      .where((element) => suppliersSettings.getConfig(element).enabled)
       .toSet();
 }

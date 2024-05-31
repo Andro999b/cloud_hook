@@ -2,29 +2,16 @@ import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/content/content_info_card.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/search/search_model.dart';
-import 'package:cloud_hook/search/search_provider.dart';
 import 'package:cloud_hook/widgets/horizontal_list.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
-class SearchResultsView extends HookConsumerWidget {
-  const SearchResultsView({super.key});
+class SearchResults extends HookWidget {
+  final SearchState searchState;
+  const SearchResults({super.key, required this.searchState});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final searchState = ref.watch(searchProvider);
-
-    final content = switch (searchState) {
-      SearchState.empty => _renderEmptyResults(context),
-      _ => _renderResults(context, searchState)
-    };
-
-    return Expanded(
-      child: content,
-    );
-  }
-
-  Widget _renderResults(BuildContext context, SearchState searchState) {
+  Widget build(BuildContext context) {
     final suppliersWithResult =
         searchState.results.entries.where((r) => r.value.isNotEmpty);
 
@@ -36,23 +23,18 @@ class SearchResultsView extends HookConsumerWidget {
         ),
       );
     } else if (searchState.results.isEmpty) {
-      // wait for firast provider
+      // wait for first provider
       return const Center(child: CircularProgressIndicator());
     }
 
     // loading providers
     return ListView(
       children: [
-        ...suppliersWithResult
-            .map((e) => _renderSupplierResults(context, e.key, e.value)),
-        if (searchState.isLoading)
-          const Center(child: CircularProgressIndicator())
+        ...suppliersWithResult.map(
+          (e) => _renderSupplierResults(context, e.key, e.value),
+        ),
       ],
     );
-  }
-
-  Widget _renderEmptyResults(BuildContext context) {
-    return Center(child: Text(AppLocalizations.of(context)!.search));
   }
 
   Widget _renderSupplierResults(

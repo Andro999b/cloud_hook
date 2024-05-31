@@ -34,5 +34,7 @@
     "contentTypeAnime": "Аніме",
     "contentTypeSeries": "Серіали",
     "contentTypeCartoon": "Мультфільми",
-    "contentTypeManga": "Манга"
+    "contentTypeManga": "Манга",
+    "useSearchHint": "Ваша колекція порожня\nСкористайтесь пошуком",
+    "videSourceFailed": "Помилка відтворення відео"
 }

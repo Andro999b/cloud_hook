@@ -2,6 +2,7 @@ import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/auth/auth.dart';
 import 'package:cloud_hook/auth/auth_provider.dart';
 import 'package:cloud_hook/collection/collection_sync.dart';
+import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -79,7 +80,10 @@ class _AuthUserMenuState extends ConsumerState<_AuthUserMenu> {
           ),
         );
       },
-      style: const MenuStyle(alignment: Alignment.bottomLeft),
+      style: MenuStyle(
+        alignment:
+            isMobile(context) ? Alignment.topCenter : Alignment.bottomLeft,
+      ),
       menuChildren: [
         BackButtonListener(
           onBackButtonPressed: () async {

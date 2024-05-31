@@ -45,6 +45,10 @@ class EneyidaSupplier extends ContentSupplier with DLEChannelsLoader {
         ContentType.anime,
       };
 
+  @override
+  Set<ContentLanguage> get supportedLanguages =>
+      const {ContentLanguage.ukrainian};
+
   late final _contentInfoFieldSelector = SelectorsToMap({
     "supplier": Const(name),
     "id": UrlId.forScope("a.short_title"),

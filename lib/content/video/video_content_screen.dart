@@ -22,7 +22,6 @@ class VideoContentScreen extends ConsumerWidget {
     return SafeArea(
       child: AppTheme(
         child: Scaffold(
-          backgroundColor: Colors.black,
           body: result.when(
             data: (data) => VideoContentView(
               details: data.$1,
@@ -34,9 +33,12 @@ class VideoContentScreen extends ConsumerWidget {
               onRefresh: () =>
                   ref.refresh(detailsProvider(supplier, id).future),
             ),
-            loading: () => const Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
+            loading: () => const Material(
+              color: Colors.black,
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
