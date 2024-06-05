@@ -126,7 +126,7 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
         const MaterialDesktopPlayOrPauseButton(),
         SkipNextButton(
           provider: widget.provider,
-          enabled: widget.playlistController.canSkipNext,
+          mediaItems: playlistController.mediaItems,
         ),
         const MaterialDesktopVolumeButton(),
         const MaterialDesktopPositionIndicator(),

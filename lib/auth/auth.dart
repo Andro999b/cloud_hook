@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_hook/app_preferences.dart';
+import 'package:cloud_hook/app_secrets.dart';
 import 'package:firebase_dart/firebase_dart.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 abstract class AuthTokenStore {
   FutureOr<void> write(AccessCredentials? credentials);
@@ -132,9 +132,8 @@ class Auth {
 
   static Future<ClientId> _loadDesktopClientId() async {
     if (desktopClientId == null) {
-      final clientSecretJson =
-          await rootBundle.loadString("desktop_client_secret.json");
-      desktopClientId = ClientId.fromJson(json.decode(clientSecretJson));
+      final clientSecretJson = AppSecrets.getJson("google_auth");
+      desktopClientId = ClientId.fromJson(clientSecretJson);
     }
 
     return desktopClientId!;

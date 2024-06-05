@@ -12,14 +12,15 @@ const defaultHeaders = {
 };
 
 final dio = Dio()
-  ..interceptors.add(LogInterceptor(
-    requestBody: true,
-    responseBody: false,
+    // ..interceptors.add(LogInterceptor(
+    //   requestBody: true,
+    //   responseBody: false,
     // logPrint: logger.i,
-  ));
+    // ))
+    ;
 
 class Scrapper {
-  final Uri uri;
+  final String uri;
   final String method;
   final Map<String, String> headers;
   final Object? body;
@@ -48,7 +49,7 @@ class Scrapper {
 
   Future<String> _loadPage() async {
     final resposnse = await dio.request(
-      uri.toString(),
+      uri,
       options: Options(
         method: method,
         headers: {...defaultHeaders, ...headers},

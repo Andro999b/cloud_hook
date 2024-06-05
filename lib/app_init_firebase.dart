@@ -1,18 +1,14 @@
-import 'dart:convert';
-
+import 'package:cloud_hook/app_secrets.dart';
 import 'package:firebase_dart/firebase_dart.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 class AppInitFirebase {
   AppInitFirebase._();
 
   static Future<FirebaseOptions> loadOptions() async {
-    final firebaseOptionsJson =
-        await rootBundle.loadString("firebase_config.json");
-
+    final firebaseOptionsJson = AppSecrets.getJson("firebase");
     return FirebaseOptions.fromMap(
-      json.decode(firebaseOptionsJson),
+      firebaseOptionsJson,
     );
   }
 

@@ -42,6 +42,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-desktop_client_secret.json
-firebase_config.json
+secrets.json
 /android/app/google-services.json

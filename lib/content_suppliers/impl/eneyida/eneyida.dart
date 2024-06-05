@@ -6,7 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'eneyida.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
 class EneyidaContentDetails extends BaseContentDetails
     with PLayerJSIframe, AsyncIframe {
@@ -27,8 +27,6 @@ class EneyidaContentDetails extends BaseContentDetails
 
   factory EneyidaContentDetails.fromJson(Map<String, dynamic> json) =>
       _$EneyidaContentDetailsFromJson(json);
-
-  toJson() => _$EneyidaContentDetailsToJson(this);
 }
 
 class EneyidaSupplier extends ContentSupplier with DLEChannelsLoader {
@@ -76,7 +74,7 @@ class EneyidaSupplier extends ContentSupplier with DLEChannelsLoader {
     final uri = Uri.https(host, "/index.php", {"do": "search"});
 
     final scrapper = Scrapper(
-      uri: uri,
+      uri: uri.toString(),
       method: "post",
       headers: const {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -97,7 +95,7 @@ class EneyidaSupplier extends ContentSupplier with DLEChannelsLoader {
 
   @override
   Future<ContentDetails> detailsById(String id) async {
-    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html"));
+    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html").toString());
 
     final result = await scrapper.scrap(Scope(
       scope: "#main",

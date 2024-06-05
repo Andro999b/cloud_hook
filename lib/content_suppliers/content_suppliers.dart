@@ -2,6 +2,7 @@ import 'dart:isolate';
 
 import 'package:cloud_hook/content_suppliers/impl/animeua/animeua.dart';
 import 'package:cloud_hook/content_suppliers/impl/eneyida/eneyida.dart';
+import 'package:cloud_hook/content_suppliers/impl/tmdb/tmdb.dart';
 import 'package:cloud_hook/content_suppliers/impl/uafilms/uafilms.dart';
 import 'package:cloud_hook/content_suppliers/impl/uakinoclub/uakinoclub.dart';
 import 'package:cloud_hook/content_suppliers/impl/ufdub/ufdub.dart';
@@ -14,6 +15,7 @@ class ContentSuppliers {
   static final ContentSuppliers instance = ContentSuppliers._();
 
   final List<ContentSupplier> _suppliers = [
+    TmdbSupplier(),
     UAKinoClubSupplier(),
     EneyidaSupplier(),
     AnimeUASupplier(),
@@ -29,12 +31,12 @@ class ContentSuppliers {
     return _suppliersByName[supplierName];
   }
 
-  Stream<Map<String, List<ContentSearchResult>>> search(
+  Stream<Map<String, List<ContentInfo>>> search(
     String query,
     Set<String> contentSuppliers,
     Set<ContentType> contentTypes,
   ) async* {
-    final results = <String, List<ContentSearchResult>>{};
+    final results = <String, List<ContentInfo>>{};
     for (var supplierName in contentSuppliers) {
       final supplier = getSupplier(supplierName);
 

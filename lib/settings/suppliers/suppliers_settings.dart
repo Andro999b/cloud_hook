@@ -100,7 +100,6 @@ class _RecomendationsSettingsItem extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _renderTtitle(context, ref, supplier, config),
-            const SizedBox(height: 8),
             _renderChannels(context, ref, supplier, config),
           ],
         ),
@@ -171,28 +170,31 @@ class _RecomendationsSettingsItem extends ConsumerWidget {
 
     return channels.isEmpty
         ? const SizedBox.shrink()
-        : Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: channels
-                .map(
-                  (channel) => ChoiceChip(
-                    selected: config.channels.contains(channel),
-                    label: Text(channel),
-                    onSelected: (value) {
-                      if (value) {
-                        ref
-                            .read(suppliersSettingsProvider.notifier)
-                            .enableChannel(supplierName, channel);
-                      } else {
-                        ref
-                            .read(suppliersSettingsProvider.notifier)
-                            .disableChannel(supplierName, channel);
-                      }
-                    },
-                  ),
-                )
-                .toList(),
+        : Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: channels
+                  .map(
+                    (channel) => ChoiceChip(
+                      selected: config.channels.contains(channel),
+                      label: Text(channel),
+                      onSelected: (value) {
+                        if (value) {
+                          ref
+                              .read(suppliersSettingsProvider.notifier)
+                              .enableChannel(supplierName, channel);
+                        } else {
+                          ref
+                              .read(suppliersSettingsProvider.notifier)
+                              .disableChannel(supplierName, channel);
+                        }
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
           );
   }
 }

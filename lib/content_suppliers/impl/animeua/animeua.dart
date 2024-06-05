@@ -6,7 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'animeua.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
 class AnimeUAContentDetails extends BaseContentDetails
     with PLayerJSIframe, AsyncIframe {
@@ -27,8 +27,6 @@ class AnimeUAContentDetails extends BaseContentDetails
 
   factory AnimeUAContentDetails.fromJson(Map<String, dynamic> json) =>
       _$AnimeUAContentDetailsFromJson(json);
-
-  Map<String, dynamic> toJson() => _$AnimeUAContentDetailsToJson(this);
 }
 
 class AnimeUASupplier extends ContentSupplier with DLEChannelsLoader {
@@ -68,7 +66,7 @@ class AnimeUASupplier extends ContentSupplier with DLEChannelsLoader {
   ) async {
     final uri = Uri.https(host, "/index.php", {"do": "search"});
     final scrapper = Scrapper(
-      uri: uri,
+      uri: uri.toString(),
       method: "post",
       headers: const {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -92,7 +90,7 @@ class AnimeUASupplier extends ContentSupplier with DLEChannelsLoader {
 
   @override
   Future<ContentDetails> detailsById(String id) async {
-    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html"));
+    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html").toString());
 
     final result = await scrapper.scrap(Scope(
       scope: "#dle-content",

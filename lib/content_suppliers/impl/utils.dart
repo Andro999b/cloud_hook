@@ -1,7 +1,7 @@
 import 'dart:isolate';
 
-import 'package:cloud_hook/content_suppliers/media_extrators/extractor.dart';
-import 'package:cloud_hook/content_suppliers/media_extrators/playerjs.dart';
+import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
+import 'package:cloud_hook/content_suppliers/extrators/playerjs/playerjs.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
@@ -12,7 +12,7 @@ mixin PLayerJSIframe {
     includeFromJson: false,
     includeToJson: false,
   )
-  MediaExtractor get mediaExtractor =>
+  ContentMediaItemExtractor get mediaExtractor =>
       PlayerJSExtractor(DubSeasonEpisodeConvertStrategy());
 }
 
@@ -21,7 +21,7 @@ mixin AsyncIframe on ContentDetails {
     includeFromJson: false,
     includeToJson: false,
   )
-  MediaExtractor get mediaExtractor;
+  ContentMediaItemExtractor get mediaExtractor;
 
   String get iframe;
 
@@ -57,7 +57,7 @@ mixin DLEChannelsLoader on ContentSupplier {
       return [];
     }
 
-    final scrapper = Scrapper(uri: Uri.https(host, tragetPath));
+    final scrapper = Scrapper(uri: Uri.https(host, tragetPath).toString());
     final results = await scrapper.scrap(contentInfoSelector);
 
     return results.map(ContentSearchResult.fromJson).toList();

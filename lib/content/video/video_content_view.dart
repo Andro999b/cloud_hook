@@ -30,9 +30,7 @@ class PlaylistController {
   final Player player;
   final List<ContentMediaItem> mediaItems;
   final WidgetRef ref;
-
-  var _canSkipPrev = false;
-  var _canSkipNext = false;
+  final ValueNotifier<bool> isLoading = ValueNotifier(false);
 
   PlaylistController({
     required this.provider,
@@ -41,16 +39,13 @@ class PlaylistController {
     required this.ref,
   });
 
-  bool get canSkipPrev => _canSkipPrev;
-  bool get canSkipNext => _canSkipNext;
-
   Future<void> play(ContentProgress progress) async {
     try {
+      isLoading.value = true;
+      await player.stop();
+
       final itemIdx = progress.currentItem;
       final sourceIdx = progress.currentSource;
-
-      _canSkipPrev = itemIdx > 0;
-      _canSkipNext = itemIdx < mediaItems.length - 1;
 
       final item = mediaItems[itemIdx];
       final sources = await item.sources;
@@ -76,11 +71,14 @@ class PlaylistController {
         start: start,
       );
 
+      isLoading.value = false;
       await player.open(media);
     } on Exception catch (e, stackTrace) {
       logger.e("Fail to play", error: e, stackTrace: stackTrace);
       player.stop();
       rethrow;
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -229,7 +227,23 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
       height: size.height,
       width: size.width,
       color: Colors.black,
-      child: view,
+      child: Stack(
+        children: [
+          view,
+          ValueListenableBuilder(
+            valueListenable: playlistController.isLoading,
+            builder: (context, value, child) {
+              return value
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    )
+                  : const SizedBox.shrink();
+            },
+          )
+        ],
+      ),
     );
   }
 

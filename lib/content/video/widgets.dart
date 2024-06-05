@@ -253,13 +253,13 @@ class SkipPrevButton extends _MediaCollectionItemConsumerWidger {
 }
 
 class SkipNextButton extends _MediaCollectionItemConsumerWidger {
-  final bool enabled;
+  final List<ContentMediaItem> mediaItems;
   final double? iconSize;
   final FocusNode? focusNode;
 
   const SkipNextButton({
     super.key,
-    this.enabled = true,
+    required this.mediaItems,
     required super.provider,
     this.iconSize,
     this.focusNode,
@@ -272,7 +272,7 @@ class SkipNextButton extends _MediaCollectionItemConsumerWidger {
     MediaCollectionItem collectionItem,
   ) {
     return IconButton(
-      onPressed: enabled
+      onPressed: collectionItem.currentItem < mediaItems.length - 1
           ? () {
               ref
                   .read(provider.notifier)

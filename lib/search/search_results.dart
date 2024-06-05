@@ -38,7 +38,7 @@ class SearchResults extends HookWidget {
   }
 
   Widget _renderSupplierResults(
-      BuildContext context, String key, List<ContentSearchResult> value) {
+      BuildContext context, String key, List<ContentInfo> value) {
     return HorizontalList(
       title: Text(
         key,

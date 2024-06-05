@@ -81,7 +81,7 @@ class _VideoContentMobileViewState extends State<VideoContentMobileView> {
         const Spacer(),
         SkipNextButton(
           provider: widget.provider,
-          enabled: widget.playlistController.canSkipNext,
+          mediaItems: widget.playlistController.mediaItems,
           iconSize: 36.0,
         ),
         const Spacer(flex: 2),

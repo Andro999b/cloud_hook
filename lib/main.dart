@@ -5,6 +5,7 @@ import 'package:cloud_hook/app_image_cache.dart';
 import 'package:cloud_hook/app_init_firebase.dart';
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/app_preferences.dart';
+import 'package:cloud_hook/app_secrets.dart';
 import 'package:cloud_hook/collection/collection_screen.dart';
 import 'package:cloud_hook/content/content_details_screen.dart';
 import 'package:cloud_hook/content/video/video_content_screen.dart';
@@ -26,6 +27,7 @@ void main() async {
   // init media kit
   MediaKit.ensureInitialized();
 
+  await AppSecrets.init();
   await AppDatabase.init();
   await AppImageCache.init();
   await AppPreferences.init();
@@ -66,7 +68,7 @@ class MainApp extends StatelessWidget {
             // initialLocation: "/search",
             // initialLocation: "/collection",
             // initialLocation: "/settings",
-            // initialLocation: "/content/EneyidaTV/6037-chetvertyj",
+            // initialLocation: "/content/TMDB/tv%2F1855",
             // initialLocation: "/video/UAFilmsTV/18323-utawarerumono",
             routes: [
               GoRoute(

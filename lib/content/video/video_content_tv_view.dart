@@ -282,7 +282,6 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
   }
 
   Widget _renderBottomBar() {
-    var canSkipNext = widget.playlistController.canSkipNext;
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -306,12 +305,11 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
             const Spacer(),
             SkipPrevButton(provider: widget.provider),
             AndroidTVPlayOrPauseButton(
-              focusNode: canSkipNext ? null : playPauseFocusNode,
+              focusNode: playPauseFocusNode,
             ),
             SkipNextButton(
               provider: widget.provider,
-              enabled: canSkipNext,
-              focusNode: canSkipNext ? playPauseFocusNode : null,
+              mediaItems: widget.playlistController.mediaItems,
             ),
             const Spacer(),
             SourceSelector(

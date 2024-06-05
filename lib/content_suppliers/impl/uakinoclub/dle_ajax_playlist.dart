@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cloud_hook/content_suppliers/media_extrators/playerjs.dart';
+import 'package:cloud_hook/content_suppliers/extrators/playerjs/playerjs.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
@@ -29,6 +29,8 @@ class _AjaxPlaylistItem {
 
   toJson() => _$AjaxPlaylistItemToJson(this);
 }
+
+
 
 class DLEAjaxPlaylistScrapper {
   final Uri uri;

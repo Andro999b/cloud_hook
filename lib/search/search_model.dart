@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 @immutable
 class SearchState extends Equatable {
-  final Map<String, List<ContentSearchResult>> results;
+  final Map<String, List<ContentInfo>> results;
   final bool isLoading;
   final String? query;
 
@@ -22,7 +22,7 @@ class SearchState extends Equatable {
         results = const {};
 
   SearchState copyWith({
-    Map<String, List<ContentSearchResult>>? results,
+    Map<String, List<ContentInfo>>? results,
     bool? isLoading,
   }) {
     return SearchState(

@@ -34,7 +34,7 @@ abstract class ContentSupplier {
   Set<String> get defaultChannels => const {};
   Set<ContentType> get supportedTypes => const {};
   Set<ContentLanguage> get supportedLanguages => const {};
-  Future<List<ContentSearchResult>> search(
+  Future<List<ContentInfo>> search(
     String query,
     Set<ContentType> type,
   ) async =>
@@ -132,9 +132,11 @@ abstract class BaseContentDetails extends Equatable implements ContentDetails {
   final List<String> additionalInfo;
   @override
   @JsonKey(defaultValue: [])
-  final List<ContentSearchResult> similar;
+  final List<ContentInfo> similar;
   @override
   MediaType get mediaType => MediaType.video;
+  @override
+  FutureOr<Iterable<ContentMediaItem>> get mediaItems => const [];
 
   const BaseContentDetails({
     required this.id,

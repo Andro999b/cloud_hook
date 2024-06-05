@@ -25,16 +25,3 @@ UAKinoContentDetails _$UAKinoContentDetailsFromJson(
               .toList() ??
           [],
     );
-
-Map<String, dynamic> _$UAKinoContentDetailsToJson(
-        UAKinoContentDetails instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'supplier': instance.supplier,
-      'title': instance.title,
-      'originalTitle': instance.originalTitle,
-      'image': instance.image,
-      'description': instance.description,
-      'additionalInfo': instance.additionalInfo,
-      'similar': instance.similar,
-    };

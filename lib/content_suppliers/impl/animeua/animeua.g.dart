@@ -26,17 +26,3 @@ AnimeUAContentDetails _$AnimeUAContentDetailsFromJson(
           [],
       iframe: json['iframe'] as String,
     );
-
-Map<String, dynamic> _$AnimeUAContentDetailsToJson(
-        AnimeUAContentDetails instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'supplier': instance.supplier,
-      'title': instance.title,
-      'originalTitle': instance.originalTitle,
-      'image': instance.image,
-      'description': instance.description,
-      'additionalInfo': instance.additionalInfo,
-      'similar': instance.similar,
-      'iframe': instance.iframe,
-    };

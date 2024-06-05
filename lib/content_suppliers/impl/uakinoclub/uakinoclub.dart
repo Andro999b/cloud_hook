@@ -1,5 +1,5 @@
 import 'package:cloud_hook/content_suppliers/impl/uakinoclub/dle_ajax_playlist.dart';
-import 'package:cloud_hook/content_suppliers/media_extrators/playerjs.dart';
+import 'package:cloud_hook/content_suppliers/extrators/playerjs/playerjs.dart';
 import 'package:cloud_hook/content_suppliers/impl/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
@@ -9,7 +9,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'uakinoclub.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
 class UAKinoContentDetails extends BaseContentDetails {
   UAKinoContentDetails({
@@ -25,8 +25,6 @@ class UAKinoContentDetails extends BaseContentDetails {
 
   factory UAKinoContentDetails.fromJson(Map<String, dynamic> json) =>
       _$UAKinoContentDetailsFromJson(json);
-
-  Map<String, dynamic> toJson() => _$UAKinoContentDetailsToJson(this);
 
   // ignore: prefer_final_fields
   Iterable<ContentMediaItem> _mediaItems = const [];
@@ -78,7 +76,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
       String query, Set<ContentType> type) async {
     final uri = Uri.https(host, "/index.php");
     final scrapper = Scrapper(
-      uri: uri,
+      uri: uri.toString(),
       method: "post",
       headers: const {"Content-Type": "application/x-www-form-urlencoded"},
       form: {
@@ -100,7 +98,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
 
   @override
   Future<ContentDetails> detailsById(String id) async {
-    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html"));
+    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html").toString());
 
     final result = await scrapper.scrap(Scope(
       scope: "#dle-content",

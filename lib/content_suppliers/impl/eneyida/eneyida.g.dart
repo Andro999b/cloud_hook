@@ -26,17 +26,3 @@ EneyidaContentDetails _$EneyidaContentDetailsFromJson(
           [],
       iframe: json['iframe'] as String,
     );
-
-Map<String, dynamic> _$EneyidaContentDetailsToJson(
-        EneyidaContentDetails instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'supplier': instance.supplier,
-      'title': instance.title,
-      'originalTitle': instance.originalTitle,
-      'image': instance.image,
-      'description': instance.description,
-      'additionalInfo': instance.additionalInfo,
-      'similar': instance.similar,
-      'iframe': instance.iframe,
-    };

@@ -2,6 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_hook/content_suppliers/model.dart';
 
-mixin MediaExtractor {
+abstract interface class ContentMediaItemExtractor {
   FutureOr<List<ContentMediaItem>> extract(String iframe);
 }

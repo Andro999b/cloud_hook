@@ -1,7 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:cloud_hook/content_suppliers/media_extrators/extractor.dart';
+import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/utils/text.dart';
@@ -178,7 +178,7 @@ class PlayerJSScrapper {
   }
 }
 
-class PlayerJSExtractor with MediaExtractor {
+class PlayerJSExtractor implements ContentMediaItemExtractor {
   final PlaylistConvertStrategy<ContentMediaItem> convertStrategy;
 
   PlayerJSExtractor(this.convertStrategy);

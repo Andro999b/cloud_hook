@@ -75,5 +75,4 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
-    - desktop_client_secret.json
-    - firebase_config.json
+    - secrets.json
