@@ -21,6 +21,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_kit/media_kit.dart';
 
+// next: https://moviesapi.club
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -69,7 +71,7 @@ class MainApp extends StatelessWidget {
             // initialLocation: "/collection",
             // initialLocation: "/settings",
             // initialLocation: "/content/TMDB/tv%2F1855",
-            // initialLocation: "/video/UAFilmsTV/18323-utawarerumono",
+            // initialLocation: "/video/TMDB/tv%2F1855",
             routes: [
               GoRoute(
                 path: NavigationRoute.home.path,

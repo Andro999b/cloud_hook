@@ -48,7 +48,8 @@ class PlaylistController {
       final sourceIdx = progress.currentSource;
 
       final item = mediaItems[itemIdx];
-      final sources = await item.sources;
+      final sources =
+          (await item.sources).where((s) => s.kind == FileKind.video).toList();
 
       final sourceIndex = sourceIdx >= sources.length ? 0 : sourceIdx;
       final source = sources[sourceIndex];

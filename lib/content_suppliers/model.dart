@@ -64,7 +64,10 @@ abstract interface class ContentMediaItem {
   String? get image;
 }
 
+enum FileKind { video, image, subtitle }
+
 abstract interface class ContentMediaItemSource {
+  FileKind get kind;
   String get description;
   FutureOr<Uri> get link;
   Map<String, String>? get headers;
@@ -131,8 +134,10 @@ abstract class BaseContentDetails extends Equatable implements ContentDetails {
   @JsonKey(defaultValue: [])
   final List<String> additionalInfo;
   @override
-  @JsonKey(defaultValue: [])
-  final List<ContentInfo> similar;
+  @JsonKey(
+    defaultValue: [],
+  )
+  final List<ContentSearchResult> similar;
   @override
   MediaType get mediaType => MediaType.video;
   @override
@@ -224,6 +229,8 @@ class SimpleContentMediaItem extends BasicContentMediaItem {
 class SimpleContentMediaItemSource extends Equatable
     implements ContentMediaItemSource {
   @override
+  final FileKind kind;
+  @override
   final String description;
   @override
   final Uri link;
@@ -233,6 +240,7 @@ class SimpleContentMediaItemSource extends Equatable
   const SimpleContentMediaItemSource({
     required this.description,
     required this.link,
+    this.kind = FileKind.video,
     this.headers,
   });
 
@@ -246,13 +254,15 @@ typedef ContentItemMediaSourceLinkLoader = Future<Uri> Function();
 class AsyncContentMediaItemSource extends Equatable
     implements ContentMediaItemSource {
   @override
+  final FileKind kind;
+  @override
   final String description;
   @override
   final Map<String, String>? headers;
 
   Uri? _linkLoader;
 
-  ContentItemMediaSourceLinkLoader linkLoader;
+  final ContentItemMediaSourceLinkLoader linkLoader;
 
   @override
   Future<Uri> get link async => _linkLoader ??= await linkLoader();
@@ -260,6 +270,7 @@ class AsyncContentMediaItemSource extends Equatable
   AsyncContentMediaItemSource({
     required this.description,
     required this.linkLoader,
+    this.kind = FileKind.video,
     this.headers,
   });
 

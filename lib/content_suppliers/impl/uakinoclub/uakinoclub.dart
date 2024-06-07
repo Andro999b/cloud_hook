@@ -41,7 +41,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
   final host = "uakino.club";
 
   @override
-  String get name => "UAKino";
+  String get name => "UAKinoClub";
 
   @override
   Set<ContentType> get supportedTypes => const {

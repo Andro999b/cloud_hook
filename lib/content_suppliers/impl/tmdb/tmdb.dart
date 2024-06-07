@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cloud_hook/app_secrets.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/two_embed.dart';
+import 'package:cloud_hook/content_suppliers/extrators/source/vidsrcto.dart';
 import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:collection/collection.dart';
@@ -10,27 +12,19 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'tmdb.g.dart';
 
-@JsonSerializable(createToJson: false)
-class TmdbSearchResponse {
-  final List<TmdbContentInfo> results;
-
-  TmdbSearchResponse({required this.results});
-
-  factory TmdbSearchResponse.fromJson(Map<String, dynamic> json) =>
-      _$TmdbSearchResponseFromJson(json);
-}
+const supplierName = "TMDB";
 
 class TmdbContentInfo implements ContentInfo {
   @override
   final String id;
-  @override
-  final String supplier = "TMDB";
   @override
   final String title;
   @override
   final String? subtitle;
   @override
   final String image;
+  @override
+  String get supplier => supplierName;
 
   TmdbContentInfo({
     required this.id,
@@ -53,58 +47,48 @@ class TmdbContentInfo implements ContentInfo {
   }
 }
 
-class TmdbContentDetails extends BaseContentDetails {
+class TmdbContentDetails implements ContentDetails {
+  @override
+  final String id;
+  @override
+  final String title;
+  @override
+  final String? originalTitle;
+  @override
+  final String image;
+  @override
+  final String description;
+  @override
+  @JsonKey(defaultValue: [])
+  final List<String> additionalInfo;
+  @override
+  final List<ContentInfo> similar;
   @override
   final List<ContentMediaItem> mediaItems;
+  @override
+  String get supplier => supplierName;
+
+  @override
+  MediaType get mediaType => MediaType.video;
 
   const TmdbContentDetails({
-    required super.id,
-    super.supplier = "TMDB",
-    required super.title,
-    required super.originalTitle,
-    required super.image,
-    required super.description,
-    required super.additionalInfo,
-    required super.similar,
+    required this.id,
+    required this.title,
+    required this.originalTitle,
+    required this.image,
+    required this.description,
+    required this.additionalInfo,
+    required this.similar,
     required this.mediaItems,
   });
 
-  factory TmdbContentDetails.fromJson(String id, Map<String, dynamic> json) {
+  factory TmdbContentDetails.fromJson(
+    String id,
+    List<ContentMediaItem> mediaItems,
+    Map<String, dynamic> json,
+  ) {
     final title = json["name"] ?? json["title"];
     final originalTitle = json["original_title"];
-    final imdbId = json["external_ids"]?["imdb_id"] ?? json["imdb_id"];
-
-    List<ContentMediaItem> mediaItems = [];
-    if (json["seasons"] == null) {
-      mediaItems.add(
-        _createMediaItem(imdbId: imdbId),
-      );
-    } else {
-      List<dynamic> seasons = json["seasons"];
-      int count = 0;
-      seasons.forEachIndexed((seasonNumber, season) {
-        final seasonNumber = season["season_number"];
-        final int episodeCount = season["episode_count"];
-
-        if (seasonNumber == 0) {
-          return;
-        }
-
-        for (int episodeNumber = 0;
-            episodeNumber < episodeCount;
-            episodeNumber++) {
-          mediaItems.add(
-            _createMediaItem(
-              id: count++,
-              imdbId: imdbId,
-              season: seasonNumber,
-              seasonName: season["name"],
-              episode: episodeNumber + 1,
-            ),
-          );
-        }
-      });
-    }
 
     return TmdbContentDetails(
       id: id,
@@ -129,30 +113,8 @@ class TmdbContentDetails extends BaseContentDetails {
         if (json["production_countries"] != null)
           "Country: ${json["production_countries"].map((e) => e["name"]).join(", ")}",
       ],
-      similar: TmdbSearchResponse.fromJson(json["recommendations"]).results,
+      similar: _TmdbSearchResponse.fromJson(json["recommendations"]).results,
       mediaItems: mediaItems,
-    );
-  }
-
-  static AsyncContentMediaItem _createMediaItem({
-    int id = 0,
-    String? imdbId,
-    int? season,
-    String? seasonName,
-    int? episode,
-  }) {
-    return AsyncContentMediaItem(
-      number: id,
-      section: season != null ? "Season $season" : seasonName,
-      title: episode != null ? "Episode $episode" : "",
-      sourcesLoader: aggSourceLoader([
-        if (imdbId != null)
-          TwoEmbedSourceLoader(
-            imdbId: imdbId,
-            season: season,
-            episode: episode,
-          ),
-      ]),
     );
   }
 }
@@ -185,7 +147,7 @@ class TmdbSupplier extends ContentSupplier {
   ;
 
   @override
-  String get name => "TMDB";
+  String get name => supplierName;
 
   @override
   Set<ContentType> get supportedTypes => const {
@@ -207,7 +169,72 @@ class TmdbSupplier extends ContentSupplier {
 
     final res = await dio.get(uri.toString());
 
-    return TmdbContentDetails.fromJson(id, res.data);
+    final json = res.data;
+    final tmdb = json["id"];
+    final imdb = json["external_ids"]?["imdb_id"] ?? json["imdb_id"];
+
+    List<ContentMediaItem> mediaItems = [];
+    if (json["seasons"] == null) {
+      mediaItems.add(
+        _createMediaItem(json["id"], imdb: imdb),
+      );
+    } else {
+      List<dynamic> seasons = json["seasons"];
+
+      final episodes = await Stream.fromIterable(seasons)
+          .asyncMap((s) async {
+            var seasonUri =
+                Uri.https(api, "/3/$id/season/${s["season_number"]}");
+            final seasonRes = await dio.get(seasonUri.toString());
+            final season = _TmdbSeason.fromJson(seasonRes.data);
+
+            return season.episodes;
+          })
+          .expand((e) => e)
+          .toList();
+
+      mediaItems = episodes
+          .mapIndexed((index, ep) => _createMediaItem(
+                tmdb,
+                id: index,
+                imdb: imdb,
+                season: ep.seasonNumber,
+                seasonName: ep.seasonNumber == 0
+                    ? "Specials"
+                    : "Season ${ep.seasonNumber}",
+                episode: ep.episodeNumber,
+                episodeName: ep.name,
+                episodePoster:
+                    ep.stillPath != null ? _posterImage(ep.stillPath!) : null,
+              ))
+          .toList();
+    }
+
+    return TmdbContentDetails.fromJson(id, mediaItems, res.data);
+  }
+
+  AsyncContentMediaItem _createMediaItem(
+    int tmdb, {
+    int id = 0,
+    String? imdb,
+    int? season,
+    String? seasonName,
+    int? episode,
+    String? episodeName,
+    String? episodePoster,
+  }) {
+    return AsyncContentMediaItem(
+      number: id,
+      section: seasonName,
+      title: episodeName ?? "",
+      image: episodePoster,
+      sourcesLoader: aggSourceLoader([
+        if (imdb != null) ...[
+          VidSrcToSourceLoader(imdb: imdb, season: season, episode: episode),
+          TwoEmbedSourceLoader(imdb: imdb, season: season, episode: episode),
+        ]
+      ]),
+    );
   }
 
   @override
@@ -227,6 +254,47 @@ class TmdbSupplier extends ContentSupplier {
 
     final res = await dio.get(uri.toString());
 
-    return TmdbSearchResponse.fromJson(res.data).results;
+    return _TmdbSearchResponse.fromJson(res.data).results;
   }
+}
+
+@JsonSerializable(createToJson: false)
+class _TmdbSearchResponse {
+  final List<TmdbContentInfo> results;
+
+  _TmdbSearchResponse({required this.results});
+
+  factory _TmdbSearchResponse.fromJson(Map<String, dynamic> json) =>
+      _$TmdbSearchResponseFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class _TmdbSeason {
+  final List<_TmdbEpisode> episodes;
+
+  _TmdbSeason(this.episodes);
+
+  factory _TmdbSeason.fromJson(Map<String, dynamic> json) =>
+      _$TmdbSeasonFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class _TmdbEpisode {
+  @JsonKey(name: "season_number")
+  final int seasonNumber;
+  @JsonKey(name: "episode_number")
+  final int episodeNumber;
+  final String name;
+  @JsonKey(name: "still_path")
+  final String? stillPath;
+
+  _TmdbEpisode({
+    required this.seasonNumber,
+    required this.episodeNumber,
+    required this.name,
+    this.stillPath,
+  });
+
+  factory _TmdbEpisode.fromJson(Map<String, dynamic> json) =>
+      _$TmdbEpisodeFromJson(json);
 }

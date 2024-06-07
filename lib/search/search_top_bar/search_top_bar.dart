@@ -5,8 +5,11 @@ import 'package:cloud_hook/search/search_provider.dart';
 import 'package:cloud_hook/search/search_top_bar/search_suggestion_model.dart';
 import 'package:cloud_hook/search/search_top_bar/search_suggestion_provider.dart';
 import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
+import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -31,7 +34,28 @@ class SearchTopBar extends HookConsumerWidget {
 
     return Column(
       children: [
-        _renderSearchBar(searchController, showFilter, context, ref),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: Center(
+                  child: _renderSearchBar(
+                    searchController,
+                    showFilter,
+                    context,
+                    ref,
+                  ),
+                ),
+              ),
+              if (AndroidTVDetector.isTV)
+                Padding(
+                  padding: EdgeInsets.only(left: 8.0),
+                  child: _renderFilterSwitcher(showFilter),
+                ),
+            ],
+          ),
+        ),
         if (showFilter.value) const _FilterSelectors(),
       ],
     );
@@ -43,55 +67,54 @@ class SearchTopBar extends HookConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: SearchAnchor(
-          isFullScreen: isMobile(context),
-          searchController: searchController,
-          viewOnChanged: (value) {
-            ref.read(suggestionsProvider.notifier).suggest(value);
-          },
-          viewOnSubmitted: (value) {
-            _search(ref, value);
-            if (searchController.isOpen) {
-              searchController.closeView(value);
-            }
-          },
-          builder: (context, controller) {
-            return SearchBar(
-              padding: const MaterialStatePropertyAll<EdgeInsets>(
-                EdgeInsets.only(left: 16.0, right: 8.0),
-              ),
-              autoFocus: true,
-              leading: const Icon(Icons.search),
-              controller: controller,
-              onTap: () {
-                controller.openView();
-              },
-              onChanged: (value) {
-                controller.openView();
-              },
-              onSubmitted: (value) {
-                _search(ref, value);
-              },
-              trailing: [
-                IconButton(
-                  onPressed: () {
-                    showFilter.value = !showFilter.value;
-                  },
-                  icon: const Icon(Icons.tune),
-                )
-              ],
-            );
-          },
-          viewBuilder: (suggestions) => _TopSearchSuggestions(
-            searchController: searchController,
-            onSelect: (value) => _search(ref, value),
+    return SearchAnchor(
+      isFullScreen: isMobile(context),
+      searchController: searchController,
+      viewOnChanged: (value) {
+        ref.read(suggestionsProvider.notifier).suggest(value);
+      },
+      viewOnSubmitted: (value) {
+        _search(ref, value);
+        if (searchController.isOpen) {
+          searchController.closeView(value);
+        }
+      },
+      builder: (context, controller) {
+        return SearchBar(
+          padding: const MaterialStatePropertyAll<EdgeInsets>(
+            EdgeInsets.only(left: 16.0, right: 8.0),
           ),
-          suggestionsBuilder: (context, controller) => [],
-        ), // do nothing
+          autoFocus: true,
+          leading: const Icon(Icons.search),
+          controller: controller,
+          onTap: () {
+            controller.openView();
+          },
+          onChanged: (value) {
+            controller.openView();
+          },
+          onSubmitted: (value) {
+            _search(ref, value);
+          },
+          trailing: AndroidTVDetector.isTV
+              ? null
+              : [_renderFilterSwitcher(showFilter)],
+        );
+      },
+      viewBuilder: (suggestions) => _TopSearchSuggestions(
+        searchController: searchController,
+        onSelect: (value) => _search(ref, value),
       ),
+      suggestionsBuilder: (context, controller) => [],
+    );
+  }
+
+  IconButton _renderFilterSwitcher(ValueNotifier<bool> showFilter) {
+    return IconButton(
+      onPressed: () {
+        showFilter.value = !showFilter.value;
+      },
+      icon: const Icon(Icons.tune),
     );
   }
 }

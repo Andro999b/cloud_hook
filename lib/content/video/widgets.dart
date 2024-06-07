@@ -194,6 +194,7 @@ class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: snapshot.data!
+                        .where((e) => e.kind == FileKind.video)
                         .mapIndexed(
                           (idx, e) => MenuItemButton(
                             trailingIcon: data.currentSource == idx

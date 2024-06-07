@@ -8,13 +8,13 @@ class TwoEmbedSourceLoader {
   static final _fileRegExp = RegExp("file:\\s?['\"](?<file>.+)['\"]");
   static const playerBaseUrl = "https://uqloads.xyz/e";
   static const baseUrl = "https://www.2embed.cc";
-  final String imdbId;
+  final String imdb;
 
   final int? episode;
   final int? season;
 
   TwoEmbedSourceLoader({
-    required this.imdbId,
+    required this.imdb,
     this.season,
     this.episode,
   });
@@ -23,9 +23,9 @@ class TwoEmbedSourceLoader {
     String uri;
 
     if (episode == null) {
-      uri = "$baseUrl/embed/$imdbId";
+      uri = "$baseUrl/embed/$imdb";
     } else {
-      uri = "$baseUrl/embedtv/$imdbId&s=$season&e=$episode";
+      uri = "$baseUrl/embedtv/$imdb&s=$season&e=$episode";
     }
 
     final scrapper = Scrapper(uri: uri);

@@ -76,6 +76,8 @@ FutureOr<Map<MediaCollectionItemStatus, List<MediaCollectionItem>>>
     collectionActiveItems(
   CollectionActiveItemsRef ref,
 ) async {
+  ref.watch(collectionChangesProvider);
+
   final repository = ref.watch(collectionServiceProvider);
 
   final collectionItems = await repository.search(status: {

@@ -23,7 +23,6 @@ class CollectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const GeneralLayout(
       selectedIndex: 2,
-      floatingActionButton: AuthIcon(),
       child: Column(
         children: [
           CollectionTopBar(),
