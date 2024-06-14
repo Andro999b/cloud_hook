@@ -4,57 +4,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  # build-for-linux:
-  #   runs-on: ubuntu-latest
-  #   name: "Buid for Linux"
-  #   permissions: write-all
-  #   steps:
-  #     - name: Clone Repository
-  #       uses: actions/checkout@v4
-  #     - name: Create secrets
-  #       run: echo "$SECRETS_JSON" > secrets.json
-  #       env:
-  #         SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
-  #     - name: Install dependencies
-  #       run: |
-  #         sudo apt-get update
-  #         sudo apt-get install -y clang cmake libgtk-3-dev ninja-build libstdc++-12-dev liblzma-dev mpv unzip libmpv-dev
-  #       shell: bash
-  #     - name: Set up Flutter
-  #       uses: subosito/flutter-action@v2
-  #       with:
-  #         channel: stable
-  #         flutter-version-file: pubspec.yaml
-  #         cache: true
-  #     - name: Get Flutter dependencies
-  #       run: flutter pub get
-  #       shell: bash
-  #     - name: Build Flutter for Linux
-  #       run: flutter build linux
-  #       shell: bash
-  #     - name: Package linux build output
-  #       run: tar -zcvf cloud_hook_linux.tar.gz -C build/linux/x64/release/bundle .
-  #       shell: bash
-  #     - name: Upload linux outputs
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: linux_outputs
-  #         path: cloud_hook_*.tar.gz
-
-  build-for-windows:
-    runs-on: windows-latest
-    name: "Buid for Windows"
+  build-for-linux:
+    runs-on: ubuntu-latest
+    name: "Buid for Linux"
     permissions: write-all
     steps:
       - name: Clone Repository
         uses: actions/checkout@v4
       - name: Create secrets
-        run: |
-         echo "$SECRETS_JSON" > secrets.json
-        shell: bash
+        run: echo "$SECRETS_JSON" > secrets.json
         env:
           SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
-      - run: choco install yq
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake libgtk-3-dev ninja-build libstdc++-12-dev liblzma-dev mpv unzip libmpv-dev
+        shell: bash
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -63,12 +28,42 @@ jobs:
           cache: true
       - name: Get Flutter dependencies
         run: flutter pub get
-      - name: Build Flutter for Windows
-        run: flutter build windows
-      - name: Package windows build output
-        run: Compress-Archive build/windows/x64/runner/Release/* cloud_hook_win.zip
-      - name: Upload windows outputs
+        shell: bash
+      - name: Build Flutter for Linux
+        run: flutter build linux
+        shell: bash
+      - name: Upload linux outputs
         uses: actions/upload-artifact@v4
         with:
-          name: windows_outputs
-          path: cloud_hook_*.zip
+          name: linux
+          path: build/linux/x64/release/bundle/
+
+  # build-for-windows:
+  #   runs-on: windows-latest
+  #   name: "Buid for Windows"
+  #   permissions: write-all
+  #   steps:
+  #     - name: Clone Repository
+  #       uses: actions/checkout@v4
+  #     - name: Create secrets
+  #       run: |
+  #        echo "$SECRETS_JSON" > secrets.json
+  #       shell: bash
+  #       env:
+  #         SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
+  #     - run: choco install yq
+  #     - name: Set up Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         channel: stable
+  #         flutter-version-file: pubspec.yaml
+  #         cache: true
+  #     - name: Get Flutter dependencies
+  #       run: flutter pub get
+  #     - name: Build Flutter for Windows
+  #       run: flutter build windows
+  #     - name: Upload windows outputs
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: windows
+  #         path: build/windows/x64/runner/Release/
