@@ -49,24 +49,22 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v4
       - name: Create secrets
-        run: $SECRETS_JSON | Out-File secrets.json
-        env:
-          SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
-      - run: choco install yq
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version-file: pubspec.yaml
-          cache: true
-      - name: Get Flutter dependencies
-        run: flutter pub get
-      - name: Build Flutter for Windows
-        run: flutter build windows
-      - name: Package windows build output
-        run: Compress-Archive build/windows/x64/runner/Release/* cloud_hook_win.zip
-      - name: Upload windows outputs
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows_outputs
-          path: cloud_hook_*.zip
+        run: "${{ secrets.SECRETS_JSON }}" | Out-File secrets.json
+      # - run: choco install yq
+      # - name: Set up Flutter
+      #   uses: subosito/flutter-action@v2
+      #   with:
+      #     channel: stable
+      #     flutter-version-file: pubspec.yaml
+      #     cache: true
+      # - name: Get Flutter dependencies
+      #   run: flutter pub get
+      # - name: Build Flutter for Windows
+      #   run: flutter build windows
+      # - name: Package windows build output
+      #   run: Compress-Archive build/windows/x64/runner/Release/* cloud_hook_win.zip
+      # - name: Upload windows outputs
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: windows_outputs
+      #     path: cloud_hook_*.zip
