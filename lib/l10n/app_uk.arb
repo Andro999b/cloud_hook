@@ -36,5 +36,7 @@
     "contentTypeCartoon": "Мультфільми",
     "contentTypeManga": "Манга",
     "useSearchHint": "Ваша колекція порожня\nСкористайтесь пошуком",
-    "videSourceFailed": "Помилка відтворення відео"
+    "videoSourceFailed": "Помилка відтворення відео",
+    "videoNoSources": "Немає доступних джерел відео",
+    "videoSubtitlesOff": "Без субтитрів"
 }

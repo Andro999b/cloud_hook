@@ -34,6 +34,8 @@ class PlaylistController {
   final WidgetRef ref;
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
 
+  List<ContentMediaItemSource>? currentSources;
+
   PlaylistController({
     required this.provider,
     required this.player,
@@ -50,13 +52,17 @@ class PlaylistController {
       final sourceIdx = progress.currentSource;
 
       final item = mediaItems[itemIdx];
-      final sources =
-          (await item.sources).where((s) => s.kind == FileKind.video).toList();
+      final sources = await item.sources;
+      final videos = sources.where((s) => s.kind == FileKind.video).toList();
 
       final sourceIndex = sourceIdx >= sources.length ? 0 : sourceIdx;
-      final source = sources[sourceIndex];
+      final video = videos.elementAtOrNull(sourceIndex);
 
-      final link = await source.link;
+      if (video == null) {
+        throw Exception("Video not found");
+      }
+
+      final link = await video.link;
 
       Duration? start;
       final currentItemPosition = progress.currentItemPosition;
@@ -69,23 +75,45 @@ class PlaylistController {
 
       final media = Media(
         link.toString(),
-        httpHeaders: source.headers,
+        httpHeaders: video.headers,
         start: start,
       );
 
       isLoading.value = false;
       await player.open(media);
 
-      // try to fix incorrect start position
-      if (start == Duration.zero) {
-        await player.seek(Duration.zero);
-      }
+      currentSources = sources;
+
+      await setSubtitle(progress.currentSubtitle);
     } on Exception catch (e, stackTrace) {
       logger.e("Fail to play", error: e, stackTrace: stackTrace);
       player.stop();
       rethrow;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> setSubtitle(int? currentSubtitle) async {
+    if (currentSources == null) {
+      return;
+    }
+
+    if (currentSubtitle == null) {
+      await player.setSubtitleTrack(SubtitleTrack.no());
+      return;
+    }
+
+    final subtitles =
+        currentSources!.where((s) => s.kind == FileKind.subtitle).toList();
+
+    final subtitle = subtitles.elementAtOrNull(currentSubtitle);
+
+    if (subtitle != null) {
+      await player.setSubtitleTrack(SubtitleTrack.uri(
+        subtitle.link.toString(),
+        title: subtitle.description,
+      ));
     }
   }
 
@@ -171,20 +199,13 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
         final previousValue = previous?.value;
         final nextValue = next.value;
 
-        if (nextValue != null &&
-            (previousValue?.currentItem != nextValue.currentItem ||
-                previousValue?.currentSource != nextValue.currentSource)) {
-          try {
-            await playlistController.play(nextValue);
-          } catch (_) {
-            // show error snackbar
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(AppLocalizations.of(context)!.videSourceFailed),
-                ),
-              );
-            }
+        if (nextValue != null) {
+          if ((previousValue?.currentItem != nextValue.currentItem ||
+              previousValue?.currentSource != nextValue.currentSource)) {
+            await _playMediaItems(nextValue);
+          } else if (previousValue?.currentSubtitle !=
+              nextValue.currentSubtitle) {
+            await playlistController.setSubtitle(nextValue.currentSubtitle);
           }
         }
       },
@@ -215,7 +236,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.videSourceFailed),
+            content: Text(AppLocalizations.of(context)!.videoSourceFailed),
           ),
         );
       }
@@ -227,6 +248,21 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ]);
+    }
+  }
+
+  Future<void> _playMediaItems(MediaCollectionItem nextValue) async {
+    try {
+      await playlistController.play(nextValue);
+    } catch (_) {
+      // show error snackbar
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.videoSourceFailed),
+          ),
+        );
+      }
     }
   }
 

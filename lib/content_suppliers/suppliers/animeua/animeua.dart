@@ -50,7 +50,7 @@ class AnimeUASupplier extends ContentSupplier with DLEChannelsLoader {
       "supplier": Const(name),
       "id": UrlId(),
       "title": Text.forScope(".poster__desc > .poster__title"),
-      "subtitle": Text.forScope(".poster__subtitle"),
+      "secondaryTitle": Text.forScope(".poster__subtitle"),
       "image": Image.forScope(
         ".poster__img img",
         host,

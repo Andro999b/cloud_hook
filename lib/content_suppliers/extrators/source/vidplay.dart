@@ -1,56 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cloud_hook/content_suppliers/extrators/jwplayer/jwplayer.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
+import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:simple_rc4/simple_rc4.dart';
-
-part 'vidplay.g.dart';
-
-@immutable
-@JsonSerializable(createToJson: false)
-class Track {
-  final String file;
-  final String? label;
-  final String kind;
-
-  const Track({required this.file, required this.label, required this.kind});
-
-  factory Track.fromJson(Map<String, dynamic> json) => _$TrackFromJson(json);
-}
-
-@immutable
-@JsonSerializable(createToJson: false)
-class Sources {
-  final String file;
-
-  const Sources({required this.file});
-
-  factory Sources.fromJson(Map<String, dynamic> json) =>
-      _$SourcesFromJson(json);
-}
-
-@immutable
-@JsonSerializable(createToJson: false)
-class Result {
-  final List<Sources> sources;
-  final List<Track> tracks;
-
-  const Result({required this.sources, required this.tracks});
-
-  factory Result.fromJson(Map<String, dynamic> json) => _$ResultFromJson(json);
-}
 
 class VidPlaySourceLoader {
   static final futokenRegExp = RegExp(r"k='(?<futoken>\S+)'");
   static final wafDetectorRegExp =
       RegExp(r"_a = '(?<a>[a-z0-9]+)',\s+_b = '(?<b>[a-z0-9]+)'");
 
-  static final dio = Dio();
+  // static final dio = Dio();
   // ..interceptors.add(LogInterceptor(
   //   requestBody: true,
   //   responseBody: false,
@@ -91,23 +55,10 @@ class VidPlaySourceLoader {
       }),
     );
 
-    final result = Result.fromJson(mediaInfoRes.data["result"]);
-
-    return [
-      ...result.sources.map(
-        (e) => SimpleContentMediaItemSource(
-          description: "VidPlay",
-          link: Uri.parse(e.file),
-        ),
-      ),
-      ...result.tracks.map(
-        (e) => SimpleContentMediaItemSource(
-          kind: FileKind.subtitle,
-          description: "[VidPlay]${e.label}",
-          link: Uri.parse(e.file),
-        ),
-      ),
-    ];
+    return JWPlayer.fromJson(
+      mediaInfoRes.data["result"],
+      despriptionPrefix: "VidPlay",
+    );
   }
 
   Future<List<String>> _fetchKeys() async {

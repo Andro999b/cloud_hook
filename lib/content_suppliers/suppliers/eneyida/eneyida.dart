@@ -52,7 +52,7 @@ class EneyidaSupplier extends ContentSupplier with DLEChannelsLoader {
     "supplier": Const(name),
     "id": UrlId.forScope("a.short_title"),
     "title": Text.forScope("a.short_title"),
-    "subtitle": Text.forScope(".short_subtitle"),
+    "secondaryTitle": Text.forScope(".short_subtitle"),
     "image": Image.forScope(
       "a.short_img img",
       host,

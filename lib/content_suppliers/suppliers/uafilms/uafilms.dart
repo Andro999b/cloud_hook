@@ -55,7 +55,7 @@ class UAFilmsSupplier extends ContentSupplier with DLEChannelsLoader {
       "supplier": Const(name),
       "id": UrlId.forScope("a.movie-title"),
       "title": Text.forScope("a.movie-title"),
-      "subtitle": ConcatSelectors([
+      "secondaryTitle": ConcatSelectors([
         Text.forScope(".movie-img>span"),
         Text.forScope(".movie-img>.movie-series"),
       ]),

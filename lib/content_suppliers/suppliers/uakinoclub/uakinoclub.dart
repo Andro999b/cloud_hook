@@ -66,7 +66,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
             "supplier": Const(name),
             "image": Image.forScope(".movie-img > img", host),
             "title": Text.forScope(".movie-title"),
-            "subtitle": Text.forScope(".full-quality")
+            "secondaryTitle": Text.forScope(".full-quality")
           },
         ),
       ));

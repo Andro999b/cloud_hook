@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/media_items_list.dart';
@@ -185,44 +186,118 @@ class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
         child: Center(
           child: Card(
             clipBehavior: Clip.antiAlias,
-            child: SizedBox(
-              width: 300,
-              child: FutureBuilder(
-                future: Future.value(mediaItems[data.currentItem].sources),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasError) {
-                    return Center(child: Text(snapshot.error!.toString()));
-                  }
-
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: snapshot.data!
-                        .where((e) => e.kind == FileKind.video)
-                        .mapIndexed(
-                          (idx, e) => MenuItemButton(
-                            trailingIcon: data.currentSource == idx
-                                ? const Icon(Icons.check)
-                                : null,
-                            onPressed: () {
-                              context.pop();
-                              final notifier = ref.read(provider.notifier);
-                              notifier.setCurrentSource(idx);
-                            },
-                            child: Text(e.description),
-                          ),
-                        )
-                        .toList(),
+            child: FutureBuilder(
+              future: Future.value(mediaItems[data.currentItem].sources),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: Center(child: CircularProgressIndicator()),
                   );
-                },
-              ),
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text(snapshot.error!.toString()));
+                }
+
+                final videos =
+                    snapshot.data!.where((e) => e.kind == FileKind.video);
+                final subtitles =
+                    snapshot.data!.where((e) => e.kind == FileKind.subtitle);
+
+                if (videos.isEmpty) {
+                  return Container(
+                    width: 250,
+                    constraints: const BoxConstraints.tightFor(height: 60),
+                    child: Center(
+                      child: Text(AppLocalizations.of(context)!.videoNoSources),
+                    ),
+                  );
+                }
+
+                return Wrap(
+                  children: [
+                    _renderVideoSources(context, ref, videos, data),
+                    if (subtitles.isNotEmpty)
+                      _renderSubtitlesSources(context, ref, subtitles, data),
+                  ],
+                );
+              },
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _renderVideoSources(
+    BuildContext context,
+    WidgetRef ref,
+    Iterable<ContentMediaItemSource> sources,
+    MediaCollectionItem data,
+  ) {
+    return SizedBox(
+      width: 250,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: sources
+            .mapIndexed(
+              (idx, e) => MenuItemButton(
+                leadingIcon: const Icon(Icons.video_file),
+                trailingIcon:
+                    data.currentSource == idx ? const Icon(Icons.check) : null,
+                onPressed: () {
+                  context.pop();
+                  final notifier = ref.read(provider.notifier);
+                  notifier.setCurrentSource(idx);
+                },
+                child: Text(e.description),
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+
+  Widget _renderSubtitlesSources(
+    BuildContext context,
+    WidgetRef ref,
+    Iterable<ContentMediaItemSource> sources,
+    MediaCollectionItem data,
+  ) {
+    return SizedBox(
+      width: 250,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          MenuItemButton(
+            leadingIcon: const Icon(Icons.subtitles),
+            trailingIcon:
+                data.currentSubtitle == null ? const Icon(Icons.check) : null,
+            onPressed: () {
+              final notifier = ref.read(provider.notifier);
+              notifier.setCurrentSubtitle(null);
+              context.pop();
+            },
+            child: Text(AppLocalizations.of(context)!.videoSubtitlesOff),
+          ),
+          ...sources.mapIndexed(
+            (idx, e) => MenuItemButton(
+              leadingIcon: const Icon(Icons.subtitles),
+              trailingIcon:
+                  data.currentSubtitle == idx ? const Icon(Icons.check) : null,
+              onPressed: () {
+                final notifier = ref.read(provider.notifier);
+                notifier.setCurrentSubtitle(idx);
+                context.pop();
+              },
+              child: Text(e.description),
+            ),
+          )
+        ],
       ),
     );
   }

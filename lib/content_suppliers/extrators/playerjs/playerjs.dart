@@ -80,6 +80,14 @@ class DubSeasonEpisodeConvertStrategy
             description: dub.title.trim(),
             link: Uri.parse(episode.file!),
           ));
+
+          if (episode.subtitle != null) {
+            mediaItem.sources.add(SimpleContentMediaItemSource(
+              kind: FileKind.subtitle,
+              description: dub.title.trim(),
+              link: Uri.parse(episode.subtitle!),
+            ));
+          }
         });
       });
     }

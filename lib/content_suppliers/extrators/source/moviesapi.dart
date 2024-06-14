@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_hook/content_suppliers/extrators/cryptojs.dart';
+import 'package:cloud_hook/content_suppliers/extrators/jwplayer/jwplayer.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/multi_api_keys.dart';
 import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
@@ -36,8 +37,12 @@ class MoviesapiSourceLoader {
   static const iframeBaseUrl = "https://w1.moviesapi.club";
 
   static final _aesRegExp = RegExp(r"JScripts\s+=\s+'(?<aes>[^']+)'");
-  static final _fileRegExp = RegExp(r'"file":\s*"(?<file>[^"]+)');
-  static final _subtitlesRegExp = RegExp(r'"subtitle"?:\s*"(?<subtitle>[^"]+)');
+  static final _sourcesConfigRegExp = RegExp(
+    r'sources:\s+(?<arr>[^\]]+\])',
+  );
+  static final _tracksConfigRegExp = RegExp(
+    r'tracks:\s+(?<arr>[^\]]+\])',
+  );
 
   final int tmdb;
   final int? episode;
@@ -111,22 +116,16 @@ class MoviesapiSourceLoader {
       padding: "PKCS7",
     ));
 
-    final script = encrypter
-        .decrypt64(cryptoParams.ct, iv: encrypt.IV(iv))
-        .replaceAll(r"\", "");
+    final script =
+        json.decode(encrypter.decrypt64(cryptoParams.ct, iv: encrypt.IV(iv)));
 
-    final fileUrl = _fileRegExp.firstMatch(script)?.namedGroup("file");
+    final sources = _sourcesConfigRegExp.firstMatch(script)?.namedGroup("arr");
+    final tracks = _tracksConfigRegExp.firstMatch(script)?.namedGroup("arr");
 
-    if (fileUrl == null) {
-      logger.w("[moviesapi] file url not found");
+    if (sources == null) {
+      logger.w("[moviesapi] sources url not found");
       return [];
     }
-
-    final subtitlesSources = [];
-    final subtitles =
-        _subtitlesRegExp.firstMatch(script)?.namedGroup("subtitle");
-
-    if (subtitles != null) {}
 
     const headers = {
       ...defaultHeaders,
@@ -139,13 +138,13 @@ class MoviesapiSourceLoader {
       "Referer": iframeBaseUrl
     };
 
-    return [
-      SimpleContentMediaItemSource(
-        description: "Moviesapi",
-        link: Uri.parse(fileUrl),
-        headers: headers,
-      ),
-      ...subtitlesSources
-    ];
+    return JWPlayer.fromConfig(
+      JWPlayerConfig.fromJson({
+        "sources": json.decode(sources),
+        "tracks": tracks != null ? json.decode(tracks) : [],
+      }),
+      despriptionPrefix: "MoviesAPI",
+      headers: headers,
+    );
   }
 }

@@ -39,6 +39,16 @@ class CollectionItem extends _$CollectionItem {
     state = await AsyncValue.guard(() => _saveNewValue(newValue));
   }
 
+  void setCurrentSubtitle(int? subtitleIdx) async {
+    final value = state.requireValue;
+    final newValue = value.copyWith(
+      currentSubtitle: () => subtitleIdx,
+      status: MediaCollectionItemStatus.inProgress,
+    );
+
+    state = await AsyncValue.guard(() => _saveNewValue(newValue));
+  }
+
   void setCurrentPosition(int position, int length) async {
     final value = state.requireValue;
     final currentItemPosition = value.currentItemPosition;

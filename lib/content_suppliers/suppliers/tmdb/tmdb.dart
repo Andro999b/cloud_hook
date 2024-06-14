@@ -20,7 +20,7 @@ class TmdbContentInfo implements ContentInfo {
   @override
   final String title;
   @override
-  final String? subtitle;
+  final String? secondaryTitle;
   @override
   final String image;
   @override
@@ -29,7 +29,7 @@ class TmdbContentInfo implements ContentInfo {
   TmdbContentInfo({
     required this.id,
     required this.title,
-    required this.subtitle,
+    required this.secondaryTitle,
     required this.image,
   });
 
@@ -40,7 +40,7 @@ class TmdbContentInfo implements ContentInfo {
     return TmdbContentInfo(
       id: "${json["media_type"]}/${json["id"]}",
       title: title,
-      subtitle: title != originalTitle ? originalTitle : null,
+      secondaryTitle: title != originalTitle ? originalTitle : null,
       image:
           json["poster_path"] != null ? _posterImage(json["poster_path"]) : "",
     );
@@ -100,6 +100,8 @@ class TmdbContentDetails implements ContentDetails {
       description: json["overview"],
       additionalInfo: [
         json["vote_average"].toString(),
+        if (json["created_by"] != null)
+          "Created by: ${json["created_by"].map((e) => e["name"]).join(", ")}",
         if (json["release_date"] != null)
           "Realise date: ${json["release_date"]}",
         if (json["first_air_date"] != null)
@@ -112,6 +114,8 @@ class TmdbContentDetails implements ContentDetails {
           "Genres: ${json["genres"].map((e) => e["name"]).join(", ")}",
         if (json["production_countries"] != null)
           "Country: ${json["production_countries"].map((e) => e["name"]).join(", ")}",
+        if (json["credits"]?["cast"] != null)
+          "Cast: ${json["credits"]["cast"].map((e) => e["name"]).join(", ")}",
       ],
       similar: _TmdbSearchResponse.fromJson(json["recommendations"]).results,
       mediaItems: mediaItems,
@@ -166,7 +170,7 @@ class TmdbSupplier extends ContentSupplier {
   @override
   Future<ContentDetails> detailsById(String id) async {
     final uri = Uri.https(api, "/3/$id", {
-      "append_to_response": "external_ids,recommendations",
+      "append_to_response": "external_ids,credits,recommendations",
     });
 
     final res = await dio.get(uri.toString());

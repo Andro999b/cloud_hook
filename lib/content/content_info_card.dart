@@ -62,10 +62,10 @@ class ContentInfoCard extends StatelessWidget {
                 style: const TextStyle(color: Colors.white, inherit: true),
                 maxLines: 2,
               ),
-              subtitle: contentInfo.subtitle == null
+              subtitle: contentInfo.secondaryTitle == null
                   ? null
                   : Text(
-                      contentInfo.subtitle!,
+                      contentInfo.secondaryTitle!,
                       overflow: TextOverflow.ellipsis,
                       style:
                           const TextStyle(color: Colors.white, inherit: true),

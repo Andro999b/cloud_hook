@@ -39,15 +39,17 @@ class MediaCollectionItem with ContentProgress implements ContentInfo {
   @override
   final String title;
   @override
+  String? get secondaryTitle => null;
+  @override
   final String image;
   @JsonKey(defaultValue: MediaType.video)
   final MediaType mediaType;
   @override
-  String? get subtitle => null;
-  @override
   int currentItem;
   @override
   int currentSource;
+  @override
+  int? currentSubtitle;
   @override
   Map<int, MediaItemPosition> positions;
 
@@ -68,6 +70,7 @@ class MediaCollectionItem with ContentProgress implements ContentInfo {
     required this.mediaType,
     this.currentItem = 0,
     this.currentSource = 0,
+    this.currentSubtitle,
     this.positions = const {},
     this.status = MediaCollectionItemStatus.none,
     this.priority = 1,
@@ -89,6 +92,7 @@ class MediaCollectionItem with ContentProgress implements ContentInfo {
     String? image,
     int? currentItem,
     int? currentSource,
+    ValueGetter<int?>? currentSubtitle,
     Map<int, MediaItemPosition>? positions,
     MediaCollectionItemStatus? status,
     int? priority,
@@ -101,6 +105,8 @@ class MediaCollectionItem with ContentProgress implements ContentInfo {
       mediaType: mediaType,
       currentItem: currentItem ?? this.currentItem,
       currentSource: currentSource ?? this.currentSource,
+      currentSubtitle:
+          currentSubtitle != null ? currentSubtitle() : this.currentSubtitle,
       positions: positions != null
           ? {...this.positions, ...positions}
           : this.positions,
@@ -160,6 +166,7 @@ mixin ContentProgress {
 
   int get currentItem;
   int get currentSource;
+  int? get currentSubtitle;
 
   Map<int, MediaItemPosition> get positions;
 

@@ -52,7 +52,7 @@ abstract interface class ContentInfo {
   String get id;
   String get supplier;
   String get title;
-  String? get subtitle;
+  String? get secondaryTitle;
   String get image;
 }
 
@@ -98,14 +98,14 @@ class ContentSearchResult extends Equatable implements ContentInfo {
   @override
   final String title;
   @override
-  final String? subtitle;
+  final String? secondaryTitle;
 
   const ContentSearchResult({
     required this.id,
     required this.supplier,
     required this.image,
     required this.title,
-    required this.subtitle,
+    required this.secondaryTitle,
   });
 
   factory ContentSearchResult.fromJson(Map<String, dynamic> json) =>
@@ -114,7 +114,7 @@ class ContentSearchResult extends Equatable implements ContentInfo {
   Map<String, dynamic> toJson() => _$ContentSearchResultToJson(this);
 
   @override
-  List<Object?> get props => [id, supplier, image, title, subtitle];
+  List<Object?> get props => [id, supplier, image, title, secondaryTitle];
 }
 
 abstract class BaseContentDetails extends Equatable implements ContentDetails {

@@ -12,7 +12,7 @@ ContentSearchResult _$ContentSearchResultFromJson(Map<String, dynamic> json) =>
       supplier: json['supplier'] as String,
       image: json['image'] as String,
       title: json['title'] as String,
-      subtitle: json['subtitle'] as String?,
+      secondaryTitle: json['secondaryTitle'] as String?,
     );
 
 Map<String, dynamic> _$ContentSearchResultToJson(
@@ -22,5 +22,5 @@ Map<String, dynamic> _$ContentSearchResultToJson(
       'supplier': instance.supplier,
       'image': instance.image,
       'title': instance.title,
-      'subtitle': instance.subtitle,
+      'secondaryTitle': instance.secondaryTitle,
     };

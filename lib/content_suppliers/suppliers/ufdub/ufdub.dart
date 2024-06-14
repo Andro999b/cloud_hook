@@ -54,7 +54,7 @@ class UFDubSupplier extends ContentSupplier with DLEChannelsLoader {
       "supplier": Const(name),
       "id": UrlId.forScope(".short-text > .short-t"),
       "title": Text.forScope(".short-text > .short-t"),
-      "subtitle": Text.forScope(".short-text > .short-c"),
+      "secondaryTitle": Text.forScope(".short-text > .short-c"),
       "image": Image.forScope(".short-i img", host),
     }),
   );

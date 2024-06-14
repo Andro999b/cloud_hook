@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'vidplay.dart';
+part of 'jwplayer.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -16,7 +16,8 @@ Sources _$SourcesFromJson(Map<String, dynamic> json) => Sources(
       file: json['file'] as String,
     );
 
-Result _$ResultFromJson(Map<String, dynamic> json) => Result(
+JWPlayerConfig _$JWPlayerConfigFromJson(Map<String, dynamic> json) =>
+    JWPlayerConfig(
       sources: (json['sources'] as List<dynamic>)
           .map((e) => Sources.fromJson(e as Map<String, dynamic>))
           .toList(),
