@@ -50,23 +50,25 @@ jobs:
         uses: actions/checkout@v4
       - name: Create secrets
         run: |
-         echo "${{ secrets.SECRETS_JSON }}" > secrets.json
+         echo "$SECRETS_JSON" > secrets.json
         shell: bash
-      # - run: choco install yq
-      # - name: Set up Flutter
-      #   uses: subosito/flutter-action@v2
-      #   with:
-      #     channel: stable
-      #     flutter-version-file: pubspec.yaml
-      #     cache: true
-      # - name: Get Flutter dependencies
-      #   run: flutter pub get
-      # - name: Build Flutter for Windows
-      #   run: flutter build windows
-      # - name: Package windows build output
-      #   run: Compress-Archive build/windows/x64/runner/Release/* cloud_hook_win.zip
-      # - name: Upload windows outputs
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: windows_outputs
-      #     path: cloud_hook_*.zip
+        env:
+          SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
+      - run: choco install yq
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+      - name: Get Flutter dependencies
+        run: flutter pub get
+      - name: Build Flutter for Windows
+        run: flutter build windows
+      - name: Package windows build output
+        run: Compress-Archive build/windows/x64/runner/Release/* cloud_hook_win.zip
+      - name: Upload windows outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows_outputs
+          path: cloud_hook_*.zip
