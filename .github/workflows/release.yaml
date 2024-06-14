@@ -16,6 +16,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang cmake libgtk-3-dev ninja-build libstdc++-12-dev liblzma-dev mpv unzip libmpv-dev
         shell: bash
+      - name: Screate secrets
+        run: echo $SECRETS_JSON > secrets.json
+        env:
+          SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
