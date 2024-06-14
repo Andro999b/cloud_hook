@@ -41,7 +41,6 @@ jobs:
           name: android_outputs
           path: build/app/outputs/flutter-apk/app-*-release.apk
 
-  release:
   build-for-linux:
     runs-on: ubuntu-latest
     name: "Buid for Linux"
