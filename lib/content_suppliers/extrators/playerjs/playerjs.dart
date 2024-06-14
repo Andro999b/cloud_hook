@@ -48,6 +48,7 @@ Comparable defaultSeasonEpisodeId(String season, String episode) {
 class DubSeasonEpisodeConvertStrategy
     extends PlaylistConvertStrategy<ContentMediaItem> {
   final SeasonEpisodeId seasonEpisodeId;
+  final subtitleRegExp = RegExp(r"^\[(?<label>[^\]]+)\](?<url>.*)");
 
   DubSeasonEpisodeConvertStrategy({
     this.seasonEpisodeId = defaultSeasonEpisodeId,
@@ -81,11 +82,13 @@ class DubSeasonEpisodeConvertStrategy
             link: Uri.parse(episode.file!),
           ));
 
-          if (episode.subtitle != null) {
+          if (episode.subtitle?.isNotEmpty == true) {
+            var subMath = subtitleRegExp.firstMatch(episode.subtitle!);
+
             mediaItem.sources.add(SimpleContentMediaItemSource(
               kind: FileKind.subtitle,
-              description: dub.title.trim(),
-              link: Uri.parse(episode.subtitle!),
+              description: subMath?.namedGroup("label") ?? dub.title.trim(),
+              link: Uri.parse(subMath?.namedGroup("url") ?? episode.subtitle!),
             ));
           }
         });

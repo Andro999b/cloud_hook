@@ -245,7 +245,7 @@ class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
         children: sources
             .mapIndexed(
               (idx, e) => MenuItemButton(
-                leadingIcon: const Icon(Icons.video_file),
+                leadingIcon: const Icon(Icons.music_note),
                 trailingIcon:
                     data.currentSource == idx ? const Icon(Icons.check) : null,
                 onPressed: () {

@@ -40,6 +40,7 @@ jobs:
         with:
           name: android_outputs
           path: build/app/outputs/flutter-apk/app-*-release.apk
+          retention-days: 7
 
   build-for-linux:
     runs-on: ubuntu-latest
@@ -71,6 +72,7 @@ jobs:
         with:
           name: linux-x64
           path: build/linux/x64/release/bundle/
+          retention-days: 7
 
   build-for-windows:
     runs-on: windows-latest
@@ -101,3 +103,4 @@ jobs:
         with:
           name: windows-x64
           path: build/windows/x64/runner/Release/
+          retention-days: 7
