@@ -62,7 +62,7 @@ android {
 
     signingConfigs {
         debug {
-            storeFile file("cloud_hook.keystore")
+            storeFile file("cloud_hook.jks")
             storePassword "cloud_hook"
             keyAlias "cloud_hook"
             keyPassword "cloud_hook"

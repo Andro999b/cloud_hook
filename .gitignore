@@ -44,3 +44,5 @@ app.*.map.json
 
 secrets.json
 /android/app/google-services.json
+/android/app/cloud_hook.jks
+/android/app/cloud_hook.txt

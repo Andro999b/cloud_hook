@@ -11,15 +11,15 @@ jobs:
   #   steps:
   #     - name: Clone Repository
   #       uses: actions/checkout@v4
+  #     - name: Create secrets
+  #       run: echo "$SECRETS_JSON" > secrets.json
+  #       env:
+  #         SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
   #     - name: Install dependencies
   #       run: |
   #         sudo apt-get update
   #         sudo apt-get install -y clang cmake libgtk-3-dev ninja-build libstdc++-12-dev liblzma-dev mpv unzip libmpv-dev
   #       shell: bash
-  #     - name: Screate secrets
-  #       run: echo "$SECRETS_JSON" > secrets.json
-  #       env:
-  #         SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
   #     - name: Set up Flutter
   #       uses: subosito/flutter-action@v2
   #       with:
@@ -39,7 +39,7 @@ jobs:
   #       uses: actions/upload-artifact@v4
   #       with:
   #         name: linux_outputs
-  #         path: cloud_hook.tar.gz
+  #         path: linux_cloud_hook.tar.gz
 
   build-for-windows:
     runs-on: windows-latest
@@ -48,6 +48,10 @@ jobs:
     steps:
       - name: Clone Repository
         uses: actions/checkout@v4
+      - name: Create secrets
+        run: $SECRETS_JSON | Out-File secrets.json
+        env:
+          SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
       - run: choco install yq
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -55,13 +59,9 @@ jobs:
           channel: stable
           flutter-version-file: pubspec.yaml
           cache: true
-      - name: Screate secrets
-        run: echo "$SECRETS_JSON" > secrets.json
-        env:
-          SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
       - name: Get Flutter dependencies
         run: flutter pub get
-      - name: Build Flutter for Linux
+      - name: Build Flutter for Windows
         run: flutter build windows
       - name: Package windows build output
         run: Compress-Archive build/windows/x64/runner/Release/* cloud_hook.zip
@@ -69,4 +69,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows_outputs
-          path: cloud_hook.zip
+          path: win_cloud_hook.zip
