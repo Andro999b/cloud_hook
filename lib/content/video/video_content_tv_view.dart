@@ -6,6 +6,7 @@ import 'package:cloud_hook/content/video/widgets.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:media_kit_video/media_kit_video_controls/src/controls/extensions/duration.dart';
@@ -210,7 +211,9 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
                             padding: EdgeInsets.symmetric(horizontal: 16.0),
                             child: MaterialSeekBar(),
                           ),
-                          _renderBottomBar()
+                          _AndroidTVBottomBar(
+                              widget: widget,
+                              playPauseFocusNode: playPauseFocusNode)
                         ],
                       )
                     : const SizedBox.shrink(),
@@ -281,52 +284,6 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
     );
   }
 
-  Widget _renderBottomBar() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: [
-            0,
-            1.0,
-          ],
-          colors: [
-            Colors.transparent,
-            Colors.black54,
-          ],
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-      child: FocusScope(
-        child: Row(
-          children: [
-            const MaterialDesktopPositionIndicator(),
-            const Spacer(),
-            SkipPrevButton(provider: widget.provider),
-            AndroidTVPlayOrPauseButton(
-              focusNode: playPauseFocusNode,
-            ),
-            SkipNextButton(
-              provider: widget.provider,
-              mediaItems: widget.playlistController.mediaItems,
-            ),
-            const Spacer(),
-            SourceSelector(
-              mediaItems: widget.playlistController.mediaItems,
-              provider: widget.provider,
-            ),
-            if (widget.playlistController.mediaItems.length > 1)
-              PlaylistButton(
-                playlistController: widget.playlistController,
-                provider: widget.provider,
-              )
-          ],
-        ),
-      ),
-    );
-  }
-
   _renderSeekPosition() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 96),
@@ -368,69 +325,64 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
   }
 }
 
-class AndroidTVPlayOrPauseButton extends StatefulWidget {
-  final double? iconSize;
-  final Color? iconColor;
-  final FocusNode? focusNode;
-
-  const AndroidTVPlayOrPauseButton({
-    super.key,
-    this.iconSize,
-    this.iconColor,
-    this.focusNode,
+class _AndroidTVBottomBar extends ConsumerWidget {
+  const _AndroidTVBottomBar({
+    required this.widget,
+    required this.playPauseFocusNode,
   });
 
-  @override
-  AndroidTVPlayOrPauseButtonState createState() =>
-      AndroidTVPlayOrPauseButtonState();
-}
-
-class AndroidTVPlayOrPauseButtonState extends State<AndroidTVPlayOrPauseButton>
-    with SingleTickerProviderStateMixin {
-  late final animation = AnimationController(
-    vsync: this,
-    value: controller(context).player.state.playing ? 1 : 0,
-    duration: const Duration(milliseconds: 200),
-  );
-
-  StreamSubscription<bool>? subscription;
+  final AndroidTVControls widget;
+  final FocusNode playPauseFocusNode;
 
   @override
-  void setState(VoidCallback fn) {
-    if (mounted) {
-      super.setState(fn);
-    }
-  }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentProgress = ref.watch(widget.provider);
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    subscription ??= controller(context).player.stream.playing.listen((event) {
-      if (event) {
-        animation.forward();
-      } else {
-        animation.reverse();
-      }
-    });
-  }
+    final isLastItem = currentProgress.valueOrNull?.currentItem !=
+        widget.playlistController.mediaItems.length - 1;
 
-  @override
-  void dispose() {
-    animation.dispose();
-    subscription?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      focusNode: widget.focusNode,
-      color: Colors.white,
-      onPressed: controller(context).player.playOrPause,
-      icon: AnimatedIcon(
-        progress: animation,
-        color: Colors.white,
-        icon: AnimatedIcons.play_pause,
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [
+            0,
+            1.0,
+          ],
+          colors: [
+            Colors.transparent,
+            Colors.black54,
+          ],
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+      child: FocusScope(
+        child: Row(
+          children: [
+            const MaterialDesktopPositionIndicator(),
+            const Spacer(),
+            SkipPrevButton(provider: widget.provider),
+            PlayOrPauseButton(
+              focusNode: !isLastItem ? playPauseFocusNode : null,
+            ),
+            SkipNextButton(
+              provider: widget.provider,
+              mediaItems: widget.playlistController.mediaItems,
+              focusNode: isLastItem ? playPauseFocusNode : null,
+            ),
+            const Spacer(),
+            SourceSelector(
+              mediaItems: widget.playlistController.mediaItems,
+              provider: widget.provider,
+            ),
+            if (widget.playlistController.mediaItems.length > 1)
+              PlaylistButton(
+                playlistController: widget.playlistController,
+                provider: widget.provider,
+              )
+          ],
+        ),
       ),
     );
   }

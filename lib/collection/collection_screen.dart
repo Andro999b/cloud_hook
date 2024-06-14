@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/auth/auth_icon.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_provider.dart';
 import 'package:cloud_hook/collection/collection_top_bar.dart';

@@ -1,11 +1,11 @@
 import 'dart:isolate';
 
-import 'package:cloud_hook/content_suppliers/impl/animeua/animeua.dart';
-import 'package:cloud_hook/content_suppliers/impl/eneyida/eneyida.dart';
-import 'package:cloud_hook/content_suppliers/impl/tmdb/tmdb.dart';
-import 'package:cloud_hook/content_suppliers/impl/uafilms/uafilms.dart';
-import 'package:cloud_hook/content_suppliers/impl/uakinoclub/uakinoclub.dart';
-import 'package:cloud_hook/content_suppliers/impl/ufdub/ufdub.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/animeua/animeua.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/eneyida/eneyida.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/tmdb/tmdb.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/uafilms/uafilms.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/uakinoclub/uakinoclub.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/ufdub/ufdub.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/logger.dart';
 

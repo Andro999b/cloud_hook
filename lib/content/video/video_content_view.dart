@@ -10,7 +10,9 @@ import 'package:cloud_hook/content/video/video_content_tv_view.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/logger.dart';
+import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -57,13 +59,12 @@ class PlaylistController {
       final link = await source.link;
 
       Duration? start;
-      if (progress.currentPosition > 10) {
-        var currentItemPosition = progress.currentItemPosition;
-        if (currentItemPosition.length - currentItemPosition.position < 60) {
-          start = Duration(seconds: currentItemPosition.length - 60);
-        } else {
-          start = Duration(seconds: progress.currentPosition);
-        }
+      final currentItemPosition = progress.currentItemPosition;
+      if (currentItemPosition.length > 0 &&
+          currentItemPosition.position > currentItemPosition.length - 60) {
+        start = Duration(seconds: currentItemPosition.length - 60);
+      } else {
+        start = Duration(seconds: progress.currentPosition);
       }
 
       final media = Media(
@@ -74,6 +75,11 @@ class PlaylistController {
 
       isLoading.value = false;
       await player.open(media);
+
+      // try to fix incorrect start position
+      if (start == Duration.zero) {
+        await player.seek(Duration.zero);
+      }
     } on Exception catch (e, stackTrace) {
       logger.e("Fail to play", error: e, stackTrace: stackTrace);
       player.stop();
@@ -204,6 +210,24 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
 
     player.setVolume(AppPreferences.volume);
     player.stream.volume.listen((event) => AppPreferences.volume = event);
+
+    player.stream.error.listen((event) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.videSourceFailed),
+          ),
+        );
+      }
+      logger.e("[player]: $event");
+    });
+
+    if (isMobileDevice()) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    }
   }
 
   @override
@@ -211,6 +235,15 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
     subscription.close();
     player.dispose();
     super.dispose();
+
+    if (isMobileDevice()) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
   }
 
   @override
@@ -236,9 +269,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
             builder: (context, value, child) {
               return value
                   ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
+                      child: CircularProgressIndicator(color: Colors.white),
                     )
                   : const SizedBox.shrink();
             },

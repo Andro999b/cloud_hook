@@ -15,7 +15,8 @@ class CollectionItem extends _$CollectionItem {
       details.id,
     );
 
-    return item ?? MediaCollectionItem.fromContentDetails(details);
+    return item?.copyWith(title: details.title, image: details.image) ??
+        MediaCollectionItem.fromContentDetails(details);
   }
 
   void setCurrentItem(int itemIdx) async {

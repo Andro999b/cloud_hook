@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
+import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'multi_api_keys.g.dart';
@@ -22,11 +22,20 @@ class MultiApiKeys {
   static const url =
       "https://raw.githubusercontent.com/rushi-chavan/multi-keys/keys/keys.json";
 
+  static const refreshInterval = Duration(seconds: 3600);
+  static DateTime? _lastRefresh;
+  static ApiKeys? _lastKeys;
+
   MultiApiKeys._();
 
   static Future<ApiKeys> fetch() async {
-    final res = await dio.get(url);
+    if (_lastRefresh == null ||
+        DateTime.now().difference(_lastRefresh!) > refreshInterval) {
+      final res = await dio.get(url);
+      _lastKeys = ApiKeys.fromJson(json.decode(res.data));
+      _lastRefresh = DateTime.now();
+    }
 
-    return ApiKeys.fromJson(json.decode(res.data));
+    return _lastKeys!;
   }
 }

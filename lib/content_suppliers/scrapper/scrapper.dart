@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
 import 'package:dio/dio.dart';
@@ -8,15 +9,8 @@ import 'package:html/parser.dart' as parser;
 
 const defaultHeaders = {
   "User-Agent":
-      "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+      "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 };
-
-final dio = Dio();
-// ..interceptors.add(LogInterceptor(
-//   requestBody: true,
-//   responseBody: false,
-//   // logPrint: logger.i,
-// ));
 
 class Scrapper {
   final String uri;

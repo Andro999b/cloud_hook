@@ -2,6 +2,7 @@ import 'package:cloud_hook/content_suppliers/extrators/source/vidplay.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
+import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:simple_rc4/simple_rc4.dart';
 

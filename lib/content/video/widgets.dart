@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/media_items_list.dart';
@@ -8,8 +10,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:media_kit_video/media_kit_video_controls/src/controls/material.dart';
 import 'package:media_kit_video/media_kit_video_controls/src/controls/methods/fullscreen.dart';
+import 'package:media_kit_video/media_kit_video_controls/src/controls/methods/video_state.dart';
 
 abstract class _MediaCollectionItemConsumerWidger extends ConsumerWidget {
   final CollectionItemProvider provider;
@@ -116,7 +118,7 @@ class PlaylistButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return MaterialCustomButton(
+    return IconButton(
       onPressed: () {
         final contentProgress = ref.read(provider).valueOrNull;
 
@@ -127,6 +129,9 @@ class PlaylistButton extends ConsumerWidget {
         ));
       },
       icon: const Icon(Icons.list),
+      color: Colors.white,
+      focusColor: Colors.white.withOpacity(0.4),
+      disabledColor: Colors.white.withOpacity(0.7),
     );
   }
 }
@@ -143,7 +148,7 @@ class SourceSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialCustomButton(
+    return IconButton(
       onPressed: () {
         showDialog(
           context: context,
@@ -154,6 +159,9 @@ class SourceSelector extends StatelessWidget {
         );
       },
       icon: const Icon(Icons.track_changes),
+      color: Colors.white,
+      focusColor: Colors.white.withOpacity(0.4),
+      disabledColor: Colors.white.withOpacity(0.7),
     );
   }
 }
@@ -248,6 +256,7 @@ class SkipPrevButton extends _MediaCollectionItemConsumerWidger {
       icon: const Icon(Icons.skip_previous),
       iconSize: iconSize,
       color: Colors.white,
+      focusColor: Colors.white.withOpacity(0.4),
       disabledColor: Colors.white.withOpacity(0.7),
     );
   }
@@ -284,8 +293,77 @@ class SkipNextButton extends _MediaCollectionItemConsumerWidger {
       icon: const Icon(Icons.skip_next),
       iconSize: iconSize,
       color: Colors.white,
+      focusColor: Colors.white.withOpacity(0.4),
       disabledColor: Colors.white.withOpacity(0.7),
       focusNode: focusNode,
+    );
+  }
+}
+
+class PlayOrPauseButton extends StatefulWidget {
+  final double? iconSize;
+  final Color? iconColor;
+  final FocusNode? focusNode;
+
+  const PlayOrPauseButton({
+    super.key,
+    this.iconSize,
+    this.iconColor,
+    this.focusNode,
+  });
+
+  @override
+  PlayOrPauseButtonState createState() => PlayOrPauseButtonState();
+}
+
+class PlayOrPauseButtonState extends State<PlayOrPauseButton>
+    with SingleTickerProviderStateMixin {
+  late final animation = AnimationController(
+    vsync: this,
+    value: controller(context).player.state.playing ? 1 : 0,
+    duration: const Duration(milliseconds: 200),
+  );
+
+  StreamSubscription<bool>? subscription;
+
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    subscription ??= controller(context).player.stream.playing.listen((event) {
+      if (event) {
+        animation.forward();
+      } else {
+        animation.reverse();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    animation.dispose();
+    subscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      focusNode: widget.focusNode,
+      color: Colors.white,
+      focusColor: Colors.white.withOpacity(0.4),
+      onPressed: controller(context).player.playOrPause,
+      icon: AnimatedIcon(
+        progress: animation,
+        color: Colors.white,
+        icon: AnimatedIcons.play_pause,
+      ),
     );
   }
 }

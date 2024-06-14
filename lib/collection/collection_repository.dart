@@ -264,7 +264,7 @@ class FirebaseRepository extends CollectionRepository {
       return;
     }
 
-    final itemId = "$supplier$id";
+    final itemId = "$supplier${id.replaceAll("/", "|")}";
     final ref = database.reference().child("collection/${user!.id}/$itemId");
 
     await ref.remove();

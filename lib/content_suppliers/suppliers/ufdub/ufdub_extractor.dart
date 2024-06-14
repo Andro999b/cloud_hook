@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
+import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:collection/collection.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 class UFDubMediaExtractor implements ContentMediaItemExtractor {
   static final _episodeUrlRegExp =
@@ -13,9 +14,11 @@ class UFDubMediaExtractor implements ContentMediaItemExtractor {
 
   @override
   Future<List<ContentMediaItem>> extract(String iframe) async {
-    final iframeRes =
-        await http.get(Uri.parse(iframe), headers: defaultHeaders);
-    final iframeContent = iframeRes.body;
+    final iframeRes = await dio.get(
+      iframe,
+      options: Options(headers: defaultHeaders),
+    );
+    final iframeContent = iframeRes.data as String;
 
     final matches = _episodeUrlRegExp.allMatches(iframeContent);
 

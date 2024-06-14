@@ -38,7 +38,7 @@ final collectionProvider = AutoDisposeFutureProvider<
 typedef CollectionRef = AutoDisposeFutureProviderRef<
     Map<MediaCollectionItemStatus, List<MediaCollectionItem>>>;
 String _$collectionActiveItemsHash() =>
-    r'90c36a8d4a33c8f8dd5b4927e7dd2ec826283fd3';
+    r'1437dc7a64136759dbcad63135c545998349cd88';
 
 /// See also [collectionActiveItems].
 @ProviderFor(collectionActiveItems)

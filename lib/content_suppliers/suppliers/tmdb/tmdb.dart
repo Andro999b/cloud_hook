@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:cloud_hook/app_secrets.dart';
+import 'package:cloud_hook/content_suppliers/extrators/source/moviesapi.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/two_embed.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/vidsrcto.dart';
 import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
@@ -120,12 +120,14 @@ class TmdbContentDetails implements ContentDetails {
 }
 
 String _posterImage(String path) {
-  if (path.startsWith("/")) return "https://image.tmdb.org/t/p/w500$path";
+  if (path.startsWith("/")) return "http://image.tmdb.org/t/p/w342$path";
   return path;
 }
 
 String _originalPosterImage(String path) {
-  if (path.startsWith("/")) return "https://image.tmdb.org/t/p/original$path";
+  if (path.startsWith("/")) {
+    return "http://image.tmdb.org/t/p/original$path";
+  }
   return path;
 }
 
@@ -182,6 +184,7 @@ class TmdbSupplier extends ContentSupplier {
       List<dynamic> seasons = json["seasons"];
 
       final episodes = await Stream.fromIterable(seasons)
+          .where((s) => s["season_number"] != 0)
           .asyncMap((s) async {
             var seasonUri =
                 Uri.https(api, "/3/$id/season/${s["season_number"]}");
@@ -199,11 +202,9 @@ class TmdbSupplier extends ContentSupplier {
                 id: index,
                 imdb: imdb,
                 season: ep.seasonNumber,
-                seasonName: ep.seasonNumber == 0
-                    ? "Specials"
-                    : "Season ${ep.seasonNumber}",
+                seasonName: "Season ${ep.seasonNumber}",
                 episode: ep.episodeNumber,
-                episodeName: ep.name,
+                episodeName: "${ep.episodeNumber}. ${ep.name}",
                 episodePoster:
                     ep.stillPath != null ? _posterImage(ep.stillPath!) : null,
               ))
@@ -229,6 +230,7 @@ class TmdbSupplier extends ContentSupplier {
       title: episodeName ?? "",
       image: episodePoster,
       sourcesLoader: aggSourceLoader([
+        MoviesapiSourceLoader(tmdb: tmdb, season: season, episode: episode),
         if (imdb != null) ...[
           VidSrcToSourceLoader(imdb: imdb, season: season, episode: episode),
           TwoEmbedSourceLoader(imdb: imdb, season: season, episode: episode),

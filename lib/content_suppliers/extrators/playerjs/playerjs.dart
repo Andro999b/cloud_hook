@@ -4,9 +4,10 @@ import 'dart:convert';
 import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
+import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/text.dart';
+import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:http/http.dart' as http;
 
 part 'playerjs.g.dart';
 
@@ -162,12 +163,13 @@ class PlayerJSScrapper {
   }
 
   Future<String> loadPlayerJsFile() async {
-    final response = await http.get(uri, headers: {
-      ...defaultHeaders,
-      if (referer != null) "Referer": referer!,
-    });
+    final response = await dio.get(uri.toString(),
+        options: Options(headers: {
+          ...defaultHeaders,
+          if (referer != null) "Referer": referer!,
+        }));
 
-    final match = _fileRegExp.firstMatch(response.body);
+    final match = _fileRegExp.firstMatch(response.data);
     final fileEncodedJson = match?.namedGroup("file");
 
     if (fileEncodedJson == null) {

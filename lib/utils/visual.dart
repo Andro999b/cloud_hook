@@ -1,4 +1,6 @@
-import 'package:device_info_plus/device_info_plus.dart';
+import 'dart:io';
+
+import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:flutter/widgets.dart';
 import 'package:isar/isar.dart';
 
@@ -12,12 +14,6 @@ float getPadding(BuildContext context) {
   return MediaQuery.sizeOf(context).width < mobileWidth ? 8.0 : 16.0;
 }
 
-Future<bool> isAndroidTV() async {
-  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-
-  // Check for the presence of features typical of Android TV
-  bool isTV = androidInfo.systemFeatures.contains('android.software.leanback');
-
-  return isTV;
+bool isMobileDevice() {
+  return Platform.isIOS || (Platform.isAndroid && !AndroidTVDetector.isTV);
 }

@@ -1,6 +1,6 @@
 import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
-import 'package:cloud_hook/content_suppliers/impl/ufdub/ufdub_extractor.dart';
-import 'package:cloud_hook/content_suppliers/impl/utils.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/ufdub/ufdub_extractor.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';

@@ -229,7 +229,7 @@ class _MediaItemsListSection extends HookWidget {
         final item = list[index];
         final image = item.image;
         final title = item.title;
-        final progress = contentProgress?.positions[index]?.progress ?? 0;
+        final progress = contentProgress?.positions[item.number]?.progress ?? 0;
 
         return _MediaItemsListItem(
           title: title,

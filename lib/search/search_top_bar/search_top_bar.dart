@@ -7,9 +7,7 @@ import 'package:cloud_hook/search/search_top_bar/search_suggestion_provider.dart
 import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/visual.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -50,7 +48,7 @@ class SearchTopBar extends HookConsumerWidget {
               ),
               if (AndroidTVDetector.isTV)
                 Padding(
-                  padding: EdgeInsets.only(left: 8.0),
+                  padding: const EdgeInsets.only(left: 8.0),
                   child: _renderFilterSwitcher(showFilter),
                 ),
             ],

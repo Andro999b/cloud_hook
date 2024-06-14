@@ -71,7 +71,7 @@ class MainApp extends StatelessWidget {
             // initialLocation: "/collection",
             // initialLocation: "/settings",
             // initialLocation: "/content/TMDB/tv%2F1855",
-            // initialLocation: "/video/TMDB/tv%2F1855",
+            // initialLocation: "/video/TMDB/movie%2F54138",
             routes: [
               GoRoute(
                 path: NavigationRoute.home.path,

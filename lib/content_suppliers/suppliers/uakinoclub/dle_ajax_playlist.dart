@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:cloud_hook/content_suppliers/extrators/playerjs/playerjs.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
+import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:collection/collection.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'dle_ajax_playlist.g.dart';
@@ -30,18 +29,20 @@ class _AjaxPlaylistItem {
   toJson() => _$AjaxPlaylistItemToJson(this);
 }
 
-
-
 class DLEAjaxPlaylistScrapper {
   final Uri uri;
 
   DLEAjaxPlaylistScrapper({required this.uri});
 
   Future<List<ContentMediaItem>> scrap() async {
-    final res = await http.get(uri, headers: defaultHeaders);
+    final res = await dio.get(
+      uri.toString(),
+      options: Options(headers: defaultHeaders),
+    );
 
+    final response = res.data["response"] as String;
     final playlistItems = await Scrapper.scrapFragment(
-          jsonDecode(res.body)["response"],
+          response,
           ".playlists-player",
           IterateOverScope(
             itemScope: ".playlists-videos li[data-id]",

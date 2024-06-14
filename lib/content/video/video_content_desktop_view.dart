@@ -123,7 +123,7 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
       ],
       bottomButtonBar: [
         SkipPrevButton(provider: widget.provider),
-        const MaterialDesktopPlayOrPauseButton(),
+        const PlayOrPauseButton(),
         SkipNextButton(
           provider: widget.provider,
           mediaItems: playlistController.mediaItems,
