@@ -12,10 +12,10 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v4
       - name: Create secrets
-        run: 
-          - echo "$SECRETS_JSON" > secrets.json
-          - echo "$GOOGLE_SERVICE_JSON" > android/app/google-services.json
-          - echo "$ANDOID_KEYSTORE_B64" | base64 -di > android/app/cloud_hook.jks
+        run: |
+          echo "$SECRETS_JSON" > secrets.json
+          echo "$GOOGLE_SERVICE_JSON" > android/app/google-services.json
+          echo "$ANDOID_KEYSTORE_B64" | base64 -di > android/app/cloud_hook.jks
         env:
           SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
           GOOGLE_SERVICE_JSON: ${{ secrets.GOOGLE_SERVICE_JSON }}
@@ -35,7 +35,7 @@ jobs:
         with:
           name: android_outputs
           path: build/app/outputs/flutter-apk/app-*-release.apk
-          
+
   # release:
   # build-for-linux:
   #   runs-on: ubuntu-latest
