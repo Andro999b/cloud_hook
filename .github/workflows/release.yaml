@@ -33,13 +33,13 @@ jobs:
   #       run: flutter build linux
   #       shell: bash
   #     - name: Package linux build output
-  #       run: tar -zcvf cloud_hook.tar.gz -C build/linux/x64/release/bundle .
+  #       run: tar -zcvf cloud_hook_linux.tar.gz -C build/linux/x64/release/bundle .
   #       shell: bash
   #     - name: Upload linux outputs
   #       uses: actions/upload-artifact@v4
   #       with:
   #         name: linux_outputs
-  #         path: linux_cloud_hook.tar.gz
+  #         path: cloud_hook_*.tar.gz
 
   build-for-windows:
     runs-on: windows-latest
@@ -64,9 +64,9 @@ jobs:
       - name: Build Flutter for Windows
         run: flutter build windows
       - name: Package windows build output
-        run: Compress-Archive build/windows/x64/runner/Release/* cloud_hook.zip
+        run: Compress-Archive build/windows/x64/runner/Release/* cloud_hook_win.zip
       - name: Upload windows outputs
         uses: actions/upload-artifact@v4
         with:
           name: windows_outputs
-          path: win_cloud_hook.zip
+          path: cloud_hook_*.zip
