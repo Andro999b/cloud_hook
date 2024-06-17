@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Clone Repository
         uses: actions/checkout@v4
+        with:
+          fetch-tags: true
       - name: Create secrets
         run: |
           echo "$SECRETS_JSON" > secrets.json
@@ -72,6 +74,8 @@ jobs:
     steps:
       - name: Clone Repository
         uses: actions/checkout@v4
+        with:
+          fetch-tags: true
       - name: Create secrets
         run: echo "$SECRETS_JSON" > secrets.json
         env:
@@ -110,6 +114,8 @@ jobs:
     steps:
       - name: Clone Repository
         uses: actions/checkout@v4
+        with:
+          fetch-tags: true
       - name: Create secrets
         run: |
          echo "$SECRETS_JSON" > secrets.json
