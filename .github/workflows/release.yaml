@@ -41,8 +41,7 @@ jobs:
           ANDOID_KEYSTORE_B64: ${{ secrets.ANDOID_KEYSTORE_B64 }}
       - name: Extract tag name
         run: |
-          git fetch --tags
-          TAG=$(git describe --abbrev=0 --tags)
+          TAG=$(git ls-remote -t --sort='-v:refname' | grep -o 'v.*')
           echo "TAG=$TAG-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
         shell: bash
       - name: Set up JDK 17
@@ -81,8 +80,7 @@ jobs:
           SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
       - name: Extract tag name
         run: |
-          git fetch --tags
-          TAG=$(git describe --abbrev=0 --tags)
+          TAG=$(git ls-remote -t --sort='-v:refname' | grep -o 'v.*')
           echo "TAG=$TAG-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
         shell: bash
       - name: Install dependencies
@@ -122,8 +120,7 @@ jobs:
           SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
       - name: Extract tag name
         run: |
-          git fetch --tags
-          TAG=$(git describe --abbrev=0 --tags)
+          TAG=$(git ls-remote -t --sort='-v:refname' | grep -o 'v.*')
           echo "TAG=$TAG-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
         shell: bash
       - run: choco install yq
