@@ -5,18 +5,19 @@ on:
     tags:
       - "v*.*.*"
   workflow_dispatch:
-    android:
-      description: 'Build Android'
-      required: false
-      type: boolean
-    linux:
-      description: 'Build Linux'
-      required: false
-      type: boolean
-    windows:
-      description: 'Build Windows'
-      required: false
-      type: boolean
+    inputs:
+      android:
+        description: 'Build Android'
+        required: false
+        type: boolean
+      linux:
+        description: 'Build Linux'
+        required: false
+        type: boolean
+      windows:
+        description: 'Build Windows'
+        required: false
+        type: boolean
 
 jobs:
   build-for-android:
