@@ -41,6 +41,7 @@ jobs:
           ANDOID_KEYSTORE_B64: ${{ secrets.ANDOID_KEYSTORE_B64 }}
       - name: Extract tag name
         run: |
+          git fetch --tags
           TAG=$(git describe --abbrev=0 --tags)
           echo "TAG=$TAG-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
         shell: bash
@@ -74,14 +75,13 @@ jobs:
     steps:
       - name: Clone Repository
         uses: actions/checkout@v4
-        with:
-          fetch-tags: true
       - name: Create secrets
         run: echo "$SECRETS_JSON" > secrets.json
         env:
           SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
       - name: Extract tag name
         run: |
+          git fetch --tags
           TAG=$(git describe --abbrev=0 --tags)
           echo "TAG=$TAG-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
         shell: bash
@@ -114,8 +114,6 @@ jobs:
     steps:
       - name: Clone Repository
         uses: actions/checkout@v4
-        with:
-          fetch-tags: true
       - name: Create secrets
         run: |
          echo "$SECRETS_JSON" > secrets.json
@@ -124,6 +122,7 @@ jobs:
           SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
       - name: Extract tag name
         run: |
+          git fetch --tags
           TAG=$(git describe --abbrev=0 --tags)
           echo "TAG=$TAG-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
         shell: bash
