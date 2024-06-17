@@ -135,6 +135,7 @@ jobs:
         run: flutter pub get
       - name: Build Flutter for Windows
         run: flutter build windows --build-name $TAG
+        shell: bash
       - name: Upload windows outputs
         uses: actions/upload-artifact@v4
         with:
