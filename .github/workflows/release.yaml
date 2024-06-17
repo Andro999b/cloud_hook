@@ -158,13 +158,13 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: linux-outputs
-          path: linux-outputs
+          name: linux_outputs
+          path: linux_outputs
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: windows-outputs
-          path: windows-outputs
+          name: windows_outputs
+          path: windows_outputs
       - name: RePackage Desktops
         run: |
           tar -czf linux-x64.tar.gz -C linux-outputs .
