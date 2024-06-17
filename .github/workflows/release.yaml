@@ -41,8 +41,9 @@ jobs:
           ANDOID_KEYSTORE_B64: ${{ secrets.ANDOID_KEYSTORE_B64 }}
       - name: Extract tag name
         run: |
-          TAG=$(git ls-remote -t --sort='-v:refname' | grep -o 'v.*')
-          echo "TAG=$TAG-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+          TAG=$(git ls-remote -t --sort='-v:refname' | tail -n1 | sed 's/.*\/v//')
+          echo $TAG
+          echo "TAG=$TAG" >> $GITHUB_ENV
         shell: bash
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -78,10 +79,11 @@ jobs:
         run: echo "$SECRETS_JSON" > secrets.json
         env:
           SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
-      - name: Extract tag name
+      - name: Extract Latest Tag
         run: |
-          TAG=$(git ls-remote -t --sort='-v:refname' | grep -o 'v.*')
-          echo "TAG=$TAG-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+          TAG=$(git ls-remote -t --sort='-v:refname' | tail -n1 | sed 's/.*\/v//')
+          echo $TAG
+          echo "TAG=$TAG" >> $GITHUB_ENV
         shell: bash
       - name: Install dependencies
         run: |
@@ -118,10 +120,11 @@ jobs:
         shell: bash
         env:
           SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
-      - name: Extract tag name
+      - name: Extract Latest Tag
         run: |
-          TAG=$(git ls-remote -t --sort='-v:refname' | grep -o 'v.*')
-          echo "TAG=$TAG-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+          TAG=$(git ls-remote -t --sort='-v:refname' | tail -n1 | sed 's/.*\/v//')
+          echo $TAG
+          echo "TAG=$TAG" >> $GITHUB_ENV
         shell: bash
       - run: choco install yq
       - name: Set up Flutter
