@@ -7,8 +7,8 @@ import 'package:dio/dio.dart';
 
 class TwoEmbedSourceLoader {
   static final _fileRegExp = RegExp("file:\\s?['\"](?<file>.+)['\"]");
-  static const playerBaseUrl = "https://uqloads.xyz/e";
-  static const baseUrl = "https://www.2embed.cc";
+  final playerBaseUrl = "https://uqloads.xyz/e";
+  final baseUrl = "https://www.2embed.cc";
   final String imdb;
 
   final int? episode;

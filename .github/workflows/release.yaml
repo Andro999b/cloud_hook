@@ -1,6 +1,9 @@
 name: Release
 
 on:
+  push:
+    tags:
+      - "v*.*.*"
   workflow_dispatch:
 
 jobs:
@@ -70,7 +73,7 @@ jobs:
       - name: Upload linux outputs
         uses: actions/upload-artifact@v4
         with:
-          name: linux-x64
+          name: linux-outputs
           path: build/linux/x64/release/bundle/
           retention-days: 7
 
@@ -101,6 +104,42 @@ jobs:
       - name: Upload windows outputs
         uses: actions/upload-artifact@v4
         with:
-          name: windows-x64
+          name: windows-outputs
           path: build/windows/x64/runner/Release/
           retention-days: 7
+
+  release:
+    runs-on: ubuntu-latest
+    name: "Release"
+    permissions: write-all
+    needs: [build-for-android, build-for-linux, build-for-windows]
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: android_outputs
+          path: android_outputs
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-outputs
+          path: linux-outputs
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-outputs
+          path: windows-outputs
+      - name: RePackage Desktops
+        run: |
+          tar -czf linux-x64.tar.gz -C linux-outputs .
+          zip -r windows-x64.zip windows-outputs
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            android_outputs/*
+            linux-x64.tar.gz
+            windows-x64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

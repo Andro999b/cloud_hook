@@ -173,11 +173,15 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
   void initState() {
     super.initState();
 
+    if (player.platform is NativePlayer) {
+      (player.platform as NativePlayer).setProperty("force-seekable", "yes");
+    }
+
     videoController = AndroidTVDetector.isTV
         ? VideoController(
             player,
             configuration: const VideoControllerConfiguration(
-              vo: "gpu",
+              vo: "mediacodec_embed",
               hwdec: "mediacodec",
             ),
           )
@@ -236,7 +240,9 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.videoSourceFailed),
+            content: Text(
+              "${AppLocalizations.of(context)!.videoSourceFailed}: $event",
+            ),
           ),
         );
       }

@@ -33,8 +33,8 @@ class _CryptoJSParams {
 }
 
 class MoviesapiSourceLoader {
-  static const baseUrl = "https://moviesapi.club";
-  static const iframeBaseUrl = "https://w1.moviesapi.club";
+  final baseUrl = "https://moviesapi.club";
+  final iframeBaseUrl = "https://w1.moviesapi.club";
 
   static final _aesRegExp = RegExp(r"JScripts\s+=\s+'(?<aes>[^']+)'");
   static final _sourcesConfigRegExp = RegExp(
@@ -127,7 +127,7 @@ class MoviesapiSourceLoader {
       return [];
     }
 
-    const headers = {
+    final headers = {
       ...defaultHeaders,
       "Accept": "*/*",
       "Connection": "keep-alive",

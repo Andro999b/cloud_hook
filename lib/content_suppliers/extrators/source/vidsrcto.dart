@@ -7,8 +7,8 @@ import 'package:cloud_hook/utils/logger.dart';
 import 'package:simple_rc4/simple_rc4.dart';
 
 class VidSrcToSourceLoader {
-  static const rc4key = "WXrUARXb1aDLaZjI";
-  static const baseUrl = "https://vidsrc.to";
+  final rc4key = "WXrUARXb1aDLaZjI";
+  final baseUrl = "https://vidsrc.to";
   final String imdb;
   final int? episode;
   final int? season;

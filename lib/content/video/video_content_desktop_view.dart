@@ -50,22 +50,22 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
         widget.player.playOrPause(),
     const SingleActivator(LogicalKeyboardKey.keyJ): () {
       widget.player.safeSeek(
-        widget.player.state.position - const Duration(seconds: 10),
+        widget.player.state.position - const Duration(seconds: 60),
       );
     },
     const SingleActivator(LogicalKeyboardKey.keyI): () {
       widget.player.safeSeek(
-        widget.player.state.position + const Duration(seconds: 10),
+        widget.player.state.position + const Duration(seconds: 60),
       );
     },
     const SingleActivator(LogicalKeyboardKey.arrowLeft): () {
       widget.player.safeSeek(
-        widget.player.state.position - const Duration(seconds: 2),
+        widget.player.state.position - const Duration(seconds: 10),
       );
     },
     const SingleActivator(LogicalKeyboardKey.arrowRight): () {
       widget.player.safeSeek(
-        widget.player.state.position + const Duration(seconds: 2),
+        widget.player.state.position + const Duration(seconds: 10),
       );
     },
     const SingleActivator(LogicalKeyboardKey.arrowUp): () {
