@@ -39,7 +39,7 @@ jobs:
           ANDOID_KEYSTORE_B64: ${{ secrets.ANDOID_KEYSTORE_B64 }}
       - name: Extract tag name
         run: |
-          TAG=$(git ls-remote -t --sort='-v:refname' | tail -n1 | sed 's/.*\/v//')
+          TAG=$(git ls-remote -t --sort='v:refname' | tail -n1 | sed 's/.*\/v//')
           echo $TAG
           echo "TAG=$TAG" >> $GITHUB_ENV
         shell: bash
@@ -79,7 +79,7 @@ jobs:
           SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
       - name: Extract Latest Tag
         run: |
-          TAG=$(git ls-remote -t --sort='-v:refname' | tail -n1 | sed 's/.*\/v//')
+          TAG=$(git ls-remote -t --sort='v:refname' | tail -n1 | sed 's/.*\/v//')
           echo $TAG
           echo "TAG=$TAG" >> $GITHUB_ENV
         shell: bash
@@ -120,7 +120,7 @@ jobs:
           SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
       - name: Extract Latest Tag
         run: |
-          TAG=$(git ls-remote -t --sort='-v:refname' | tail -n1 | sed 's/.*\/v//')
+          TAG=$(git ls-remote -t --sort='v:refname' | tail -n1 | sed 's/.*\/v//')
           echo $TAG
           echo "TAG=$TAG" >> $GITHUB_ENV
         shell: bash

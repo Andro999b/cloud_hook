@@ -38,5 +38,8 @@
     "useSearchHint": "Ваша колекція порожня\nСкористайтесь пошуком",
     "videoSourceFailed": "Помилка відтворення відео",
     "videoNoSources": "Немає доступних джерел відео",
-    "videoSubtitlesOff": "Без субтитрів"
+    "videoSubtitlesOff": "Без субтитрів",
+    "settingsUnableDownloadNewVersion": "Не вдається завантажити нову версію",
+    "settingsCheckForUpdate": "Перевірити оновлення",
+    "settingsDownloadUpdate": "Завантажити оновлення {update}"
 }

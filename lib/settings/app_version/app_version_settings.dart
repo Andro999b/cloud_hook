@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/settings/app_version/app_version_provider.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -52,13 +53,14 @@ class AppVersionSettings extends ConsumerWidget {
     if (hasNewVersion) {
       return FilledButton(
         onPressed: () => _downloadNewVersion(context, latestAppVersionInfo),
-        child: Text("Заванатжити версію ${latestAppVersionInfo.name}"),
+        child: Text(AppLocalizations.of(context)!
+            .settingsDownloadUpdate(latestAppVersionInfo.name)),
       );
     }
 
     return FilledButton.tonal(
       onPressed: () => ref.refresh(latestAppVersionInfoProvider),
-      child: const Text("Перевірити оновленя"),
+      child: Text(AppLocalizations.of(context)!.settingsCheckForUpdate),
     );
   }
 
@@ -94,8 +96,10 @@ class AppVersionSettings extends ConsumerWidget {
     if (asset == null) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Не вдлось завантажити нову версію"),
+        SnackBar(
+          content: Text(
+              // ignore: use_build_context_synchronously
+              AppLocalizations.of(context)!.settingsUnableDownloadNewVersion),
           behavior: SnackBarBehavior.floating,
         ),
       );
