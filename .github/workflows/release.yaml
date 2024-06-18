@@ -100,7 +100,7 @@ jobs:
       - name: Upload linux outputs
         uses: actions/upload-artifact@v4
         with:
-          name: linux-outputs
+          name: linux_outputs
           path: build/linux/x64/release/bundle/
           retention-days: 7
 
@@ -139,7 +139,7 @@ jobs:
       - name: Upload windows outputs
         uses: actions/upload-artifact@v4
         with:
-          name: windows-outputs
+          name: windows_outputs
           path: build/windows/x64/runner/Release/
           retention-days: 7
 
