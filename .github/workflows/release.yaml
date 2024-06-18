@@ -57,7 +57,7 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
       - name: Build Flutter for Android
-        run: flutter build apk --split-per-abi --build-name $TAG
+        run: flutter build apk --build-name $TAG
       - name: Upload android outputs
         uses: actions/upload-artifact@v4
         with:
