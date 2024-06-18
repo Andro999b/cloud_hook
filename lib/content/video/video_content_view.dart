@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/app_preferences.dart';
@@ -177,7 +178,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
       (player.platform as NativePlayer).setProperty("force-seekable", "yes");
     }
 
-    videoController = AndroidTVDetector.isTV
+    videoController = Platform.isAndroid
         ? VideoController(
             player,
             configuration: const VideoControllerConfiguration(
@@ -243,6 +244,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
             content: Text(
               "${AppLocalizations.of(context)!.videoSourceFailed}: $event",
             ),
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -266,6 +268,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context)!.videoSourceFailed),
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }

@@ -1,5 +1,6 @@
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/layouts/general_layout.dart';
+import 'package:cloud_hook/settings/app_version/app_version_settings.dart';
 import 'package:cloud_hook/settings/suppliers/suppliers_settings.dart';
 import 'package:cloud_hook/settings/theme/brightnes_switcher.dart';
 import 'package:cloud_hook/settings/theme/color_switcher.dart';
@@ -46,7 +47,8 @@ class _SettingsView extends StatelessWidget {
                     AppLocalizations.of(context)!.settingsColor,
                     const ColorSwitcher(),
                   ),
-                  const SuppliersSettingsSection()
+                  _renderSection(context, "Версія", const AppVersionSettings()),
+                  const SuppliersSettingsSection(),
                 ],
               ),
             )
@@ -58,34 +60,42 @@ class _SettingsView extends StatelessWidget {
 
   Widget _renderSection(BuildContext context, String label, Widget section) {
     const padding = EdgeInsets.only(top: 8.0, bottom: 8.0);
-    final children = [
-      Padding(
-        padding: padding,
-        child: SizedBox(
-          width: 200,
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
+    final lableText = Padding(
+      padding: padding,
+      child: SizedBox(
+        width: 200,
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.labelLarge,
         ),
       ),
-      Padding(
-        padding: padding,
-        child: section,
-      )
-    ];
+    );
 
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 450) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: children,
+            children: [
+              lableText,
+              Padding(
+                padding: padding,
+                child: section,
+              )
+            ],
           );
         } else {
-          return Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: children,
+          return Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              lableText,
+              Expanded(
+                child: Padding(
+                  padding: padding,
+                  child: section,
+                ),
+              )
+            ],
           );
         }
       },

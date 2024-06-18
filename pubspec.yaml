@@ -1,7 +1,7 @@
 name: cloud_hook
 description: "Cloud Hooks"
 publish_to: 'none'
-version: 0.1.0
+version: 1.0.2
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -53,6 +53,7 @@ dependencies:
   simple_rc4: ^0.3.0
   pointycastle: ^3.9.1
   encrypt: ^5.0.3
+  package_info_plus: ^8.0.0
 
 dependency_overrides:
   analyzer:

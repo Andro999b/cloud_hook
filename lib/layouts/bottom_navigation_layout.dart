@@ -17,10 +17,12 @@ class BottomNavigationLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var routes = NavigationRoute.routes
-        .map((r) => NavigationDestination(
-              icon: Icon(r.icon),
-              label: r.lableBuilder(context),
-            ))
+        .map(
+          (r) => NavigationDestination(
+            icon: r.icon,
+            label: r.lableBuilder(context),
+          ),
+        )
         .toList();
 
     return Scaffold(

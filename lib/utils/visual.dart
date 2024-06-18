@@ -17,3 +17,7 @@ float getPadding(BuildContext context) {
 bool isMobileDevice() {
   return Platform.isIOS || (Platform.isAndroid && !AndroidTVDetector.isTV);
 }
+
+bool isDesktopDevice() {
+  return Platform.isWindows || Platform.isLinux;
+}

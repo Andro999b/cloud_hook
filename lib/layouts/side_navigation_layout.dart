@@ -21,7 +21,7 @@ class SideNavigationLayout extends StatelessWidget {
     final routes = NavigationRoute.routes
         .map(
           (r) => NavigationRailDestination(
-            icon: Icon(r.icon),
+            icon: r.icon,
             label: Text(r.lableBuilder(context)),
           ),
         )
