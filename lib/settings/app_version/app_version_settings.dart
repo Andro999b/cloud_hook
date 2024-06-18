@@ -78,13 +78,13 @@ class AppVersionSettings extends ConsumerWidget {
     } else if (Platform.isAndroid) {
       final deviceInfo = await DeviceInfoPlugin().androidInfo;
 
-      if (deviceInfo.supportedAbis.contains("arm7")) {
-        asset = latestAppVersionInfo.assets
-            .where((a) => a.name.contains("app-armeabi-v7a-release.apk"))
-            .firstOrNull;
-      } else if (deviceInfo.supportedAbis.contains("arm64")) {
+      if (deviceInfo.supportedAbis.contains("arm64")) {
         asset = latestAppVersionInfo.assets
             .where((a) => a.name.contains("app-arm64-v8a-release.apk"))
+            .firstOrNull;
+      } else if (deviceInfo.supportedAbis.contains("arm7")) {
+        asset = latestAppVersionInfo.assets
+            .where((a) => a.name.contains("app-armeabi-v7a-release.apk"))
             .firstOrNull;
       } else {
         asset = latestAppVersionInfo.assets
