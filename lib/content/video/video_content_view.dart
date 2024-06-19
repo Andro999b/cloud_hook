@@ -265,12 +265,14 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
     } catch (_) {
       // show error snackbar
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.videoSourceFailed),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.videoSourceFailed),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
       }
     }
   }

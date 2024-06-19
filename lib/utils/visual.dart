@@ -19,5 +19,5 @@ bool isMobileDevice() {
 }
 
 bool isDesktopDevice() {
-  return Platform.isWindows || Platform.isLinux;
+  return Platform.isWindows || Platform.isLinux || Platform.isMacOS;
 }

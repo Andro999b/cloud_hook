@@ -54,6 +54,7 @@ dependencies:
   pointycastle: ^3.9.1
   encrypt: ^5.0.3
   package_info_plus: ^8.0.0
+  js_unpack: ^1.0.4
 
 dependency_overrides:
   analyzer:

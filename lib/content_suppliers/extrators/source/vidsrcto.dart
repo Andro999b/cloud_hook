@@ -1,3 +1,4 @@
+import 'package:cloud_hook/content_suppliers/extrators/source/filemoon.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/vidplay.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
@@ -49,6 +50,7 @@ class VidSrcToSourceLoader {
     final Stream<ContentMediaItemSource> stream = Stream.fromIterable(sources)
         .asyncMap((source) async => switch (source["title"]) {
               "Vidplay" => await _extractVidplay(source["id"]),
+              "Filemoon" => await _extractFilemoon(source["id"], url),
               _ => <ContentMediaItemSource>[]
             })
         .expand((element) => element);
@@ -64,6 +66,17 @@ class VidSrcToSourceLoader {
     }
 
     return VidPlaySourceLoader(url: finalUrl).call();
+  }
+
+  Future<List<ContentMediaItemSource>> _extractFilemoon(
+      String id, String url) async {
+    final finalUrl = await _loadSource(id);
+
+    if (finalUrl == null) {
+      return [];
+    }
+
+    return FileMoonSourceLoader(url: finalUrl, referer: url).call();
   }
 
   Future<String?> _loadSource(String id) async {
