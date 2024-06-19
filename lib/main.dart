@@ -15,11 +15,13 @@ import 'package:cloud_hook/search/search_screen.dart';
 import 'package:cloud_hook/settings/settings_screan.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/error_observer.dart';
+import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_kit/media_kit.dart';
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +37,13 @@ void main() async {
 
   // init firebase
   await AppInitFirebase.init();
+
+  if (isDesktopDevice()) {
+    windowManager.waitUntilReadyToShow(null, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
 
   // start ui
   runApp(ProviderScope(

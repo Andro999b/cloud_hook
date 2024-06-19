@@ -2,10 +2,13 @@ import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/video/video_content_view.dart';
 import 'package:cloud_hook/content/video/widgets.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:window_manager/window_manager.dart';
 
 class VideoContentDesktopView extends StatefulWidget {
   final CollectionItemProvider provider;
@@ -29,6 +32,7 @@ class VideoContentDesktopView extends StatefulWidget {
 }
 
 class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
+  bool pipMode = false;
   late final GlobalKey<VideoState> videoStateKey = GlobalKey<VideoState>();
 
   late final _keyboardShortcuts = {
@@ -94,7 +98,12 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
       child: Video(
         key: videoStateKey,
         controller: widget.videoController,
-        controls: (state) => MaterialDesktopVideoControls(state),
+        controls: (state) => pipMode
+            ? PipVideoControls(
+                state,
+                onPipExit: _switchToPipMode,
+              )
+            : MaterialDesktopVideoControls(state),
       ),
     );
   }
@@ -131,6 +140,10 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
         const MaterialDesktopVolumeButton(),
         const MaterialDesktopPositionIndicator(),
         const Spacer(),
+        MaterialCustomButton(
+          onPressed: _switchToPipMode,
+          icon: const Icon(Symbols.pip),
+        ),
         SourceSelector(
           mediaItems: playlistController.mediaItems,
           provider: widget.provider,
@@ -139,5 +152,97 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
       ],
       keyboardShortcuts: _keyboardShortcuts,
     );
+  }
+
+  void _switchToPipMode() async {
+    if (pipMode) {
+      // Exit PiP Mode
+      await windowManager.setTitleBarStyle(TitleBarStyle.normal);
+      await Future.delayed(const Duration(milliseconds: 100));
+      await windowManager.setSize(const Size(1280, 720));
+      await windowManager.setAlwaysOnTop(false);
+      await Future.delayed(const Duration(milliseconds: 100));
+      await windowManager.setAlignment(Alignment.center);
+    } else {
+      // Enter PiP Mode
+      await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
+      await Future.delayed(const Duration(milliseconds: 100));
+      await windowManager.setSize(const Size(384, 216));
+      await windowManager.setAlwaysOnTop(true);
+      await Future.delayed(const Duration(milliseconds: 100));
+      await windowManager.setAlignment(Alignment.bottomRight);
+    }
+
+    setState(() {
+      pipMode = !pipMode;
+    });
+  }
+}
+
+class PipVideoControls extends StatefulWidget {
+  final VideoState state;
+  final VoidCallback onPipExit;
+  const PipVideoControls(
+    this.state, {
+    super.key,
+    required this.onPipExit,
+  });
+
+  @override
+  State<PipVideoControls> createState() => _PipVideoControlsState();
+}
+
+class _PipVideoControlsState extends State<PipVideoControls> {
+  bool uiVisible = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onPanStart: (details) {
+        windowManager.startDragging();
+      },
+      child: MouseRegion(
+        onEnter: (_) => _onEnter(),
+        onExit: (_) => _onExit(),
+        child: Stack(
+          children: [
+            LayoutBuilder(builder: (context, constraints) {
+              return Container(
+                width: constraints.maxWidth,
+                height: constraints.maxHeight,
+                color: Colors.transparent,
+              );
+            }),
+            if (uiVisible) ...[
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: MaterialDesktopCustomButton(
+                      onPressed: widget.onPipExit,
+                      icon: const Icon(Symbols.pip_exit),
+                    ),
+                  ),
+                ),
+              ),
+              const Center(child: PlayOrPauseButton(iconSize: 64))
+            ]
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _onEnter() {
+    setState(() {
+      uiVisible = true;
+    });
+  }
+
+  void _onExit() {
+    setState(() {
+      uiVisible = false;
+    });
   }
 }
