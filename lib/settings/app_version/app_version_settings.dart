@@ -36,7 +36,7 @@ class AppVersionSettings extends ConsumerWidget {
               child: CircularProgressIndicator.adaptive(),
             ),
             onPressed: () {},
-            label: const Text("Перевірити оновленя"),
+            label: Text(AppLocalizations.of(context)!.settingsCheckForUpdate),
           ),
           orElse: () => const SizedBox.shrink(),
         )
@@ -54,7 +54,7 @@ class AppVersionSettings extends ConsumerWidget {
       return FilledButton(
         onPressed: () => _downloadNewVersion(context, latestAppVersionInfo),
         child: Text(AppLocalizations.of(context)!
-            .settingsDownloadUpdate(latestAppVersionInfo.name)),
+            .settingsDownloadUpdate(latestAppVersionInfo.version)),
       );
     }
 

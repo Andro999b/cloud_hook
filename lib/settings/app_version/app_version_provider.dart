@@ -32,6 +32,8 @@ class LatestAppVersionInfo {
   final String name;
   final List<AppVersionDownloadAssets> assets;
 
+  String get version => name.substring(1);
+
   LatestAppVersionInfo({
     required this.name,
     required this.assets,
@@ -58,5 +60,5 @@ bool hasNewVersion(HasNewVersionRef ref) {
     return false;
   }
 
-  return currentVersion != latestVersionInfo.name.substring(1);
+  return currentVersion != latestVersionInfo.version;
 }
