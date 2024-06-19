@@ -234,10 +234,10 @@ class TmdbSupplier extends ContentSupplier {
       title: episodeName ?? "",
       image: episodePoster,
       sourcesLoader: aggSourceLoader([
-        // MoviesapiSourceLoader(tmdb: tmdb, season: season, episode: episode),
+        MoviesapiSourceLoader(tmdb: tmdb, season: season, episode: episode),
         if (imdb != null) ...[
           VidSrcToSourceLoader(imdb: imdb, season: season, episode: episode),
-          // TwoEmbedSourceLoader(imdb: imdb, season: season, episode: episode),
+          TwoEmbedSourceLoader(imdb: imdb, season: season, episode: episode),
         ]
       ]),
     );
