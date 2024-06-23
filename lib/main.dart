@@ -77,7 +77,7 @@ class MainApp extends StatelessWidget {
             // initialLocation: "/search",
             // initialLocation: "/collection",
             // initialLocation: "/settings",
-            initialLocation: "/content/AniTube/4125-yuuyuuhakusho",
+            // initialLocation: "/content/AniTube/4125-yuuyuuhakusho",
             // initialLocation: "/video/TMDB/movie%2F54138",
             routes: [
               GoRoute(
