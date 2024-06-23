@@ -45,7 +45,7 @@ abstract class ContentSupplier {
     int page = 0,
   }) async =>
       const [];
-  Future<ContentDetails> detailsById(String id);
+  Future<ContentDetails?> detailsById(String id);
 }
 
 abstract interface class ContentInfo {

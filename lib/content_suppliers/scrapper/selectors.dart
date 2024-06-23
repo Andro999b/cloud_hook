@@ -1,18 +1,18 @@
 import 'dart:async';
 
-import 'package:cloud_hook/utils/logger.dart';
 import 'package:cloud_hook/utils/url_utils.dart';
+import 'package:collection/collection.dart';
 import 'package:html/dom.dart' as dom;
 
 abstract class Selector<R> {
   FutureOr<R> select(dom.Element element);
 }
 
-class IterateOverScope<R> extends Selector<List<R>> {
+class Iterate<R> extends Selector<List<R>> {
   final String itemScope;
   final Selector<R> item;
 
-  IterateOverScope({required this.itemScope, required this.item});
+  Iterate({required this.itemScope, required this.item});
 
   @override
   FutureOr<List<R>> select(dom.Element element) async {
@@ -22,23 +22,48 @@ class IterateOverScope<R> extends Selector<List<R>> {
   }
 }
 
-class Scope<R> extends Selector<R> {
+class Scope<R> extends Selector<R?> {
   final String scope;
-  final Selector<R> item;
-  R? defaultValue;
+  final Selector<R?> item;
 
-  Scope({required this.scope, required this.item, this.defaultValue});
+  Scope({required this.scope, required this.item});
 
   @override
-  FutureOr<R> select(dom.Element element) {
+  FutureOr<R?> select(dom.Element element) {
     final scopedElement = element.querySelector(scope);
 
     if (scopedElement == null) {
-      logger.w("Scope not found: $scope");
-      return Future.value(defaultValue);
+      // logger.w("Scope not found: $scope");
+      return Future.value(null);
     }
 
     return item.select(scopedElement);
+  }
+}
+
+class ScopeWithDefault<R> extends Selector<R> {
+  final String scope;
+  final Selector<R?> item;
+  final R defaultValue;
+
+  ScopeWithDefault({
+    required this.scope,
+    required this.item,
+    required this.defaultValue,
+  });
+
+  @override
+  Future<R> select(dom.Element element) async {
+    final scopedElement = element.querySelector(scope);
+
+    if (scopedElement == null) {
+      // logger.w("Scope not found: $scope");
+      return Future.value(defaultValue);
+    }
+
+    final result = await item.select(scopedElement);
+
+    return result ?? defaultValue;
   }
 }
 
@@ -76,10 +101,10 @@ class Transform<T, E> extends Selector<T> {
   }
 }
 
-class Text extends Selector<String> {
+class TextSelector extends Selector<String> {
   final bool inline;
 
-  Text({this.inline = false});
+  TextSelector({this.inline = false});
 
   @override
   FutureOr<String> select(dom.Element element) {
@@ -90,15 +115,19 @@ class Text extends Selector<String> {
     return text;
   }
 
-  static Selector<String?> forScope(String scope, {inline = false}) {
-    return Scope(scope: scope, item: Text(inline: inline), defaultValue: "");
+  static Selector<String> forScope(String scope, {inline = false}) {
+    return ScopeWithDefault(
+      scope: scope,
+      item: TextSelector(inline: inline),
+      defaultValue: "",
+    );
   }
 }
 
-class TextNodes extends Selector<String> {
+class TextNode extends Selector<String> {
   final bool inline;
 
-  TextNodes({this.inline = false});
+  TextNode({this.inline = false});
 
   @override
   FutureOr<String> select(dom.Element element) {
@@ -110,9 +139,12 @@ class TextNodes extends Selector<String> {
         .trim();
   }
 
-  static Selector<String?> forScope(String scope, {inline = false}) {
-    return Scope(
-        scope: scope, item: TextNodes(inline: inline), defaultValue: "");
+  static Selector<String> forScope(String scope, {inline = false}) {
+    return ScopeWithDefault(
+      scope: scope,
+      item: TextNode(inline: inline),
+      defaultValue: "",
+    );
   }
 }
 
@@ -126,8 +158,12 @@ class Attribute extends Selector<String?> {
     return element.attributes[attribute];
   }
 
-  static Selector<String?> forScope(String scope, String attribute) {
-    return Scope(scope: scope, item: Attribute(attribute), defaultValue: "");
+  static Selector<String> forScope(String scope, String attribute) {
+    return ScopeWithDefault(
+      scope: scope,
+      item: Attribute(attribute),
+      defaultValue: "",
+    );
   }
 }
 
@@ -135,7 +171,7 @@ typedef MergeFun<R, E> = R Function(List<E>);
 
 class Merge<R, E> extends Selector<R> {
   final MergeFun<R, E> merge;
-  final Iterable<Selector<E>> children;
+  final Iterable<Selector<E?>> children;
 
   Merge({required this.merge, required this.children});
 
@@ -143,21 +179,15 @@ class Merge<R, E> extends Selector<R> {
   FutureOr<R> select(dom.Element element) async {
     final result = await Stream.fromIterable(children)
         .asyncMap((child) => child.select(element))
+        .where((event) => event != null)
+        .cast<E>()
         .toList();
 
     return merge(result);
   }
 }
 
-class ConcatSelectors extends Merge<String, Object?> {
-  ConcatSelectors(Iterable<Selector<Object?>> children, {separator = " "})
-      : super(
-          merge: (result) => result.nonNulls.join(separator),
-          children: children,
-        );
-}
-
-class Join<R> extends Merge<List<R?>, R?> {
+class Join<R> extends Merge<List<R>, R> {
   Join(Iterable<Selector<R?>> children)
       : super(
           merge: (result) => result,
@@ -165,30 +195,12 @@ class Join<R> extends Merge<List<R?>, R?> {
         );
 }
 
-class Expand<R> extends Merge<List<R?>, List<R?>> {
-  Expand(Iterable<Selector<List<R?>>> children, {separator = " "})
+class Flatten<R> extends Merge<List<R>, List<R>> {
+  Flatten(Iterable<Selector<List<R>>> children)
       : super(
           merge: (result) => result.expand((e) => e).toList(),
           children: children,
         );
-}
-
-class PrependAll<R> extends Selector<List<R?>> {
-  final Selector<List<R?>> listSelector;
-  final List<Selector<R?>> prependItems;
-
-  PrependAll(this.prependItems, this.listSelector);
-
-  @override
-  FutureOr<List<R?>> select(dom.Element element) async {
-    final a = await Stream.fromIterable(prependItems)
-        .asyncMap((item) => item.select(element))
-        .toList();
-
-    final b = await listSelector.select(element);
-
-    return a + b;
-  }
 }
 
 class Concat extends Selector<String> {
@@ -203,6 +215,28 @@ class Concat extends Selector<String> {
 
     return res.nonNulls.where((e) => e.isNotEmpty).join(separator);
   }
+
+  factory Concat.selectors(
+    Iterable<Selector<String?>> selectors, {
+    String separator = "",
+  }) =>
+      Concat(Join(selectors), separator: separator);
+}
+
+class Any extends Selector<String?> {
+  final Selector<List<String?>> selector;
+
+  Any(this.selector);
+
+  @override
+  FutureOr<String?> select(dom.Element element) async {
+    final result = await selector.select(element);
+
+    return result.where((element) => element?.isNotEmpty == true).firstOrNull;
+  }
+
+  factory Any.selectors(Iterable<Selector<String?>> selectors) =>
+      Any(Join(selectors));
 }
 
 class Filter<R> extends Selector<List<R>> {
@@ -228,7 +262,7 @@ class Image extends Transform<String, String?> {
 
   static Selector<String?> forScope(String scope, String host,
       {attribute = "src"}) {
-    return Scope(
+    return ScopeWithDefault(
       scope: scope,
       item: Image(host, attribute: attribute),
       defaultValue: "",
@@ -244,7 +278,7 @@ class UrlId extends Transform<String, String?> {
         );
 
   static Selector<String?> forScope(String scope, {attribute = "href"}) {
-    return Scope(
+    return ScopeWithDefault(
       scope: scope,
       item: UrlId(attribute: attribute),
       defaultValue: "",

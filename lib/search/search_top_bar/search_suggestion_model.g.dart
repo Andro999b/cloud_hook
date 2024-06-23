@@ -58,7 +58,7 @@ const SearchSuggestionSchema = CollectionSchema(
   getId: _searchSuggestionGetId,
   getLinks: _searchSuggestionGetLinks,
   attach: _searchSuggestionAttach,
-  version: '3.1.0+1',
+  version: '3.1.7',
 );
 
 int _searchSuggestionEstimateSize(

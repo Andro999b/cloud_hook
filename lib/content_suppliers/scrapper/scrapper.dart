@@ -7,9 +7,13 @@ import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
+const desktopUserAgent =
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
+const mobileUserAgent =
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1";
+
 const defaultHeaders = {
-  "User-Agent":
-      "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+  "User-Agent": desktopUserAgent,
 };
 
 class Scrapper {
@@ -21,6 +25,9 @@ class Scrapper {
   // final String? encoding;
 
   dom.Document? _document;
+  String? _page;
+
+  String get pageContent => _page ?? "";
 
   Scrapper({
     required this.uri,
@@ -31,16 +38,21 @@ class Scrapper {
     // this.encoding,
   });
 
-  FutureOr<R> scrap<R>(Selector<R> selector) async {
+  FutureOr<R?> scrap<R>(Selector<R> selector) async {
     if (_document == null) {
-      final page = await _loadPage();
-      _document = parser.parse(page);
+      _page = await _loadPage();
+
+      if (_page == null) {
+        return null;
+      }
+
+      _document = parser.parse(_page);
     }
 
     return selector.select(_document!.body!);
   }
 
-  Future<String> _loadPage() async {
+  Future<String?> _loadPage() async {
     final resposnse = await dio.request(
       uri,
       options: Options(

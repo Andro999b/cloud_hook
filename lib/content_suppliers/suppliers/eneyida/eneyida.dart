@@ -9,7 +9,7 @@ part 'eneyida.g.dart';
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
 class EneyidaContentDetails extends BaseContentDetails
-    with PLayerJSIframe, AsyncIframe {
+    with PLayerJSIframe, AsyncMediaItems {
   EneyidaContentDetails({
     required super.id,
     required super.supplier,
@@ -29,7 +29,8 @@ class EneyidaContentDetails extends BaseContentDetails
       _$EneyidaContentDetailsFromJson(json);
 }
 
-class EneyidaSupplier extends ContentSupplier with DLEChannelsLoader {
+class EneyidaSupplier extends ContentSupplier
+    with DLEChannelsLoader, DLESearch {
   @override
   final String host = "eneyida.tv";
 
@@ -51,8 +52,8 @@ class EneyidaSupplier extends ContentSupplier with DLEChannelsLoader {
   late final _contentInfoFieldSelector = SelectorsToMap({
     "supplier": Const(name),
     "id": UrlId.forScope("a.short_title"),
-    "title": Text.forScope("a.short_title"),
-    "secondaryTitle": Text.forScope(".short_subtitle"),
+    "title": TextSelector.forScope("a.short_title"),
+    "secondaryTitle": TextSelector.forScope(".short_subtitle"),
     "image": Image.forScope(
       "a.short_img img",
       host,
@@ -61,40 +62,13 @@ class EneyidaSupplier extends ContentSupplier with DLEChannelsLoader {
   });
 
   @override
-  late final contentInfoSelector = IterateOverScope(
+  late final contentInfoSelector = Iterate(
     itemScope: "article.short",
     item: _contentInfoFieldSelector,
   );
 
   @override
-  Future<List<ContentSearchResult>> search(
-    String query,
-    Set<ContentType> type,
-  ) async {
-    final uri = Uri.https(host, "/index.php", {"do": "search"});
-
-    final scrapper = Scrapper(
-      uri: uri.toString(),
-      method: "post",
-      headers: const {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      form: {
-        "do": "search",
-        "subaction": "search",
-        "story": query,
-        "sortby": "date",
-        "resorder": "desc",
-      },
-    );
-
-    final results = await scrapper.scrap(contentInfoSelector);
-
-    return results.map(ContentSearchResult.fromJson).toList();
-  }
-
-  @override
-  Future<ContentDetails> detailsById(String id) async {
+  Future<ContentDetails?> detailsById(String id) async {
     final scrapper = Scrapper(uri: Uri.https(host, "/$id.html").toString());
 
     final result = await scrapper.scrap(Scope(
@@ -103,22 +77,24 @@ class EneyidaSupplier extends ContentSupplier with DLEChannelsLoader {
         {
           "id": Const(id),
           "supplier": Const(name),
-          "title": Text.forScope("#full_header-title > h1"),
-          "originalTitle":
-              Text.forScope("#full_header-title > .full_header-subtitle"),
+          "title": TextSelector.forScope("#full_header-title > h1"),
+          "originalTitle": TextSelector.forScope(
+              "#full_header-title > .full_header-subtitle"),
           "image": Image.forScope(".full_content-poster > img", host),
-          "description": Text.forScope("#full_content-desc > p"),
-          "additionalInfo": PrependAll(
-            [Text.forScope(".full_rating > .db_rates > .r_imdb > span")],
+          "description": TextSelector.forScope("#full_content-desc > p"),
+          "additionalInfo": Flatten([
+            Join([
+              TextSelector.forScope(".full_rating > .db_rates > .r_imdb > span")
+            ]),
             Filter(
-              IterateOverScope(
+              Iterate(
                 itemScope: "#full_info li",
-                item: Text(inline: true),
+                item: TextSelector(inline: true),
               ),
               filter: (element) => !element.startsWith("Вік"),
             ),
-          ),
-          "similar": IterateOverScope(
+          ]),
+          "similar": Iterate(
             itemScope: ".short.related_item",
             item: _contentInfoFieldSelector,
           ),
@@ -126,6 +102,10 @@ class EneyidaSupplier extends ContentSupplier with DLEChannelsLoader {
         },
       ),
     ));
+
+    if (result == null) {
+      return Future.value(null);
+    }
 
     return EneyidaContentDetails.fromJson(result);
   }
@@ -138,7 +118,4 @@ class EneyidaSupplier extends ContentSupplier with DLEChannelsLoader {
     "Мультсеріали": "/cartoon-series/page/",
     "Аніме": "/anime/page/",
   };
-
-  @override
-  Set<String> get channels => channelsPath.keys.toSet();
 }

@@ -12,8 +12,12 @@ class UFDubMediaExtractor implements ContentMediaItemExtractor {
       // ignore: unnecessary_string_escapes
       RegExp("https:\/\/ufdub.com\/video\/VIDEOS\.php\?(.*?)'");
 
+  final String iframe;
+
+  UFDubMediaExtractor(this.iframe);
+
   @override
-  Future<List<ContentMediaItem>> extract(String iframe) async {
+  Future<List<ContentMediaItem>> call() async {
     final iframeRes = await dio.get(
       iframe,
       options: Options(headers: defaultHeaders),

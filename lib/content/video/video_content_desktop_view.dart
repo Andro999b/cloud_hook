@@ -2,7 +2,6 @@ import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/video/video_content_view.dart';
 import 'package:cloud_hook/content/video/widgets.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -91,10 +90,9 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
 
   @override
   Widget build(BuildContext context) {
-    final desktopThemeData = _createThemeData();
     return MaterialDesktopVideoControlsTheme(
-      normal: desktopThemeData,
-      fullscreen: desktopThemeData,
+      normal: _createThemeData(false),
+      fullscreen: _createThemeData(true),
       child: Video(
         key: videoStateKey,
         controller: widget.videoController,
@@ -108,7 +106,7 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
     );
   }
 
-  MaterialDesktopVideoControlsThemeData _createThemeData() {
+  MaterialDesktopVideoControlsThemeData _createThemeData(bool fullscrean) {
     const marging = EdgeInsets.symmetric(horizontal: 20.0);
     final playlistController = widget.playlistController;
 
@@ -140,10 +138,11 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
         const MaterialDesktopVolumeButton(),
         const MaterialDesktopPositionIndicator(),
         const Spacer(),
-        MaterialCustomButton(
-          onPressed: _switchToPipMode,
-          icon: const Icon(Symbols.pip),
-        ),
+        if (!fullscrean)
+          MaterialCustomButton(
+            onPressed: _switchToPipMode,
+            icon: const Icon(Symbols.pip),
+          ),
         SourceSelector(
           mediaItems: playlistController.mediaItems,
           provider: widget.provider,

@@ -238,7 +238,7 @@ class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
     MediaCollectionItem data,
   ) {
     return SizedBox(
-      width: 250,
+      width: 320,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
@@ -268,7 +268,7 @@ class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
     MediaCollectionItem data,
   ) {
     return SizedBox(
-      width: 250,
+      width: 320,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,

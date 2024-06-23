@@ -18,7 +18,7 @@ class FileMoonSourceLoader {
   Future<List<ContentMediaItemSource>> call() async {
     final scrapper = Scrapper(uri: url, headers: {"Referer": referer});
     final script = await scrapper.scrap(
-      Text.forScope("script[data-cfasync='false']"),
+      TextSelector.forScope("script[data-cfasync='false']"),
     );
 
     if (script == null) {

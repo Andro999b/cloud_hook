@@ -24,8 +24,8 @@ class VideoContentScreen extends ConsumerWidget {
         child: Scaffold(
           body: result.when(
             data: (data) => VideoContentView(
-              details: data.$1,
-              mediaItems: data.$2,
+              details: data.contentDetails,
+              mediaItems: data.mediaItems,
             ),
             error: (error, stackTrace) => DisplayError(
               error: error,

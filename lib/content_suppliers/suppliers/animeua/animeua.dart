@@ -9,7 +9,10 @@ part 'animeua.g.dart';
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
 class AnimeUAContentDetails extends BaseContentDetails
-    with PLayerJSIframe, AsyncIframe {
+    with PLayerJSIframe, AsyncMediaItems {
+  @override
+  final String iframe;
+
   AnimeUAContentDetails({
     required super.id,
     required super.supplier,
@@ -22,14 +25,12 @@ class AnimeUAContentDetails extends BaseContentDetails
     required this.iframe,
   });
 
-  @override
-  final String iframe;
-
   factory AnimeUAContentDetails.fromJson(Map<String, dynamic> json) =>
       _$AnimeUAContentDetailsFromJson(json);
 }
 
-class AnimeUASupplier extends ContentSupplier with DLEChannelsLoader {
+class AnimeUASupplier extends ContentSupplier
+    with DLEChannelsLoader, DLESearch {
   @override
   final String host = "animeua.club";
 
@@ -44,13 +45,13 @@ class AnimeUASupplier extends ContentSupplier with DLEChannelsLoader {
       const {ContentLanguage.ukrainian};
 
   @override
-  late final contentInfoSelector = IterateOverScope(
+  late final contentInfoSelector = Iterate(
     itemScope: ".grid-item",
     item: SelectorsToMap({
       "supplier": Const(name),
       "id": UrlId(),
-      "title": Text.forScope(".poster__desc > .poster__title"),
-      "secondaryTitle": Text.forScope(".poster__subtitle"),
+      "title": TextSelector.forScope(".poster__desc > .poster__title"),
+      "secondaryTitle": TextSelector.forScope(".poster__subtitle"),
       "image": Image.forScope(
         ".poster__img img",
         host,
@@ -60,36 +61,7 @@ class AnimeUASupplier extends ContentSupplier with DLEChannelsLoader {
   );
 
   @override
-  Future<List<ContentSearchResult>> search(
-    String query,
-    Set<ContentType> type,
-  ) async {
-    final uri = Uri.https(host, "/index.php", {"do": "search"});
-    final scrapper = Scrapper(
-      uri: uri.toString(),
-      method: "post",
-      headers: const {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      form: {
-        "do": "search",
-        "subaction": "search",
-        "full_search": "0",
-        "search_start": "0",
-        "result_from": "1",
-        "story": query,
-        "sortby": "date",
-        "resorder": "desc",
-      },
-    );
-
-    final results = await scrapper.scrap(contentInfoSelector);
-
-    return results.map(ContentSearchResult.fromJson).toList();
-  }
-
-  @override
-  Future<ContentDetails> detailsById(String id) async {
+  Future<ContentDetails?> detailsById(String id) async {
     final scrapper = Scrapper(uri: Uri.https(host, "/$id.html").toString());
 
     final result = await scrapper.scrap(Scope(
@@ -98,23 +70,24 @@ class AnimeUASupplier extends ContentSupplier with DLEChannelsLoader {
         {
           "id": Const(id),
           "supplier": Const(name),
-          "title": Text.forScope(".page__subcol-main > h1"),
-          "originalTitle":
-              Text.forScope(".page__subcol-main > .pmovie__original-title"),
+          "title": TextSelector.forScope(".page__subcol-main > h1"),
+          "originalTitle": TextSelector.forScope(
+              ".page__subcol-main > .pmovie__original-title"),
           "image": Image.forScope(
               ".pmovie__poster > img", attribute: "data-src", host),
-          "description": Text.forScope(".page__text"),
-          "additionalInfo": PrependAll(
-            [
-              Text.forScope(".page__subcol-main .pmovie__subrating--site"),
-              Text.forScope(".page__subcol-main > .pmovie__year"),
-              Text.forScope(".page__subcol-main > .pmovie__genres"),
-            ],
-            IterateOverScope(
+          "description": TextSelector.forScope(".page__text"),
+          "additionalInfo": Flatten([
+            Join([
+              TextSelector.forScope(
+                  ".page__subcol-main .pmovie__subrating--site"),
+              TextSelector.forScope(".page__subcol-main > .pmovie__year"),
+              TextSelector.forScope(".page__subcol-main > .pmovie__genres"),
+            ]),
+            Iterate(
               itemScope: ".page__subcol-side2 li",
-              item: Text(inline: true),
-            ),
-          ),
+              item: TextSelector(inline: true),
+            )
+          ]),
           "similar":
               Scope(scope: ".pmovie__related", item: contentInfoSelector),
           "iframe": Attribute.forScope(
@@ -124,6 +97,10 @@ class AnimeUASupplier extends ContentSupplier with DLEChannelsLoader {
         },
       ),
     ));
+
+    if (result == null) {
+      return Future.value(null);
+    }
 
     return AnimeUAContentDetails.fromJson(result);
   }
@@ -135,9 +112,6 @@ class AnimeUASupplier extends ContentSupplier with DLEChannelsLoader {
     "Повнометражки": "/film/page/",
     "Аніме серіали": "/anime/page/"
   };
-
-  @override
-  Set<String> get channels => channelsPath.keys.toSet();
 
   @override
   Set<String> get defaultChannels => const {"Новинки", "ТОП 100"};

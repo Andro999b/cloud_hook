@@ -5,7 +5,7 @@ import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/logger.dart';
 
 ContentItemMediaSourceLoader aggSourceLoader(
-  List<ContentItemMediaSourceLoader> sourceLoaders,
+  Iterable<ContentItemMediaSourceLoader> sourceLoaders,
 ) =>
     () => Stream.fromIterable(sourceLoaders)
         .asyncMap((loader) async {

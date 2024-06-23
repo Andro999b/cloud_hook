@@ -36,26 +36,42 @@ class PlayerJSFile {
 }
 
 abstract class PlaylistConvertStrategy<R> {
-  List<R> convert(Iterable<PlayerJSFile> playlist);
+  List<R> convert(String playlist) {
+    if (playlist.startsWith("[{")) {
+      final fileJson = jsonDecode(playlist);
+      Iterable fileListJson = fileJson as Iterable;
+
+      final playerJsFiles = fileListJson.map((e) => PlayerJSFile.fromJson(e));
+      return convertPlayerJsFiles(playerJsFiles);
+    } else {
+      return convertSingleFile(playlist);
+    }
+  }
+
+  List<R> convertPlayerJsFiles(Iterable<PlayerJSFile> playlist);
+
+  List<R> convertSingleFile(String playlist);
 }
 
-RegExp digitRegExp = RegExp(r'\d+');
 typedef SeasonEpisodeId = Comparable Function(String season, String eposode);
-Comparable defaultSeasonEpisodeId(String season, String episode) {
-  return extractDigits(season) * 10000 + extractDigits(episode);
-}
 
 class DubSeasonEpisodeConvertStrategy
     extends PlaylistConvertStrategy<ContentMediaItem> {
+  static final RegExp digitRegExp = RegExp(r'\d+');
+  static Comparable defaultSeasonEpisodeId(String season, String episode) {
+    return extractDigits(season) * 10000 + extractDigits(episode);
+  }
+
   final SeasonEpisodeId seasonEpisodeId;
   final subtitleRegExp = RegExp(r"^\[(?<label>[^\]]+)\](?<url>.*)");
 
   DubSeasonEpisodeConvertStrategy({
-    this.seasonEpisodeId = defaultSeasonEpisodeId,
+    this.seasonEpisodeId =
+        DubSeasonEpisodeConvertStrategy.defaultSeasonEpisodeId,
   });
 
   @override
-  List<ContentMediaItem> convert(Iterable<PlayerJSFile> playlist) {
+  List<ContentMediaItem> convertPlayerJsFiles(Iterable<PlayerJSFile> playlist) {
     final mediaItems = SplayTreeMap<Comparable, SimpleContentMediaItem>();
 
     for (var dub in playlist) {
@@ -97,12 +113,30 @@ class DubSeasonEpisodeConvertStrategy
 
     return mediaItems.values.toList();
   }
+
+  @override
+  List<ContentMediaItem> convertSingleFile(String playlist) {
+    return [
+      SimpleContentMediaItem(
+        number: 0,
+        title: "",
+        sources: [
+          SimpleContentMediaItemSource(
+            description: "Default",
+            link: Uri.parse(playlist),
+          )
+        ],
+      )
+    ];
+  }
 }
 
 class DubConvertStrategy
     extends PlaylistConvertStrategy<ContentMediaItemSource> {
   @override
-  List<ContentMediaItemSource> convert(Iterable<PlayerJSFile> playlist) {
+  List<ContentMediaItemSource> convertPlayerJsFiles(
+    Iterable<PlayerJSFile> playlist,
+  ) {
     return playlist
         .map(
           (dub) => SimpleContentMediaItemSource(
@@ -111,6 +145,78 @@ class DubConvertStrategy
           ),
         )
         .toList();
+  }
+
+  @override
+  List<ContentMediaItemSource> convertSingleFile(String playlist) {
+    return [
+      SimpleContentMediaItemSource(
+        description: "Default",
+        link: Uri.parse(playlist),
+      )
+    ];
+  }
+}
+
+class SimpleUrlConvertStrategy
+    extends PlaylistConvertStrategy<ContentMediaItemSource> {
+  final String prefix;
+
+  SimpleUrlConvertStrategy({this.prefix = ""});
+
+  @override
+  List<ContentMediaItemSource> convertPlayerJsFiles(
+    Iterable<PlayerJSFile> playlist,
+  ) {
+    return playlist
+        .expand((file) =>
+            convertSingleFile(file.file!) + convertSubtitle(file.subtitle))
+        .toList();
+  }
+
+  @override
+  List<ContentMediaItemSource> convertSingleFile(String playlist) {
+    return playlist
+        .split(",")
+        .map(parseUrlWithPrefix)
+        .map(
+          (e) => SimpleContentMediaItemSource(
+            description: e.$1,
+            link: Uri.parse(e.$2),
+          ),
+        )
+        .toList();
+  }
+
+  List<ContentMediaItemSource> convertSubtitle(String? subtitle) {
+    if (subtitle == null) {
+      return [];
+    }
+
+    return subtitle
+        .split(",")
+        .map(parseUrlWithPrefix)
+        .map(
+          (e) => SimpleContentMediaItemSource(
+            kind: FileKind.subtitle,
+            description: e.$1,
+            link: Uri.parse(e.$2),
+          ),
+        )
+        .toList();
+  }
+
+  (String, String) parseUrlWithPrefix(String file) {
+    if (!file.startsWith("[")) {
+      return (prefix, file);
+    }
+
+    final splitIndex = file.indexOf("]");
+
+    return (
+      file.substring(0, splitIndex + 1) + prefix,
+      file.substring(splitIndex + 1),
+    );
   }
 }
 
@@ -128,27 +234,7 @@ class PlayerJSScrapper {
   ) async {
     final fileEncodedJson = await loadPlayerJsFile();
 
-    if (fileEncodedJson.startsWith("[{")) {
-      final fileJson = jsonDecode(fileEncodedJson);
-      Iterable fileListJson = fileJson as Iterable;
-
-      final playerJsFiles = fileListJson.map((e) => PlayerJSFile.fromJson(e));
-
-      return convertStrategy.convert(playerJsFiles);
-    } else {
-      return [
-        SimpleContentMediaItem(
-          number: 0,
-          title: "",
-          sources: [
-            SimpleContentMediaItemSource(
-              description: "Default",
-              link: Uri.parse(fileEncodedJson),
-            )
-          ],
-        )
-      ];
-    }
+    return convertStrategy.convert(fileEncodedJson);
   }
 
   Future<List<ContentMediaItemSource>> scrapSources(
@@ -156,21 +242,7 @@ class PlayerJSScrapper {
   ) async {
     final fileEncodedJson = await loadPlayerJsFile();
 
-    if (fileEncodedJson.startsWith("[{")) {
-      final fileJson = jsonDecode(fileEncodedJson);
-      Iterable fileListJson = fileJson as Iterable;
-
-      final playerJsFiles = fileListJson.map((e) => PlayerJSFile.fromJson(e));
-
-      return convertStrategy.convert(playerJsFiles);
-    } else {
-      return [
-        SimpleContentMediaItemSource(
-          description: "Default",
-          link: Uri.parse(fileEncodedJson),
-        )
-      ];
-    }
+    return convertStrategy.convert(fileEncodedJson);
   }
 
   Future<String> loadPlayerJsFile() async {
@@ -193,11 +265,24 @@ class PlayerJSScrapper {
 
 class PlayerJSExtractor implements ContentMediaItemExtractor {
   final PlaylistConvertStrategy<ContentMediaItem> convertStrategy;
+  final String iframe;
 
-  PlayerJSExtractor(this.convertStrategy);
+  PlayerJSExtractor(this.iframe, this.convertStrategy);
 
   @override
-  Future<List<ContentMediaItem>> extract(String iframe) {
+  Future<List<ContentMediaItem>> call() {
     return PlayerJSScrapper(uri: Uri.parse(iframe)).scrap(convertStrategy);
+  }
+}
+
+class PlayerJSSourceLoader {
+  final PlaylistConvertStrategy<ContentMediaItemSource> convertStrategy;
+  final String iframe;
+
+  PlayerJSSourceLoader(this.iframe, this.convertStrategy);
+
+  Future<List<ContentMediaItemSource>> call() {
+    return PlayerJSScrapper(uri: Uri.parse(iframe))
+        .scrapSources(convertStrategy);
   }
 }

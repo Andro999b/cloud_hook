@@ -1,6 +1,7 @@
 import 'dart:isolate';
 
 import 'package:cloud_hook/content_suppliers/suppliers/animeua/animeua.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/anitube/anitube.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/eneyida/eneyida.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/tmdb/tmdb.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/uafilms/uafilms.dart';
@@ -18,6 +19,7 @@ class ContentSuppliers {
     TmdbSupplier(),
     UAKinoClubSupplier(),
     EneyidaSupplier(),
+    AniTubeSupplier(),
     AnimeUASupplier(),
     UAFilmsSupplier(),
     UFDubSupplier(),
@@ -78,15 +80,27 @@ class ContentSuppliers {
   Future<ContentDetails> detailsById(String supplierName, String id) async {
     logger.i("Load content details supplier: $supplierName id: $id");
 
-    final supplier = _suppliers.where((e) => e.name == supplierName).first;
+    final supplier =
+        _suppliers.where((e) => e.name == supplierName).firstOrNull;
 
+    if (supplier == null) {
+      throw Exception("No supplier $supplierName found");
+    }
+
+    ContentDetails? details;
     try {
-      return await Isolate.run(() => supplier.detailsById(id));
+      details = await Isolate.run(() => supplier.detailsById(id));
     } catch (error, stackTrace) {
       logger.e("Supplier $supplier fail with $id",
           error: error, stackTrace: stackTrace);
 
       rethrow;
     }
+
+    if (details == null) {
+      throw Exception("Details not found by supplier: $supplier and id: $id");
+    }
+
+    return details;
   }
 }

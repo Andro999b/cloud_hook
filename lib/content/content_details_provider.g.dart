@@ -171,15 +171,14 @@ class _DetailsProviderElement
   String get id => (origin as DetailsProvider).id;
 }
 
-String _$detailsAndMediaHash() => r'34d185c783c6b502ba73c53b06491fb8280fffb6';
+String _$detailsAndMediaHash() => r'9657d0b5f62d1d228d6781fdea58d16dd844af30';
 
 /// See also [detailsAndMedia].
 @ProviderFor(detailsAndMedia)
 const detailsAndMediaProvider = DetailsAndMediaFamily();
 
 /// See also [detailsAndMedia].
-class DetailsAndMediaFamily
-    extends Family<AsyncValue<(ContentDetails, List<ContentMediaItem>)>> {
+class DetailsAndMediaFamily extends Family<AsyncValue<DetailsAndMediaItems>> {
   /// See also [detailsAndMedia].
   const DetailsAndMediaFamily();
 
@@ -220,8 +219,8 @@ class DetailsAndMediaFamily
 }
 
 /// See also [detailsAndMedia].
-class DetailsAndMediaProvider extends AutoDisposeFutureProvider<
-    (ContentDetails, List<ContentMediaItem>)> {
+class DetailsAndMediaProvider
+    extends AutoDisposeFutureProvider<DetailsAndMediaItems> {
   /// See also [detailsAndMedia].
   DetailsAndMediaProvider(
     String supplier,
@@ -261,9 +260,7 @@ class DetailsAndMediaProvider extends AutoDisposeFutureProvider<
 
   @override
   Override overrideWith(
-    FutureOr<(ContentDetails, List<ContentMediaItem>)> Function(
-            DetailsAndMediaRef provider)
-        create,
+    FutureOr<DetailsAndMediaItems> Function(DetailsAndMediaRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -281,8 +278,7 @@ class DetailsAndMediaProvider extends AutoDisposeFutureProvider<
   }
 
   @override
-  AutoDisposeFutureProviderElement<(ContentDetails, List<ContentMediaItem>)>
-      createElement() {
+  AutoDisposeFutureProviderElement<DetailsAndMediaItems> createElement() {
     return _DetailsAndMediaProviderElement(this);
   }
 
@@ -303,8 +299,7 @@ class DetailsAndMediaProvider extends AutoDisposeFutureProvider<
   }
 }
 
-mixin DetailsAndMediaRef
-    on AutoDisposeFutureProviderRef<(ContentDetails, List<ContentMediaItem>)> {
+mixin DetailsAndMediaRef on AutoDisposeFutureProviderRef<DetailsAndMediaItems> {
   /// The parameter `supplier` of this provider.
   String get supplier;
 
@@ -312,8 +307,9 @@ mixin DetailsAndMediaRef
   String get id;
 }
 
-class _DetailsAndMediaProviderElement extends AutoDisposeFutureProviderElement<
-    (ContentDetails, List<ContentMediaItem>)> with DetailsAndMediaRef {
+class _DetailsAndMediaProviderElement
+    extends AutoDisposeFutureProviderElement<DetailsAndMediaItems>
+    with DetailsAndMediaRef {
   _DetailsAndMediaProviderElement(super.provider);
 
   @override

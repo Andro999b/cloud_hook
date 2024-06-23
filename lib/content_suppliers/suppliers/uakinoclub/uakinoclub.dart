@@ -56,20 +56,18 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
       const {ContentLanguage.ukrainian};
 
   @override
-  late final contentInfoSelector = Scope(
-      scope: "#dle-content",
-      item: IterateOverScope(
-        itemScope: ".movie-item",
-        item: SelectorsToMap(
-          {
-            "id": UrlId.forScope(".movie-title"),
-            "supplier": Const(name),
-            "image": Image.forScope(".movie-img > img", host),
-            "title": Text.forScope(".movie-title"),
-            "secondaryTitle": Text.forScope(".full-quality")
-          },
-        ),
-      ));
+  late final contentInfoSelector = Iterate(
+    itemScope: "#dle-content .movie-item",
+    item: SelectorsToMap(
+      {
+        "id": UrlId.forScope(".movie-title"),
+        "supplier": Const(name),
+        "image": Image.forScope(".movie-img > img", host),
+        "title": TextSelector.forScope(".movie-title"),
+        "secondaryTitle": TextSelector.forScope(".full-quality")
+      },
+    ),
+  );
 
   @override
   Future<List<ContentSearchResult>> search(
@@ -87,7 +85,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
       },
     );
 
-    final results = await scrapper.scrap(contentInfoSelector);
+    final results = await scrapper.scrap(contentInfoSelector) ?? [];
 
     return results
         .map(ContentSearchResult.fromJson)
@@ -97,7 +95,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
   }
 
   @override
-  Future<ContentDetails> detailsById(String id) async {
+  Future<ContentDetails?> detailsById(String id) async {
     final scrapper = Scrapper(uri: Uri.https(host, "/$id.html").toString());
 
     final result = await scrapper.scrap(Scope(
@@ -106,31 +104,38 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
         {
           "id": Const(id),
           "supplier": Const(name),
-          "title": Text.forScope(".solototle"),
-          "originalTitle": Text.forScope(".origintitle"),
+          "title": TextSelector.forScope(".solototle"),
+          "originalTitle": TextSelector.forScope(".origintitle"),
           "image": Image.forScope(".film-poster img", host),
-          "description": Text.forScope("div[itemprop=description]"),
+          "description": TextSelector.forScope("div[itemprop=description]"),
           "additionalInfo": Filter(
-            IterateOverScope(
+            Iterate(
               itemScope: ".film-info > *",
-              item: ConcatSelectors(
-                [Text.forScope(".fi-label"), Text.forScope(".fi-desc")],
+              item: Concat.selectors(
+                [
+                  TextSelector.forScope(".fi-label"),
+                  TextSelector.forScope(".fi-desc")
+                ],
               ),
             ),
             filter: (text) => !text.startsWith("Доступно"),
           ),
-          "similar": IterateOverScope(
+          "similar": Iterate(
             itemScope: ".related-items > .related-item > a",
             item: SelectorsToMap({
               "id": UrlId(),
               "supplier": Const(name),
-              "title": Text.forScope(".full-movie-title"),
+              "title": TextSelector.forScope(".full-movie-title"),
               "image": Image.forScope("img", host),
             }),
           ),
         },
       ),
     ));
+
+    if (result == null) {
+      return Future.value(null);
+    }
 
     var details = UAKinoContentDetails.fromJson(result);
 
@@ -176,9 +181,6 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
     "Мультфільми": "/cartoon/page/",
     "Мультсеріали": "/cartoon/cartoonseries/page/"
   };
-
-  @override
-  Set<String> get channels => channelsPath.keys.toSet();
 
   @override
   Set<String> get defaultChannels => const {"Новинки"};

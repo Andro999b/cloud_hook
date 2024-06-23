@@ -29,8 +29,15 @@ Future<ContentDetails> details(DetailsRef ref, String supplier, String id) {
   return ContentSuppliers.instance.detailsById(supplier, id);
 }
 
+class DetailsAndMediaItems {
+  final ContentDetails contentDetails;
+  final List<ContentMediaItem> mediaItems;
+
+  DetailsAndMediaItems(this.contentDetails, this.mediaItems);
+}
+
 @riverpod
-Future<(ContentDetails, List<ContentMediaItem>)> detailsAndMedia(
+Future<DetailsAndMediaItems> detailsAndMedia(
   DetailsAndMediaRef ref,
   String supplier,
   String id,
@@ -38,5 +45,5 @@ Future<(ContentDetails, List<ContentMediaItem>)> detailsAndMedia(
   final contentDetails = await ref.read(detailsProvider(supplier, id).future);
   final mediaItems = await contentDetails.mediaItems;
 
-  return (contentDetails, mediaItems.toList());
+  return DetailsAndMediaItems(contentDetails, mediaItems.toList());
 }

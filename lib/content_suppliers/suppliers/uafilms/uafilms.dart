@@ -9,7 +9,7 @@ part 'uafilms.g.dart';
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
 class UAFilmsContentDetails extends BaseContentDetails
-    with PLayerJSIframe, AsyncIframe {
+    with PLayerJSIframe, AsyncMediaItems {
   UAFilmsContentDetails({
     required super.id,
     required super.supplier,
@@ -49,15 +49,15 @@ class UAFilmsSupplier extends ContentSupplier with DLEChannelsLoader {
       const {ContentLanguage.ukrainian};
 
   @override
-  late final contentInfoSelector = IterateOverScope(
+  late final contentInfoSelector = Iterate(
     itemScope: ".movie-item",
     item: SelectorsToMap({
       "supplier": Const(name),
       "id": UrlId.forScope("a.movie-title"),
-      "title": Text.forScope("a.movie-title"),
-      "secondaryTitle": ConcatSelectors([
-        Text.forScope(".movie-img>span"),
-        Text.forScope(".movie-img>.movie-series"),
+      "title": TextSelector.forScope("a.movie-title"),
+      "secondaryTitle": Concat.selectors([
+        TextSelector.forScope(".movie-img>span"),
+        TextSelector.forScope(".movie-img>.movie-series"),
       ]),
       "image": Image.forScope(
         ".movie-img img",
@@ -97,13 +97,13 @@ class UAFilmsSupplier extends ContentSupplier with DLEChannelsLoader {
       },
     );
 
-    final results = await scrapper.scrap(contentInfoSelector);
+    final results = await scrapper.scrap(contentInfoSelector) ?? [];
 
     return results.map(ContentSearchResult.fromJson).toList();
   }
 
   @override
-  Future<ContentDetails> detailsById(String id) async {
+  Future<ContentDetails?> detailsById(String id) async {
     final scrapper = Scrapper(uri: Uri.https(host, "/$id.html").toString());
 
     final result = await scrapper.scrap(Scope(
@@ -112,27 +112,29 @@ class UAFilmsSupplier extends ContentSupplier with DLEChannelsLoader {
         {
           "id": Const(id),
           "supplier": Const(name),
-          "title": Text.forScope("h1[itemprop='name']"),
+          "title": TextSelector.forScope("h1[itemprop='name']"),
           "originalTitle":
-              Text.forScope("span[itemprop='alternativeHeadline']"),
+              TextSelector.forScope("span[itemprop='alternativeHeadline']"),
           "image": Image.forScope(".m-img>img", host),
-          "description": TextNodes.forScope(".m-desc"),
-          "additionalInfo": PrependAll(
-              [
-                Text.forScope(".m-ratings > .mr-item-rate > b"),
-              ],
-              IterateOverScope(
-                itemScope: ".m-desc>.m-info>.m-info>.mi-item",
-                item: ConcatSelectors(
-                  [Text.forScope(".mi-label-desc"), Text.forScope(".mi-desc")],
-                ),
-              )),
-          "similar": IterateOverScope(
+          "description": TextNode.forScope(".m-desc"),
+          "additionalInfo": Flatten([
+            Join([TextSelector.forScope(".m-ratings > .mr-item-rate > b")]),
+            Iterate(
+              itemScope: ".m-desc>.m-info>.m-info>.mi-item",
+              item: Concat.selectors(
+                [
+                  TextSelector.forScope(".mi-label-desc"),
+                  TextSelector.forScope(".mi-desc")
+                ],
+              ),
+            )
+          ]),
+          "similar": Iterate(
             itemScope: "#owl-rel a",
             item: SelectorsToMap({
               "id": UrlId(),
               "supplier": Const(name),
-              "title": Text.forScope(".rel-movie-title"),
+              "title": TextSelector.forScope(".rel-movie-title"),
               "image": Image.forScope("img", host, attribute: "data-src"),
             }),
           ),
@@ -140,6 +142,10 @@ class UAFilmsSupplier extends ContentSupplier with DLEChannelsLoader {
         },
       ),
     ));
+
+    if (result == null) {
+      return Future.value(null);
+    }
 
     return UAFilmsContentDetails.fromJson(result);
   }
@@ -153,9 +159,6 @@ class UAFilmsSupplier extends ContentSupplier with DLEChannelsLoader {
     "Мультсеріали": "/multserialy/page/",
     "Аніме": "/anime/page/"
   };
-
-  @override
-  Set<String> get channels => channelsPath.keys.toSet();
 
   @override
   Set<String> get defaultChannels => const {"Новинки"};

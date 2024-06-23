@@ -44,11 +44,11 @@ class DLEAjaxPlaylistScrapper {
     final playlistItems = await Scrapper.scrapFragment(
           response,
           ".playlists-player",
-          IterateOverScope(
+          Iterate(
             itemScope: ".playlists-videos li[data-id]",
             item: SelectorsToMap({
               "id": Attribute("data-id"),
-              "text": Text(),
+              "text": TextSelector(),
               "voice": Attribute("data-voice"),
               "link": Attribute("data-file")
             }),

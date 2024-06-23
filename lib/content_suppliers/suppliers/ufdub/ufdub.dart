@@ -10,7 +10,7 @@ part 'ufdub.g.dart';
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
-class UFDubContentDetails extends BaseContentDetails with AsyncIframe {
+class UFDubContentDetails extends BaseContentDetails with AsyncMediaItems {
   UFDubContentDetails({
     required super.id,
     required super.supplier,
@@ -23,17 +23,16 @@ class UFDubContentDetails extends BaseContentDetails with AsyncIframe {
     required this.iframe,
   });
 
-  @override
   final String iframe;
 
   factory UFDubContentDetails.fromJson(Map<String, dynamic> json) =>
       _$UFDubContentDetailsFromJson(json);
 
   @override
-  ContentMediaItemExtractor get mediaExtractor => UFDubMediaExtractor();
+  ContentMediaItemExtractor get mediaExtractor => UFDubMediaExtractor(iframe);
 }
 
-class UFDubSupplier extends ContentSupplier with DLEChannelsLoader {
+class UFDubSupplier extends ContentSupplier with DLEChannelsLoader, DLESearch {
   @override
   final String host = "ufdub.com";
 
@@ -48,37 +47,19 @@ class UFDubSupplier extends ContentSupplier with DLEChannelsLoader {
       const {ContentLanguage.ukrainian};
 
   @override
-  late final contentInfoSelector = IterateOverScope(
+  late final contentInfoSelector = Iterate(
     itemScope: ".cont .short",
     item: SelectorsToMap({
       "supplier": Const(name),
       "id": UrlId.forScope(".short-text > .short-t"),
-      "title": Text.forScope(".short-text > .short-t"),
-      "secondaryTitle": Text.forScope(".short-text > .short-c"),
+      "title": TextSelector.forScope(".short-text > .short-t"),
+      "secondaryTitle": TextSelector.forScope(".short-text > .short-c"),
       "image": Image.forScope(".short-i img", host),
     }),
   );
 
   @override
-  Future<List<ContentSearchResult>> search(
-    String query,
-    Set<ContentType> type,
-  ) async {
-    final uri = Uri.https(host, "/index.php");
-    final scrapper = Scrapper(
-      uri: uri.toString(),
-      method: "post",
-      headers: const {"Content-Type": "application/x-www-form-urlencoded"},
-      form: {"do": "search", "subaction": "search", "story": query},
-    );
-
-    final results = await scrapper.scrap(contentInfoSelector);
-
-    return results.map(ContentSearchResult.fromJson).toList();
-  }
-
-  @override
-  Future<ContentDetails> detailsById(String id) async {
+  Future<ContentDetails?> detailsById(String id) async {
     final scrapper = Scrapper(uri: Uri.https(host, "/$id.html").toString());
 
     final result = await scrapper.scrap(Scope(
@@ -87,31 +68,31 @@ class UFDubSupplier extends ContentSupplier with DLEChannelsLoader {
         {
           "id": Const(id),
           "supplier": Const(name),
-          "title": TextNodes.forScope("article .full-title > h1"),
+          "title": TextNode.forScope("article .full-title > h1"),
           "originalTitle":
-              Text.forScope("article > .full-title > h1 > .short-t-or"),
+              TextSelector.forScope("article > .full-title > h1 > .short-t-or"),
           "image": Image.forScope(
             "article > .full-desc > .full-text > .full-poster img",
             host,
           ),
-          "description": Concat(IterateOverScope(
+          "description": Concat(Iterate(
             itemScope: "article > .full-desc > .full-text p",
-            item: Text(),
+            item: TextSelector(),
           )),
-          "additionalInfo": Expand([
-            IterateOverScope(
+          "additionalInfo": Flatten([
+            Iterate(
               itemScope: "article > .full-desc > .full-info .fi-col-item",
-              item: Text(inline: true),
+              item: TextSelector(inline: true),
             ),
-            IterateOverScope(
+            Iterate(
               itemScope:
                   "article > .full-desc > .full-text > .full-poster .voices",
-              item: Text(inline: true),
+              item: TextSelector(inline: true),
             ),
           ]),
           "similar": Scope(
             scope: "article > .rels",
-            item: IterateOverScope(
+            item: Iterate(
               itemScope: ".rel",
               item: SelectorsToMap({
                 "id": UrlId(),
@@ -126,6 +107,10 @@ class UFDubSupplier extends ContentSupplier with DLEChannelsLoader {
       ),
     ));
 
+    if (result == null) {
+      return Future.value(null);
+    }
+
     return UFDubContentDetails.fromJson(result);
   }
 
@@ -139,9 +124,6 @@ class UFDubSupplier extends ContentSupplier with DLEChannelsLoader {
     "Мультсеріали": "/cartoon-serial/page/",
     "Дорами": "/cartoon-serial/page/"
   };
-
-  @override
-  Set<String> get channels => channelsPath.keys.toSet();
 
   @override
   Set<String> get defaultChannels => const {"Новинки"};

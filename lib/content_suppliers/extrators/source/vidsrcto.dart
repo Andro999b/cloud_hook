@@ -50,6 +50,7 @@ class VidSrcToSourceLoader {
     final Stream<ContentMediaItemSource> stream = Stream.fromIterable(sources)
         .asyncMap((source) async => switch (source["title"]) {
               "Vidplay" => await _extractVidplay(source["id"]),
+              "F2Cloud" => await _extractVidplay(source["id"]),
               "Filemoon" => await _extractFilemoon(source["id"], url),
               _ => <ContentMediaItemSource>[]
             })

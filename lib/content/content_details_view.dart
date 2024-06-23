@@ -69,7 +69,7 @@ class ContentDetailsView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _renderTitile(context),
+          _renderTitle(context),
           if (mobile) SizedBox(height: size.height * .5),
           Container(
             padding: mobile
@@ -84,8 +84,7 @@ class ContentDetailsView extends ConsumerWidget {
                 const SizedBox(height: 8),
                 _ContentWatchButtons(contentDetails),
                 _MediaCollectionItemButtons(contentDetails),
-                if (contentDetails.additionalInfo.isNotEmpty)
-                  ..._renderAdditionalInfo(context),
+                ..._renderAdditionalInfo(context),
                 SizedBox(height: paddings),
                 _renderDescription(context),
                 if (contentDetails.similar.isNotEmpty)
@@ -99,7 +98,7 @@ class ContentDetailsView extends ConsumerWidget {
     );
   }
 
-  Widget _renderTitile(BuildContext context) {
+  Widget _renderTitle(BuildContext context) {
     final theme = Theme.of(context);
     final mobile = isMobile(context);
 

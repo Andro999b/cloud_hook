@@ -99,6 +99,7 @@ class _VideoContentMobileViewState extends State<VideoContentMobileView> {
       seekGesture: true,
       seekOnDoubleTap: true,
       volumeGesture: true,
+      seekBarHeight: 8.0,
     );
   }
 }
