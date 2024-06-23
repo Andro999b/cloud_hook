@@ -171,8 +171,8 @@ jobs:
           zip -r windows-x64.zip windows-outputs
       - name: Create Release
         uses: softprops/action-gh-release@v2
-        prerelease: true
         with:
+          prerelease: true
           files: |
             android-outputs/*
             linux-x64.tar.gz
