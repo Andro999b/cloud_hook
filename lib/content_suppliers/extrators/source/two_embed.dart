@@ -39,7 +39,7 @@ class TwoEmbedSourceLoader {
       return [];
     }
 
-    final iframeUri = Uri.parse(iframe);
+    final iframeUri = parseUri(iframe);
     final id = iframeUri.queryParameters["id"];
     final ref = iframeUri.host;
 
@@ -66,7 +66,7 @@ class TwoEmbedSourceLoader {
 
     return [
       SimpleContentMediaItemSource(
-        link: Uri.parse(file),
+        link: parseUri(file),
         description: "2embed",
       )
     ];

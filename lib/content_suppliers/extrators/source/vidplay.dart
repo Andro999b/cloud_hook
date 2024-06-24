@@ -30,7 +30,7 @@ class VidPlaySourceLoader {
   });
 
   Future<List<ContentMediaItemSource>> call() async {
-    final host = Uri.parse(url).authority;
+    final host = parseUri(url).authority;
     final baseUrl = Uri.https(host).toString();
 
     String id = url.substring(0, url.indexOf("?"));

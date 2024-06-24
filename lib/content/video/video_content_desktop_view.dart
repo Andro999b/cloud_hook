@@ -154,7 +154,11 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
   }
 
   void _switchToPipMode() async {
-    if (pipMode) {
+    setState(() {
+      pipMode = !pipMode;
+    });
+
+    if (!pipMode) {
       // Exit PiP Mode
       await windowManager.setTitleBarStyle(TitleBarStyle.normal);
       await Future.delayed(const Duration(milliseconds: 100));
@@ -171,10 +175,6 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
       await Future.delayed(const Duration(milliseconds: 100));
       await windowManager.setAlignment(Alignment.bottomRight);
     }
-
-    setState(() {
-      pipMode = !pipMode;
-    });
   }
 }
 

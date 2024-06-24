@@ -4,12 +4,14 @@ import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/anitube/anitube_extractor.dart';
+import 'package:cloud_hook/content_suppliers/extrators/dle/dle_ajax_playlist_extractor.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/anitube/ralodeplayer_extractor.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/utils.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'anitube.g.dart';
+
+const _siteHost = "anitube.in.ua";
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
@@ -38,7 +40,12 @@ class AniTubeContentDetails extends BaseContentDetails with AsyncMediaItems {
   @override
   ContentMediaItemExtractor get mediaExtractor => ralodePlayerParams != null
       ? RalodePlayerExtractor(ralodePlayerParams!)
-      : AniTubeContentMediaItemExtractor(hash, newsId);
+      : DLEAjaxPLaylistExtractor(
+          Uri.https(_siteHost, "/engine/ajax/playlists.php", {
+          "user_hash": hash,
+          "xfield": "playlist",
+          "news_id": newsId,
+        }));
 }
 
 class AniTubeSupplier extends ContentSupplier
@@ -57,7 +64,7 @@ class AniTubeSupplier extends ContentSupplier
       RegExp(r"RalodePlayer\.init\((?<params>.*)\);");
 
   @override
-  final host = "anitube.in.ua";
+  final host = _siteHost;
 
   @override
   String get name => "AniTube";

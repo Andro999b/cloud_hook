@@ -69,7 +69,7 @@ class RalodePlayerExtractor implements ContentMediaItemExtractor {
         .mapIndexed(
           (i, e) => AsyncContentMediaItem(
             number: i,
-            title: e.key == 0 ? "" : "${e.key} серія",
+            title: filesByNum.length == 1 ? "" : "${e.key} серія",
             sourcesLoader: aggSourceLoader(e.value),
           ),
         )

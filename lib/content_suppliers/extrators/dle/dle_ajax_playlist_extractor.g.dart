@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'anitube_extractor.dart';
+part of 'dle_ajax_playlist_extractor.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

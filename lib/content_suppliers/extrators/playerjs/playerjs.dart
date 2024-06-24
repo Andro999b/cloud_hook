@@ -95,7 +95,7 @@ class DubSeasonEpisodeConvertStrategy
 
           mediaItem.sources.add(SimpleContentMediaItemSource(
             description: dub.title.trim(),
-            link: Uri.parse(episode.file!),
+            link: parseUri(episode.file!),
           ));
 
           if (episode.subtitle?.isNotEmpty == true) {
@@ -104,7 +104,7 @@ class DubSeasonEpisodeConvertStrategy
             mediaItem.sources.add(SimpleContentMediaItemSource(
               kind: FileKind.subtitle,
               description: subMath?.namedGroup("label") ?? dub.title.trim(),
-              link: Uri.parse(subMath?.namedGroup("url") ?? episode.subtitle!),
+              link: parseUri(subMath?.namedGroup("url") ?? episode.subtitle!),
             ));
           }
         });
@@ -123,7 +123,7 @@ class DubSeasonEpisodeConvertStrategy
         sources: [
           SimpleContentMediaItemSource(
             description: "Default",
-            link: Uri.parse(playlist),
+            link: parseUri(playlist),
           )
         ],
       )
@@ -141,7 +141,7 @@ class DubConvertStrategy
         .map(
           (dub) => SimpleContentMediaItemSource(
             description: dub.title.trim(),
-            link: Uri.parse(dub.file!),
+            link: parseUri(dub.file!),
           ),
         )
         .toList();
@@ -152,7 +152,7 @@ class DubConvertStrategy
     return [
       SimpleContentMediaItemSource(
         description: "Default",
-        link: Uri.parse(playlist),
+        link: parseUri(playlist),
       )
     ];
   }
@@ -182,7 +182,7 @@ class SimpleUrlConvertStrategy
         .map(
           (e) => SimpleContentMediaItemSource(
             description: e.$1,
-            link: Uri.parse(e.$2),
+            link: parseUri(e.$2),
           ),
         )
         .toList();
@@ -200,7 +200,7 @@ class SimpleUrlConvertStrategy
           (e) => SimpleContentMediaItemSource(
             kind: FileKind.subtitle,
             description: e.$1,
-            link: Uri.parse(e.$2),
+            link: parseUri(e.$2),
           ),
         )
         .toList();
@@ -271,7 +271,7 @@ class PlayerJSExtractor implements ContentMediaItemExtractor {
 
   @override
   Future<List<ContentMediaItem>> call() {
-    return PlayerJSScrapper(uri: Uri.parse(iframe)).scrap(convertStrategy);
+    return PlayerJSScrapper(uri: parseUri(iframe)).scrap(convertStrategy);
   }
 }
 
@@ -282,7 +282,7 @@ class PlayerJSSourceLoader {
   PlayerJSSourceLoader(this.iframe, this.convertStrategy);
 
   Future<List<ContentMediaItemSource>> call() {
-    return PlayerJSScrapper(uri: Uri.parse(iframe))
+    return PlayerJSScrapper(uri: parseUri(iframe))
         .scrapSources(convertStrategy);
   }
 }

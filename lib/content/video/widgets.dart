@@ -7,6 +7,7 @@ import 'package:cloud_hook/content/media_items_list.dart';
 import 'package:cloud_hook/content/video/video_content_view.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
+import 'package:cloud_hook/utils/visual.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -216,12 +217,33 @@ class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
                   );
                 }
 
-                return Wrap(
-                  children: [
-                    _renderVideoSources(context, ref, videos, data),
-                    if (subtitles.isNotEmpty)
-                      _renderSubtitlesSources(context, ref, subtitles, data),
-                  ],
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.maxWidth < mobileWidth) {
+                      return SingleChildScrollView(
+                        child: Column(children: [
+                          _renderVideoSources(context, ref, videos, data),
+                          if (subtitles.isNotEmpty)
+                            _renderSubtitlesSources(
+                                context, ref, subtitles, data),
+                        ]),
+                      );
+                    } else {
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SingleChildScrollView(
+                              child: _renderVideoSources(
+                                  context, ref, videos, data)),
+                          if (subtitles.isNotEmpty)
+                            SingleChildScrollView(
+                              child: _renderSubtitlesSources(
+                                  context, ref, subtitles, data),
+                            ),
+                        ],
+                      );
+                    }
+                  },
                 );
               },
             ),

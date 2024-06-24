@@ -30,7 +30,7 @@ class UFDubMediaExtractor implements ContentMediaItemExtractor {
         matches.map((e) => e.group(0)!).where((e) => !e.contains("Трейлер"));
 
     return episodesUrls.mapIndexed((index, e) {
-      final uri = Uri.parse(e);
+      final uri = parseUri(e);
       return SimpleContentMediaItem(
         number: index,
         title: uri.queryParameters["Seriya"] ?? "",

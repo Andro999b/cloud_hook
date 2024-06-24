@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/extrators/playerjs/playerjs.dart';
@@ -13,7 +14,7 @@ import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'anitube_extractor.g.dart';
+part 'dle_ajax_playlist_extractor.g.dart';
 
 @JsonSerializable(createToJson: false)
 class Label {
@@ -46,15 +47,23 @@ class EpisodeVideo {
 class PlaylistResults {
   final List<EpisodeVideo> videos;
   final List<Label> lables;
+  final Map<int, List<EpisodeVideo>> _byEpisodeNumber =
+      SplayTreeMap<int, List<EpisodeVideo>>();
 
-  PlaylistResults(this.videos, this.lables);
+  PlaylistResults(this.videos, this.lables) {
+    for (var v in videos) {
+      final id = extractDigits(v.name);
+      if (id > 0) {
+        (_byEpisodeNumber[id] ??= []).add(v);
+      }
+    }
+  }
+
+  Map<int, List<EpisodeVideo>> get byEpisodeNumber => _byEpisodeNumber;
 
   late final Map<String, String> labelById = {
     for (var e in lables) e.id: e.lable
   };
-
-  late final Map<int, List<EpisodeVideo>> byEpisodeNumber =
-      videos.groupListsBy((e) => extractDigits(e.name));
 
   String videoLable(Iterable<String> lableIds) =>
       lableIds.map((e) => labelById[e]).nonNulls.join(" ");
@@ -63,19 +72,14 @@ class PlaylistResults {
       _$PlaylistResultsFromJson(json);
 }
 
-class AniTubeContentMediaItemExtractor implements ContentMediaItemExtractor {
-  final String? hash;
-  final String newsId;
+class DLEAjaxPLaylistExtractor implements ContentMediaItemExtractor {
+  final Uri playlistUri;
 
-  AniTubeContentMediaItemExtractor(this.hash, this.newsId);
+  DLEAjaxPLaylistExtractor(this.playlistUri);
 
   @override
   FutureOr<List<ContentMediaItem>> call() async {
-    final url = Uri.https("anitube.in.ua", "/engine/ajax/playlists.php", {
-      "user_hash": hash,
-      "xfield": "playlist",
-      "news_id": newsId,
-    }).toString();
+    final url = playlistUri.toString();
 
     final res = await dio.get(url, options: Options(headers: defaultHeaders));
 
@@ -83,12 +87,16 @@ class AniTubeContentMediaItemExtractor implements ContentMediaItemExtractor {
       res.data["response"] as String,
       ".playlists-player",
       SelectorsToMap({
-        "lables": Iterate(
-            itemScope: ".playlists-lists .playlists-items li",
+        "lables": Filter(
+          Iterate(
+            itemScope: ".playlists-lists > .playlists-items li",
             item: SelectorsToMap({
               "id": Attribute("data-id"),
               "lable": TextSelector(),
-            })),
+            }),
+          ),
+          filter: (e) => e["id"] != null,
+        ),
         "videos": Iterate(
           itemScope: ".playlists-videos li",
           item: SelectorsToMap({
@@ -111,7 +119,9 @@ class AniTubeContentMediaItemExtractor implements ContentMediaItemExtractor {
           .mapIndexed(
             (i, entry) => AsyncContentMediaItem(
               number: i,
-              title: entry.key == 0 ? "" : "${entry.key} серія",
+              title: playlist.byEpisodeNumber.length == 1
+                  ? ""
+                  : "${entry.key} серія",
               sourcesLoader: aggSourceLoader(
                 entry.value.map(
                   (video) => PlayerJSSourceLoader(

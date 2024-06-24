@@ -1,4 +1,5 @@
 import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -64,7 +65,7 @@ class JWPlayer {
       ...config.sources.map(
         (e) => SimpleContentMediaItemSource(
           description: despriptionPrefix,
-          link: Uri.parse(e.file),
+          link: parseUri(e.file),
           headers: headers,
         ),
       ),
@@ -74,7 +75,7 @@ class JWPlayer {
             (e) => SimpleContentMediaItemSource(
               kind: FileKind.subtitle,
               description: "[$despriptionPrefix] ${e.label}",
-              link: Uri.parse(e.file),
+              link: parseUri(e.file),
               headers: headers,
             ),
           ),

@@ -1,9 +1,10 @@
-import 'package:cloud_hook/content_suppliers/suppliers/uakinoclub/dle_ajax_playlist.dart';
+import 'package:cloud_hook/content_suppliers/extrators/dle/dle_ajax_playlist_extractor.dart';
 import 'package:cloud_hook/content_suppliers/extrators/playerjs/playerjs.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
+import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -150,7 +151,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
           number: 0,
           title: "",
           sourcesLoader: () {
-            return PlayerJSScrapper(uri: Uri.parse(iframe!))
+            return PlayerJSScrapper(uri: parseUri(iframe!))
                 .scrapSources(DubConvertStrategy());
           },
         )
@@ -161,13 +162,13 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
 
     // async iframe
     final newsId = id.split("/").last.split("-").first;
-    details._mediaItems = await DLEAjaxPlaylistScrapper(
-      uri: Uri.https(host, "/engine/ajax/playlists.php", {
+    details._mediaItems = await DLEAjaxPLaylistExtractor(
+      Uri.https(host, "/engine/ajax/playlists.php", {
         "news_id": newsId,
         "xfield": "playlist",
         "time": DateTime.now().millisecond.toString()
       }),
-    ).scrap();
+    ).call();
 
     return details;
   }
