@@ -32,7 +32,7 @@ class _CryptoJSParams {
       _$CryptoJSParamsFromJson(json);
 }
 
-class MoviesapiSourceLoader {
+class MoviesapiSourceLoader implements ContentMediaItemSourceLoader {
   final baseUrl = "https://moviesapi.club";
   final iframeBaseUrl = "https://w1.moviesapi.club";
 
@@ -54,6 +54,7 @@ class MoviesapiSourceLoader {
     this.season,
   });
 
+  @override
   Future<List<ContentMediaItemSource>> call() async {
     String url;
 
@@ -146,5 +147,10 @@ class MoviesapiSourceLoader {
       despriptionPrefix: "MoviesAPI",
       headers: headers,
     );
+  }
+
+  @override
+  String toString() {
+    return "MoviesapiSourceLoader(tmdb: $tmdb, episode: $episode, season: $season)";
   }
 }

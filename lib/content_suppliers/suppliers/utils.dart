@@ -1,10 +1,10 @@
 import 'dart:isolate';
 
-import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/extrators/playerjs/playerjs.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
+import 'package:cloud_hook/utils/logger.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 mixin PLayerJSIframe {
@@ -13,7 +13,7 @@ mixin PLayerJSIframe {
     includeFromJson: false,
     includeToJson: false,
   )
-  ContentMediaItemExtractor get mediaExtractor =>
+  ContentMediaItemLoader get mediaExtractor =>
       PlayerJSExtractor(iframe, DubSeasonEpisodeConvertStrategy());
 }
 
@@ -22,15 +22,20 @@ mixin AsyncMediaItems on ContentDetails {
     includeFromJson: false,
     includeToJson: false,
   )
-  ContentMediaItemExtractor get mediaExtractor;
+  ContentMediaItemLoader get mediaExtractor;
 
   Iterable<ContentMediaItem>? _mediaItems;
 
   @override
   Future<Iterable<ContentMediaItem>> get mediaItems async {
-    _mediaItems ??= await Isolate.run(
-      () => mediaExtractor(),
-    );
+    try {
+      _mediaItems ??= await Isolate.run(
+        () => mediaExtractor(),
+      );
+    } catch (error, stackTrace) {
+      logger.w("Media items extraction error: $error", stackTrace: stackTrace);
+      rethrow;
+    }
 
     return _mediaItems!;
   }

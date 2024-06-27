@@ -1,4 +1,3 @@
-import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/ufdub/ufdub_extractor.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
@@ -29,7 +28,7 @@ class UFDubContentDetails extends BaseContentDetails with AsyncMediaItems {
       _$UFDubContentDetailsFromJson(json);
 
   @override
-  ContentMediaItemExtractor get mediaExtractor => UFDubMediaExtractor(iframe);
+  ContentMediaItemLoader get mediaExtractor => UFDubMediaExtractor(iframe);
 }
 
 class UFDubSupplier extends ContentSupplier with DLEChannelsLoader, DLESearch {
@@ -117,14 +116,11 @@ class UFDubSupplier extends ContentSupplier with DLEChannelsLoader, DLESearch {
   @override
   final Map<String, String> channelsPath = const {
     "Новинки": "/page/",
-    "Аніме": "/anime/page/",
-    "Серіали": "/serial/page/",
     "Фільми": "/film/page/",
+    "Серіали": "/serial/page/",
+    "Аніме": "/anime/page/",
     "Мультфільми": "/cartoons/page/",
     "Мультсеріали": "/cartoon-serial/page/",
     "Дорами": "/cartoon-serial/page/"
   };
-
-  @override
-  Set<String> get defaultChannels => const {"Новинки"};
 }

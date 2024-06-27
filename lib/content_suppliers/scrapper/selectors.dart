@@ -271,16 +271,21 @@ class Image extends Transform<String, String?> {
 }
 
 class UrlId extends Transform<String, String?> {
-  UrlId({attribute = "href"})
+  UrlId({attribute = "href", RegExp? regexp})
       : super(
-          map: (url) => url != null ? extractIdFromUrl(url) : "",
+          map: (url) =>
+              url != null ? extractIdFromUrl(url, regexp: regexp) : "",
           item: Attribute(attribute),
         );
 
-  static Selector<String?> forScope(String scope, {attribute = "href"}) {
+  static Selector<String?> forScope(
+    String scope, {
+    attribute = "href",
+    RegExp? regexp,
+  }) {
     return ScopeWithDefault(
       scope: scope,
-      item: UrlId(attribute: attribute),
+      item: UrlId(attribute: attribute, regexp: regexp),
       defaultValue: "",
     );
   }

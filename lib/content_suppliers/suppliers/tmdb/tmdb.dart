@@ -89,6 +89,7 @@ class TmdbContentDetails implements ContentDetails {
   ) {
     final title = json["name"] ?? json["title"];
     final originalTitle = json["original_title"];
+    final recommendations = json["recommendations"];
 
     return TmdbContentDetails(
       id: id,
@@ -117,7 +118,9 @@ class TmdbContentDetails implements ContentDetails {
         if (json["credits"]?["cast"] != null)
           "Cast: ${json["credits"]["cast"].map((e) => e["name"]).join(", ")}",
       ],
-      similar: _TmdbSearchResponse.fromJson(json["recommendations"]).results,
+      similar: recommendations != null
+          ? _TmdbSearchResponse.fromJson(recommendations).results
+          : [],
       mediaItems: mediaItems,
     );
   }
@@ -233,7 +236,7 @@ class TmdbSupplier extends ContentSupplier {
       section: seasonName,
       title: episodeName ?? "",
       image: episodePoster,
-      sourcesLoader: aggSourceLoader([
+      sourcesLoader: AggSourceLoader([
         MoviesapiSourceLoader(tmdb: tmdb, season: season, episode: episode),
         if (imdb != null) ...[
           VidSrcToSourceLoader(imdb: imdb, season: season, episode: episode),

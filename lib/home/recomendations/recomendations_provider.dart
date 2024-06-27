@@ -45,7 +45,7 @@ class RecomendationChannel extends _$RecomendationChannel {
   void loadNext() async {
     final current = state.requireValue;
 
-    if (!current.hasNext) {
+    if (!current.hasNext || current.loading) {
       return;
     }
 

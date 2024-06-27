@@ -112,7 +112,4 @@ class AnimeUASupplier extends ContentSupplier
     "Повнометражки": "/film/page/",
     "Аніме серіали": "/anime/page/"
   };
-
-  @override
-  Set<String> get defaultChannels => const {"Новинки", "ТОП 100"};
 }

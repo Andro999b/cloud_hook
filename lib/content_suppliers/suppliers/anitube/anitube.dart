@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
@@ -38,7 +37,7 @@ class AniTubeContentDetails extends BaseContentDetails with AsyncMediaItems {
       _$AniTubeContentDetailsFromJson(json);
 
   @override
-  ContentMediaItemExtractor get mediaExtractor => ralodePlayerParams != null
+  ContentMediaItemLoader get mediaExtractor => ralodePlayerParams != null
       ? RalodePlayerExtractor(ralodePlayerParams!)
       : DLEAjaxPLaylistExtractor(
           Uri.https(_siteHost, "/engine/ajax/playlists.php", {

@@ -5,7 +5,7 @@ import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:dio/dio.dart';
 
-class TwoEmbedSourceLoader {
+class TwoEmbedSourceLoader implements ContentMediaItemSourceLoader {
   static final _fileRegExp = RegExp("file:\\s?['\"](?<file>.+)['\"]");
   final playerBaseUrl = "https://uqloads.xyz/e";
   final baseUrl = "https://www.2embed.cc";
@@ -13,13 +13,16 @@ class TwoEmbedSourceLoader {
 
   final int? episode;
   final int? season;
+  final String despriptionPrefix;
 
   TwoEmbedSourceLoader({
     required this.imdb,
     this.season,
     this.episode,
+    this.despriptionPrefix = "",
   });
 
+  @override
   Future<List<ContentMediaItemSource>> call() async {
     String uri;
 
@@ -67,8 +70,13 @@ class TwoEmbedSourceLoader {
     return [
       SimpleContentMediaItemSource(
         link: parseUri(file),
-        description: "2embed",
+        description: "${despriptionPrefix}2embed",
       )
     ];
+  }
+
+  @override
+  String toString() {
+    return "TwoEmbedSourceLoader(imdb: $imdb, episode: $episode, season: $season)";
   }
 }

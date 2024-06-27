@@ -9,35 +9,28 @@ import 'package:cloud_hook/utils/logger.dart';
 import 'package:dio/dio.dart';
 import 'package:simple_rc4/simple_rc4.dart';
 
-class VidPlaySourceLoader {
+class VidPlaySourceLoader implements ContentMediaItemSourceLoader {
   static final futokenRegExp = RegExp(r"k='(?<futoken>\S+)'");
   static final wafDetectorRegExp =
       RegExp(r"_a = '(?<a>[a-z0-9]+)',\s+_b = '(?<b>[a-z0-9]+)'");
 
-  // static final dio = Dio();
-  // ..interceptors.add(LogInterceptor(
-  //   requestBody: true,
-  //   responseBody: false,
-  // logPrint: logger.i,
-  // ));
-
   final String url;
-
-  static String _lastWafCookie = "";
+  final String despriptionPrefix;
 
   const VidPlaySourceLoader({
     required this.url,
+    this.despriptionPrefix = "",
   });
 
+  @override
   Future<List<ContentMediaItemSource>> call() async {
     final host = parseUri(url).authority;
-    final baseUrl = Uri.https(host).toString();
 
     String id = url.substring(0, url.indexOf("?"));
     id = id.substring(id.lastIndexOf("/") + 1);
 
     final encodedId = _encodeId(id, await _fetchKeys());
-    final mediaUrl = await _callFutoken(encodedId, baseUrl, url);
+    final mediaUrl = await _callFutoken(encodedId, host, url);
 
     if (mediaUrl == null) {
       return [];
@@ -50,14 +43,20 @@ class VidPlaySourceLoader {
         "Accept": "application/json, text/javascript, */*; q=0.01",
         "X-Requested-With": "XMLHttpRequest",
         "Referer": url,
-        "Cookie": _lastWafCookie,
         "Host": host,
       }),
     );
 
+    if (mediaInfoRes.data["result"] is int) {
+      logger.w(
+          "[vidplay] Invalid media response: ${mediaInfoRes.data["result"]}. "
+          "Probably keys expired");
+      return [];
+    }
+
     return JWPlayer.fromJson(
       mediaInfoRes.data["result"],
-      despriptionPrefix: "VidPlay",
+      despriptionPrefix: "${despriptionPrefix}VidPlay",
     );
   }
 
@@ -66,17 +65,11 @@ class VidPlaySourceLoader {
 
     // return apiKeys.vidplay ?? [];
     final res = await dio.get(
-      "https://raw.githubusercontent.com/Ciarands/vidsrc-keys/main/keys.json",
+      // "https://raw.githubusercontent.com/Ciarands/vidsrc-keys/main/keys.json",
+      "https://raw.githubusercontent.com/Inside4ndroid/vidkey-js/main/keys.json",
     );
 
     return json.decode(res.data).cast<String>();
-  }
-
-  Future<String> _fetchWAFToken() async {
-    final res = await dio.get(
-        "https://gist.githubusercontent.com/Andro999b/560835a26bdabdee507d653d414b2d6e/raw/b4969665789732546cd28fed75a77fa34c555df6/vidplay-waf-token.txt");
-
-    return res.data;
   }
 
   String _encodeId(String id, List<String> keys) {
@@ -91,8 +84,16 @@ class VidPlaySourceLoader {
     return base64.encode(encodeId).replaceAll("/", "_");
   }
 
-  Future<String?> _callFutoken(String id, String baseUrl, String url) async {
-    final futokenRes = await _fetchFutoken(baseUrl, url);
+  Future<String?> _callFutoken(String id, String host, String url) async {
+    const baseUrl = "http://$cloudWallIp";
+    final futokenRes = await dio.get(
+      "$baseUrl/futoken",
+      options: Options(headers: {
+        ...defaultHeaders,
+        "Referer": url,
+        "Host": host,
+      }),
+    );
 
     final page = futokenRes.data as String;
     final futoken = futokenRegExp.firstMatch(page)?.namedGroup("futoken");
@@ -113,49 +114,8 @@ class VidPlaySourceLoader {
     return "$baseUrl/mediainfo/${a.join(",")}?${url.substring(url.indexOf("?") + 1)}";
   }
 
-  Future<Response<dynamic>> _fetchFutoken(String baseUrl, String url) async {
-    var res = await dio.get(
-      "$baseUrl/futoken",
-      options: Options(headers: {
-        ...defaultHeaders,
-        "Referer": url,
-        "Cookie": _lastWafCookie,
-      }),
-    );
-
-    var page = res.data;
-
-    final wafMatch = wafDetectorRegExp.firstMatch(page);
-    if (wafMatch != null) {
-      // sove js chellange
-      final a = wafMatch.namedGroup("a")!;
-      final b = wafMatch.namedGroup("b")!;
-      final k = await _fetchWAFToken();
-
-      var jscheck = "";
-      for (var i = 0; i < k.length; i++) {
-        jscheck += k[i] + a[i] + b[i];
-      }
-
-      res = await dio.get(
-        "$url&__jscheck=$jscheck",
-        options: Options(headers: {
-          ...defaultHeaders,
-        }),
-      );
-
-      _lastWafCookie = res.headers["set-cookie"]?.first.split(";").first ?? "";
-
-      res = await dio.get(
-        "$baseUrl/futoken",
-        options: Options(headers: {
-          ...defaultHeaders,
-          "Referer": url,
-          "Cookie": _lastWafCookie,
-        }),
-      );
-    }
-
-    return res;
+  @override
+  String toString() {
+    return "VidPlaySourceLoader(url: $url)";
   }
 }

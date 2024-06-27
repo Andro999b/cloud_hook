@@ -45,7 +45,7 @@ abstract class ContentSupplier {
     int page = 0,
   }) async =>
       const [];
-  Future<ContentDetails?> detailsById(String id);
+  Future<ContentDetails?> detailsById(String id) async => null;
 }
 
 abstract interface class ContentInfo {
@@ -189,8 +189,13 @@ abstract class BasicContentMediaItem extends Equatable
   List<Object?> get props => [number];
 }
 
-typedef ContentItemMediaSourceLoader = Future<List<ContentMediaItemSource>>
-    Function();
+abstract interface class ContentMediaItemLoader {
+  FutureOr<List<ContentMediaItem>> call();
+}
+
+abstract interface class ContentMediaItemSourceLoader {
+  FutureOr<List<ContentMediaItemSource>> call();
+}
 
 // ignore: must_be_immutable
 class AsyncContentMediaItem extends BasicContentMediaItem {
@@ -200,7 +205,7 @@ class AsyncContentMediaItem extends BasicContentMediaItem {
   Future<List<ContentMediaItemSource>> get sources async =>
       _cachedSources ??= await sourcesLoader();
 
-  final ContentItemMediaSourceLoader sourcesLoader;
+  final ContentMediaItemSourceLoader sourcesLoader;
 
   AsyncContentMediaItem({
     required super.number,

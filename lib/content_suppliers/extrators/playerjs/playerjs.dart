@@ -1,7 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
@@ -263,7 +262,7 @@ class PlayerJSScrapper {
   }
 }
 
-class PlayerJSExtractor implements ContentMediaItemExtractor {
+class PlayerJSExtractor implements ContentMediaItemLoader {
   final PlaylistConvertStrategy<ContentMediaItem> convertStrategy;
   final String iframe;
 
@@ -273,16 +272,27 @@ class PlayerJSExtractor implements ContentMediaItemExtractor {
   Future<List<ContentMediaItem>> call() {
     return PlayerJSScrapper(uri: parseUri(iframe)).scrap(convertStrategy);
   }
+
+  @override
+  String toString() {
+    return "PlayerJSExtractor($iframe)";
+  }
 }
 
-class PlayerJSSourceLoader {
+class PlayerJSSourceLoader implements ContentMediaItemSourceLoader {
   final PlaylistConvertStrategy<ContentMediaItemSource> convertStrategy;
   final String iframe;
 
   PlayerJSSourceLoader(this.iframe, this.convertStrategy);
 
+  @override
   Future<List<ContentMediaItemSource>> call() {
     return PlayerJSScrapper(uri: parseUri(iframe))
         .scrapSources(convertStrategy);
+  }
+
+  @override
+  String toString() {
+    return "PlayerJSSourceLoader($iframe)";
   }
 }

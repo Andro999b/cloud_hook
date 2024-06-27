@@ -4,7 +4,6 @@ import 'package:cloud_hook/content_suppliers/suppliers/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
-import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -117,6 +116,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
                   TextSelector.forScope(".fi-label"),
                   TextSelector.forScope(".fi-desc")
                 ],
+                separator: " ",
               ),
             ),
             filter: (text) => !text.startsWith("Доступно"),
@@ -150,10 +150,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
         AsyncContentMediaItem(
           number: 0,
           title: "",
-          sourcesLoader: () {
-            return PlayerJSScrapper(uri: parseUri(iframe!))
-                .scrapSources(DubConvertStrategy());
-          },
+          sourcesLoader: PlayerJSSourceLoader(iframe!, DubConvertStrategy()),
         )
       ];
 
@@ -182,7 +179,4 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
     "Мультфільми": "/cartoon/page/",
     "Мультсеріали": "/cartoon/cartoonseries/page/"
   };
-
-  @override
-  Set<String> get defaultChannels => const {"Новинки"};
 }

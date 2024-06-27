@@ -1,13 +1,12 @@
 import 'dart:async';
 
-import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 
-class UFDubMediaExtractor implements ContentMediaItemExtractor {
+class UFDubMediaExtractor implements ContentMediaItemLoader {
   static final _episodeUrlRegExp =
       // ignore: unnecessary_string_escapes
       RegExp("https:\/\/ufdub.com\/video\/VIDEOS\.php\?(.*?)'");

@@ -5,17 +5,20 @@ import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:js_unpack/js_unpack.dart';
 
-class FileMoonSourceLoader {
+class FileMoonSourceLoader implements ContentMediaItemSourceLoader {
   static final _fileRegExp = RegExp("file:\\s?['\"](?<file>[^\"]+)['\"]");
 
   final String url;
   final String referer;
+  final String despriptionPrefix;
 
   const FileMoonSourceLoader({
     required this.url,
     required this.referer,
+    this.despriptionPrefix = "",
   });
 
+  @override
   Future<List<ContentMediaItemSource>> call() async {
     final scrapper = Scrapper(uri: url, headers: {"Referer": referer});
     final script = await scrapper.scrap(
@@ -43,9 +46,14 @@ class FileMoonSourceLoader {
 
     return [
       SimpleContentMediaItemSource(
-        description: "Filemoon",
+        description: "${despriptionPrefix}Filemoon",
         link: parseUri(file),
       )
     ];
+  }
+
+  @override
+  String toString() {
+    return "FileMoonSourceLoader(url: $url, referer: $referer)";
   }
 }

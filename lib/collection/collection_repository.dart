@@ -258,7 +258,7 @@ class FirebaseRepository extends CollectionRepository {
     }
 
     final itemId =
-        "${collectionItem.supplier}${collectionItem.id.replaceAll("/", "|")}";
+        "${collectionItem.supplier}${_sanitizeId(collectionItem.id)}";
     final ref = database.reference().child("collection/${user!.id}/$itemId");
 
     await ref.set(collectionItem.toJson());
@@ -269,9 +269,13 @@ class FirebaseRepository extends CollectionRepository {
       return;
     }
 
-    final itemId = "$supplier${id.replaceAll("/", "|")}";
+    final itemId = "$supplier${_sanitizeId(id)}";
     final ref = database.reference().child("collection/${user!.id}/$itemId");
 
     await ref.remove();
+  }
+
+  String _sanitizeId(String id) {
+    return id.replaceAll("/", "|").replaceAll(".", "");
   }
 }

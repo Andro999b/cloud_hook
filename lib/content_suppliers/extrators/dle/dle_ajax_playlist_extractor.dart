@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/extrators/playerjs/playerjs.dart';
 import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
@@ -72,10 +71,14 @@ class PlaylistResults {
       _$PlaylistResultsFromJson(json);
 }
 
-class DLEAjaxPLaylistExtractor implements ContentMediaItemExtractor {
+class DLEAjaxPLaylistExtractor implements ContentMediaItemLoader {
   final Uri playlistUri;
+  final List<String> filterHosts;
 
-  DLEAjaxPLaylistExtractor(this.playlistUri);
+  DLEAjaxPLaylistExtractor(
+    this.playlistUri, {
+    this.filterHosts = const ["ashdi", "tortuga", "moonanime", "monstro"],
+  });
 
   @override
   FutureOr<List<ContentMediaItem>> call() async {
@@ -122,15 +125,22 @@ class DLEAjaxPLaylistExtractor implements ContentMediaItemExtractor {
               title: playlist.byEpisodeNumber.length == 1
                   ? ""
                   : "${entry.key} серія",
-              sourcesLoader: aggSourceLoader(
-                entry.value.map(
-                  (video) => PlayerJSSourceLoader(
-                    video.file,
-                    SimpleUrlConvertStrategy(
-                      prefix: playlist.videoLable(video.labelIds),
+              sourcesLoader: AggSourceLoader(
+                entry.value
+                    // filter passable videos hostings
+                    .where(
+                      (video) => filterHosts.any(
+                        (host) => video.file.contains(host),
+                      ),
+                    )
+                    .map(
+                      (video) => PlayerJSSourceLoader(
+                        video.file,
+                        SimpleUrlConvertStrategy(
+                          prefix: playlist.videoLable(video.labelIds),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
               ),
             ),
           )

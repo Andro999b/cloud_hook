@@ -155,11 +155,8 @@ class UAFilmsSupplier extends ContentSupplier with DLEChannelsLoader {
     "Новинки": "/year/${DateTime.now().year}/page/",
     "Фільми": "/filmys/page/",
     "Серіали": "/serialy/page/",
+    "Аніме": "/anime/page/",
     "Мультфільми": "/cartoons/page/",
     "Мультсеріали": "/multserialy/page/",
-    "Аніме": "/anime/page/"
   };
-
-  @override
-  Set<String> get defaultChannels => const {"Новинки"};
 }

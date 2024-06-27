@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:cloud_hook/content_suppliers/extrators/extractor.dart';
 import 'package:cloud_hook/content_suppliers/extrators/playerjs/playerjs.dart';
 import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
@@ -22,12 +21,16 @@ class RalodePlayerFile {
       _$RalodePlayerFileFromJson(json);
 }
 
-class RalodePlayerExtractor implements ContentMediaItemExtractor {
+class RalodePlayerExtractor implements ContentMediaItemLoader {
   static final _digitPattern = RegExp(r"(?<num>\d+)");
   static final _srcPattern = RegExp(r'src="(?<src>[^"]+)"');
   final String playerParams;
+  final List<String> filterHosts;
 
-  RalodePlayerExtractor(this.playerParams);
+  RalodePlayerExtractor(
+    this.playerParams, {
+    this.filterHosts = const ["ashdi", "tortuga", "moonanime", "monstro"],
+  });
 
   @override
   FutureOr<List<ContentMediaItem>> call() {
@@ -36,7 +39,7 @@ class RalodePlayerExtractor implements ContentMediaItemExtractor {
     final playersNames = decodeParams[0] as List<dynamic>;
     final players = decodeParams[1] as List<dynamic>;
 
-    Map<int, List<ContentItemMediaSourceLoader>> filesByNum = {};
+    Map<int, List<ContentMediaItemSourceLoader>> filesByNum = {};
 
     for (int i = 0; i < playersNames.length; i++) {
       final playerName = playersNames[i];
@@ -56,6 +59,10 @@ class RalodePlayerExtractor implements ContentMediaItemExtractor {
           continue;
         }
 
+        if (filterHosts.none((host) => iframe.contains(host))) {
+          continue;
+        }
+
         files.add(PlayerJSSourceLoader(
           iframe,
           SimpleUrlConvertStrategy(prefix: playerName),
@@ -70,7 +77,7 @@ class RalodePlayerExtractor implements ContentMediaItemExtractor {
           (i, e) => AsyncContentMediaItem(
             number: i,
             title: filesByNum.length == 1 ? "" : "${e.key} серія",
-            sourcesLoader: aggSourceLoader(e.value),
+            sourcesLoader: AggSourceLoader(e.value),
           ),
         )
         .toList();

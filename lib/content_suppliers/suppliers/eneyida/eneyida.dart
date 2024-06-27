@@ -114,8 +114,8 @@ class EneyidaSupplier extends ContentSupplier
   final Map<String, String> channelsPath = const {
     "Фільми": "/films/page/",
     "Серіали": "/series/page/",
+    "Аніме": "/anime/page/",
     "Мультфільми": "/cartoon/page/",
     "Мультсеріали": "/cartoon-series/page/",
-    "Аніме": "/anime/page/",
   };
 }

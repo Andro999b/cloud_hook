@@ -1,23 +1,31 @@
+import 'dart:async';
 import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/logger.dart';
 
-ContentItemMediaSourceLoader aggSourceLoader(
-  Iterable<ContentItemMediaSourceLoader> sourceLoaders,
-) =>
-    () => Stream.fromIterable(sourceLoaders)
+class AggSourceLoader implements ContentMediaItemSourceLoader {
+  final Iterable<ContentMediaItemSourceLoader> sourceLoaders;
+
+  AggSourceLoader(this.sourceLoaders);
+
+  @override
+  Future<List<ContentMediaItemSource>> call() {
+    return Stream.fromIterable(sourceLoaders)
         .asyncMap((loader) async {
           try {
-            return await Isolate.run(loader);
+            return await Isolate.run(loader.call);
           } catch (error, stackTrace) {
-            logger.w("Source loader error: $error", stackTrace: stackTrace);
+            logger.w("Source loader $loader error: $error",
+                stackTrace: stackTrace);
             return <ContentMediaItemSource>[];
           }
         })
         .expand((s) => s)
         .toList();
+  }
+}
 
 Uint8List hexToBytes(String hex) {
   final bytes = <int>[];

@@ -5,14 +5,18 @@ import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
+import 'package:dio/dio.dart';
 import 'package:simple_rc4/simple_rc4.dart';
 
-class VidSrcToSourceLoader {
+class VidSrcToSourceLoader
+    with VidSrcToServerMixin
+    implements ContentMediaItemSourceLoader {
   final rc4key = "WXrUARXb1aDLaZjI";
-  final baseUrl = "https://vidsrc.to";
+  final host = "vidsrc.to";
   final String imdb;
   final int? episode;
   final int? season;
+  late final String baseUrl = "https://$host";
 
   VidSrcToSourceLoader({
     required this.imdb,
@@ -20,6 +24,7 @@ class VidSrcToSourceLoader {
     this.episode,
   });
 
+  @override
   Future<List<ContentMediaItemSource>> call() async {
     String url;
 
@@ -29,7 +34,7 @@ class VidSrcToSourceLoader {
       url = "$baseUrl/embed/tv/$imdb/$season/$episode";
     }
 
-    final mediaId = await Scrapper(uri: url)
+    final mediaId = await Scrapper(uri: url, headers: {"Host": host})
         .scrap(Attribute.forScope("ul.episodes li a", "data-id"));
 
     if (mediaId == null) {
@@ -37,8 +42,12 @@ class VidSrcToSourceLoader {
       return [];
     }
 
-    final sourcesRes =
-        await dio.get("$baseUrl/ajax/embed/episode/$mediaId/sources");
+    final sourcesRes = await dio.get(
+      "$baseUrl/ajax/embed/episode/$mediaId/sources",
+      options: Options(
+        headers: {...defaultHeaders, "Host": host},
+      ),
+    );
 
     final List<dynamic>? sources = sourcesRes.data["result"];
 
@@ -48,40 +57,25 @@ class VidSrcToSourceLoader {
     }
 
     final Stream<ContentMediaItemSource> stream = Stream.fromIterable(sources)
-        .asyncMap((source) async => switch (source["title"]) {
-              "Vidplay" => await _extractVidplay(source["id"]),
-              "F2Cloud" => await _extractVidplay(source["id"]),
-              "Filemoon" => await _extractFilemoon(source["id"], url),
-              _ => <ContentMediaItemSource>[]
-            })
+        .asyncMap((source) => extractServer(
+              source["title"],
+              source["id"]!,
+              url,
+            ))
         .expand((element) => element);
 
     return await stream.toList();
   }
 
-  Future<List<ContentMediaItemSource>> _extractVidplay(String id) async {
-    final finalUrl = await _loadSource(id);
-
-    if (finalUrl == null) {
-      return [];
-    }
-
-    return VidPlaySourceLoader(url: finalUrl).call();
-  }
-
-  Future<List<ContentMediaItemSource>> _extractFilemoon(
-      String id, String url) async {
-    final finalUrl = await _loadSource(id);
-
-    if (finalUrl == null) {
-      return [];
-    }
-
-    return FileMoonSourceLoader(url: finalUrl, referer: url).call();
-  }
-
-  Future<String?> _loadSource(String id) async {
-    final sourceRes = await dio.get("$baseUrl/ajax/embed/source/$id");
+  @override
+  Future<String?> loadSource(String id) async {
+    final sourceRes = await dio.get("$baseUrl/ajax/embed/source/$id",
+        options: Options(
+          headers: {
+            ...defaultHeaders,
+            "Host": host,
+          },
+        ));
     final String? encUrl = sourceRes.data["result"]?["url"];
 
     if (encUrl == null) {
@@ -91,5 +85,60 @@ class VidSrcToSourceLoader {
 
     final rc4 = RC4(rc4key);
     return Uri.decodeComponent(rc4.decodeString(encUrl, true, false));
+  }
+
+  @override
+  String toString() {
+    return "VidSrcToSourceLoader(imdb: $imdb, episode: $episode, season: $season)";
+  }
+}
+
+mixin VidSrcToServerMixin {
+  Future<String?> loadSource(String id);
+
+  Future<List<ContentMediaItemSource>> extractServer(
+      String serverName, String serverId, String referer,
+      {String descriptionPrefix = ""}) async {
+    return switch (serverName.toLowerCase()) {
+      "vidplay" ||
+      "vidstream" ||
+      "f2cloud" =>
+        await _extractVidplay(serverId, descriptionPrefix),
+      "filemoon" =>
+        await _extractFilemoon(serverId, referer, descriptionPrefix),
+      _ => <ContentMediaItemSource>[]
+    };
+  }
+
+  Future<List<ContentMediaItemSource>> _extractVidplay(
+      String id, String descriptionPrefix) async {
+    final finalUrl = await loadSource(id);
+
+    if (finalUrl == null) {
+      return [];
+    }
+
+    return VidPlaySourceLoader(
+      url: finalUrl,
+      despriptionPrefix: descriptionPrefix,
+    ).call();
+  }
+
+  Future<List<ContentMediaItemSource>> _extractFilemoon(
+    String id,
+    String url,
+    String descriptionPrefix,
+  ) async {
+    final finalUrl = await loadSource(id);
+
+    if (finalUrl == null) {
+      return [];
+    }
+
+    return FileMoonSourceLoader(
+      url: finalUrl,
+      referer: url,
+      despriptionPrefix: descriptionPrefix,
+    ).call();
   }
 }
