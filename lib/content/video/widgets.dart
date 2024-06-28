@@ -198,14 +198,11 @@ class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
                   );
                 }
 
-                if (snapshot.hasError) {
-                  return Center(child: Text(snapshot.error!.toString()));
-                }
-
                 final videos =
-                    snapshot.data!.where((e) => e.kind == FileKind.video);
+                    snapshot.data?.where((e) => e.kind == FileKind.video) ?? [];
                 final subtitles =
-                    snapshot.data!.where((e) => e.kind == FileKind.subtitle);
+                    snapshot.data?.where((e) => e.kind == FileKind.subtitle) ??
+                        [];
 
                 if (videos.isEmpty) {
                   return Container(
@@ -460,6 +457,7 @@ class PlayOrPauseButtonState extends State<PlayOrPauseButton>
         progress: animation,
         color: Colors.white,
         icon: AnimatedIcons.play_pause,
+        size: widget.iconSize,
       ),
     );
   }

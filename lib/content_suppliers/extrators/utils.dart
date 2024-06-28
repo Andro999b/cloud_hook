@@ -13,15 +13,17 @@ class AggSourceLoader implements ContentMediaItemSourceLoader {
   @override
   Future<List<ContentMediaItemSource>> call() {
     return Stream.fromIterable(sourceLoaders)
-        .asyncMap((loader) async {
-          try {
-            return await Isolate.run(loader.call);
-          } catch (error, stackTrace) {
-            logger.w("Source loader $loader error: $error",
-                stackTrace: stackTrace);
-            return <ContentMediaItemSource>[];
-          }
-        })
+        .asyncMap(
+          (loader) => Isolate.run(() async {
+            try {
+              return await loader.call();
+            } catch (error, stackTrace) {
+              logger.w("Source loader $loader error: $error",
+                  stackTrace: stackTrace);
+              return <ContentMediaItemSource>[];
+            }
+          }),
+        )
         .expand((s) => s)
         .toList();
   }

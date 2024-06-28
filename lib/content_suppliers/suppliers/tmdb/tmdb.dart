@@ -36,9 +36,10 @@ class TmdbContentInfo implements ContentInfo {
   factory TmdbContentInfo.fromJson(Map<String, dynamic> json) {
     final title = json["name"] ?? json["title"];
     final originalTitle = json["original_title"];
+    final type = json["media_type"];
 
     return TmdbContentInfo(
-      id: "${json["media_type"]}/${json["id"]}",
+      id: "$type/${json["id"]}",
       title: title,
       secondaryTitle: title != originalTitle ? originalTitle : null,
       image:
@@ -254,14 +255,55 @@ class TmdbSupplier extends ContentSupplier {
     final uri = Uri.https(
       api,
       "/3/search/multi",
-      {
-        "query": query,
-        "page": "1",
-        "language": "en-US",
-      },
+      {"query": query, "page": "1", "language": "en-US"},
     );
 
     final res = await dio.get(uri.toString());
+
+    return _TmdbSearchResponse.fromJson(res.data).results;
+  }
+
+  final Map<String, String> _channelsPath = const {
+    "Trending": "/trending/all/day",
+    "Popular Movies": "/movie/popular",
+    "Popular TV Shows": "/tv/popular",
+    "Top Rated Movies": "/movie/top_rated",
+    "Top Rated TV Shows": "/tv/top_rated",
+    "Latest Movies": "/movie/latest",
+    "Latest TV Shows": "/movie/latest",
+    "On The Air TV Shows": "/tv/on_the_air"
+  };
+
+  @override
+  Set<String> get channels => _channelsPath.keys.toSet();
+
+  @override
+  Future<List<ContentInfo>> loadChannel(String channel, {int page = 0}) async {
+    final path = _channelsPath[channel];
+
+    if (path == null) {
+      return [];
+    }
+
+    final uri = Uri.https(
+      api,
+      "/3/$path",
+      {"page": page.toString(), "language": "en-US"},
+    );
+
+    final res = await dio.get(uri.toString());
+
+    // add media type
+    final results = res.data["results"] as List<dynamic>;
+    if (path.contains("movie")) {
+      for (var e in results) {
+        e["media_type"] = "movie";
+      }
+    } else if (path.contains("tv")) {
+      for (var e in results) {
+        e["media_type"] = "tv";
+      }
+    }
 
     return _TmdbSearchResponse.fromJson(res.data).results;
   }

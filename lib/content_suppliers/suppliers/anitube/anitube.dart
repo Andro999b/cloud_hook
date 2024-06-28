@@ -124,7 +124,7 @@ class AniTubeSupplier extends ContentSupplier
     ));
 
     if (result == null) {
-      return Future.value(null);
+      return null;
     }
 
     // I wish to burn in hell to the person who made this site markup

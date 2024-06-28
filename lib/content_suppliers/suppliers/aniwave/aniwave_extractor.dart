@@ -8,6 +8,7 @@ import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/aniwave/aniwave_vrf.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -37,7 +38,7 @@ class AniWaveExtractor implements ContentMediaItemLoader {
       episodesRes.data["result"],
       ".body",
       Scope(
-        scope: ".episodes ul",
+        scope: ".episodes",
         item: Iterate(
           itemScope: "li a",
           item: SelectorsToMap({
@@ -53,8 +54,8 @@ class AniWaveExtractor implements ContentMediaItemLoader {
     }
 
     return episodesJson
-        .map((e) => AsyncContentMediaItem(
-              number: int.parse(e["number"] as String),
+        .mapIndexed((i, e) => AsyncContentMediaItem(
+              number: i,
               title: "${e["number"]} episode",
               sourcesLoader: AniWaveSorceLoader(
                 address,
@@ -106,6 +107,14 @@ class AniWaveSorceLoader implements ContentMediaItemSourceLoader {
             "id": Attribute("data-link-id"),
             "title": TextSelector(),
             "prefix": Const("DUB")
+          }),
+        ),
+        Iterate(
+          itemScope: "div[data-type='softsub'] li",
+          item: SelectorsToMap({
+            "id": Attribute("data-link-id"),
+            "title": TextSelector(),
+            "prefix": Const("S-SUB")
           }),
         ),
         Iterate(

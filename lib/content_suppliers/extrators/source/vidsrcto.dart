@@ -1,4 +1,5 @@
 import 'package:cloud_hook/content_suppliers/extrators/source/filemoon.dart';
+import 'package:cloud_hook/content_suppliers/extrators/source/mp4upload.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/vidplay.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
@@ -102,17 +103,21 @@ mixin VidSrcToServerMixin {
     return switch (serverName.toLowerCase()) {
       "vidplay" ||
       "vidstream" ||
+      // "megaf" ||
       "f2cloud" =>
         await _extractVidplay(serverId, descriptionPrefix),
       "filemoon" =>
         await _extractFilemoon(serverId, referer, descriptionPrefix),
+      "mp4upload" => await _extractMp4upload(serverId, descriptionPrefix),
       _ => <ContentMediaItemSource>[]
     };
   }
 
   Future<List<ContentMediaItemSource>> _extractVidplay(
-      String id, String descriptionPrefix) async {
-    final finalUrl = await loadSource(id);
+    String serverId,
+    String descriptionPrefix,
+  ) async {
+    final finalUrl = await loadSource(serverId);
 
     if (finalUrl == null) {
       return [];
@@ -125,11 +130,11 @@ mixin VidSrcToServerMixin {
   }
 
   Future<List<ContentMediaItemSource>> _extractFilemoon(
-    String id,
+    String serverId,
     String url,
     String descriptionPrefix,
   ) async {
-    final finalUrl = await loadSource(id);
+    final finalUrl = await loadSource(serverId);
 
     if (finalUrl == null) {
       return [];
@@ -139,6 +144,22 @@ mixin VidSrcToServerMixin {
       url: finalUrl,
       referer: url,
       despriptionPrefix: descriptionPrefix,
+    ).call();
+  }
+
+  Future<List<ContentMediaItemSource>> _extractMp4upload(
+    String serverId,
+    String descriptionPrefix,
+  ) async {
+    final finalUrl = await loadSource(serverId);
+
+    if (finalUrl == null) {
+      return [];
+    }
+
+    return MP4UploadSourceLoader(
+      url: finalUrl,
+      descriptionPrefix: descriptionPrefix,
     ).call();
   }
 }

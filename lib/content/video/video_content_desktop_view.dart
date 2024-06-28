@@ -170,7 +170,7 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
       // Enter PiP Mode
       await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
       await Future.delayed(const Duration(milliseconds: 100));
-      await windowManager.setSize(const Size(384, 216));
+      await windowManager.setSize(const Size(576, 324));
       await windowManager.setAlwaysOnTop(true);
       await Future.delayed(const Duration(milliseconds: 100));
       await windowManager.setAlignment(Alignment.bottomRight);
@@ -226,7 +226,7 @@ class _PipVideoControlsState extends State<PipVideoControls> {
                 ),
               ),
               const Positioned.fill(
-                child: Center(child: PlayOrPauseButton(iconSize: 96)),
+                child: Center(child: PlayOrPauseButton(iconSize: 48)),
               )
             ]
           ],

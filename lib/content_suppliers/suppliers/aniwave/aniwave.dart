@@ -4,6 +4,7 @@ import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/aniwave/aniwave_extractor.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/utils.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
+import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'aniwave.g.dart';
@@ -123,5 +124,57 @@ class AniWaveSupplier extends ContentSupplier {
     }
 
     return AniWaveContentDetails.fromJson(results);
+  }
+
+  final Map<String, String> _channelsPath = const {
+    "Trending": "/ajax/home/widget/trending",
+    "All": "/ajax/home/widget/updated-all",
+    "Recently Updated (SUB)": "/ajax/home/widget/updated-sub",
+    "Recently Updated (DUB)": "/ajax/home/widget/updated-dub",
+    "Random": "/ajax/home/widget/random",
+  };
+
+  @override
+  Set<String> get channels => _channelsPath.keys.toSet();
+
+  @override
+  Future<List<ContentInfo>> loadChannel(String channel, {int page = 0}) async {
+    final path = _channelsPath[channel];
+
+    if (path == null) {
+      return [];
+    }
+
+    final uri = Uri.http(cloudWallIp, path, {
+      "page": page.toString(),
+    });
+
+    final res = await dio.getUri(
+      uri,
+      options: Options(headers: {
+        ...defaultHeaders,
+        "Host": host,
+      }),
+    );
+
+    final results = await Scrapper.scrapFragment(
+      res.data["result"],
+      ".items",
+      Iterate(
+        itemScope: ".item",
+        item: SelectorsToMap({
+          "supplier": Const(name),
+          "id": UrlId.forScope(".poster > a", regexp: _idRegExp),
+          "title": TextSelector.forScope(".info .name"),
+          "image": Attribute.forScope(".poster img", "src"),
+        }),
+      ),
+    );
+
+    if (results == null) {
+      return [];
+    }
+
+    return results.map(ContentSearchResult.fromJson).toList();
   }
 }

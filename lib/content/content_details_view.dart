@@ -85,7 +85,7 @@ class ContentDetailsView extends ConsumerWidget {
                 _ContentWatchButtons(contentDetails),
                 _MediaCollectionItemButtons(contentDetails),
                 ..._renderAdditionalInfo(context),
-                SizedBox(height: paddings),
+                const SizedBox(height: 8),
                 _renderDescription(context),
                 if (contentDetails.similar.isNotEmpty)
                   ..._renderSimilar(context),
@@ -244,13 +244,7 @@ class _ContentWatchButtons extends HookWidget {
     }
 
     if (snapshot.hasError) {
-      var theme = Theme.of(context);
-      return Text(
-        snapshot.error.toString(),
-        style: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.error,
-        ),
-      );
+      return const SizedBox(height: 40);
     }
 
     final mediaItems = snapshot.data!.toList();
