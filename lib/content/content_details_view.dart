@@ -365,7 +365,7 @@ class _MediaCollectionItemButtons extends ConsumerWidget {
           CollectionItemPrioritySelector(
             collectionItem: data,
             onSelect: (priority) {
-              ref.read(provider.notifier).setPriorit(priority);
+              ref.read(provider.notifier).setPriority(priority);
             },
           )
       ],

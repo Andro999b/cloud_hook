@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_hook/utils/url_utils.dart';
 import 'package:collection/collection.dart';
@@ -102,6 +103,7 @@ class Transform<T, E> extends Selector<T> {
 }
 
 class TextSelector extends Selector<String> {
+  static final inlineRegExp = RegExp(r'[\n\t\s]+');
   final bool inline;
 
   TextSelector({this.inline = false});
@@ -110,7 +112,7 @@ class TextSelector extends Selector<String> {
   FutureOr<String> select(dom.Element element) {
     final text = element.text.trim();
     if (inline) {
-      return text.replaceAll('\n', ' ');
+      return text.replaceAll(inlineRegExp, ' ');
     }
     return text;
   }

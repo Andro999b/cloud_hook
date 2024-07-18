@@ -16,4 +16,4 @@ Uri parseUri(String url) =>
 // 195.230.23.83,
 // 195.230.23.63,
 // 91.206.228.57
-const cloudWallIp = "195.230.23.7";
+const cloudWallIp = "195.230.23.67";

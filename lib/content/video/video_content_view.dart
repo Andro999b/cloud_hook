@@ -238,16 +238,16 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
     player.stream.volume.listen((event) => AppPreferences.volume = event);
 
     player.stream.error.listen((event) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "${AppLocalizations.of(context)!.videoSourceFailed}: $event",
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+      // if (mounted) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text(
+      //         "${AppLocalizations.of(context)!.videoSourceFailed}: $event",
+      //       ),
+      //       behavior: SnackBarBehavior.floating,
+      //     ),
+      //   );
+      // }
       logger.e("[player]: $event");
     });
 

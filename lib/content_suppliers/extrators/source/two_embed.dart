@@ -76,7 +76,6 @@ class TwoEmbedSourceLoader implements ContentMediaItemSourceLoader {
   }
 
   @override
-  String toString() {
-    return "TwoEmbedSourceLoader(imdb: $imdb, episode: $episode, season: $season)";
-  }
+  String toString() =>
+      "TwoEmbedSourceLoader(imdb: $imdb, episode: $episode, season: $season, despriptionPrefix: $despriptionPrefix)";
 }

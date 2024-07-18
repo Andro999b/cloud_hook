@@ -12,21 +12,31 @@ import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'aniwave_extractor.g.dart';
+part 'aniwave_loader.g.dart';
 
-class AniWaveExtractor implements ContentMediaItemLoader {
-  final String address;
+@JsonSerializable(createToJson: false)
+class Episode {
+  final String id;
+  final String number;
+
+  Episode(this.id, this.number);
+
+  factory Episode.fromJson(Map<String, dynamic> json) =>
+      _$EpisodeFromJson(json);
+}
+
+class AniWaveMediaItemLoader implements ContentMediaItemLoader {
   final String host;
   final String mediaId;
 
-  AniWaveExtractor(this.address, this.host, this.mediaId);
+  AniWaveMediaItemLoader(this.host, this.mediaId);
 
   @override
   FutureOr<List<ContentMediaItem>> call() async {
     final vrf = aniwaveVRF(mediaId);
 
     final episodesRes = await dio.get(
-      "http://$address/ajax/episode/list/$mediaId?vrf=$vrf",
+      "https://$host/ajax/episode/list/$mediaId?vrf=$vrf",
       options: Options(headers: {
         ...defaultHeaders,
         "Host": host,
@@ -34,8 +44,20 @@ class AniWaveExtractor implements ContentMediaItemLoader {
       }),
     );
 
+    final episodes = await srapEpisodeslist(episodesRes.data["result"]);
+
+    return episodes
+        .mapIndexed((i, e) => AsyncContentMediaItem(
+              number: i,
+              title: "${e.number} episode",
+              sourcesLoader: sourceLoader(e),
+            ))
+        .toList();
+  }
+
+  FutureOr<List<Episode>> srapEpisodeslist(String text) async {
     final episodesJson = await Scrapper.scrapFragment(
-      episodesRes.data["result"],
+      text,
       ".body",
       Scope(
         scope: ".episodes",
@@ -49,21 +71,11 @@ class AniWaveExtractor implements ContentMediaItemLoader {
       ),
     );
 
-    if (episodesJson == null) {
-      return [];
-    }
+    return episodesJson?.map(Episode.fromJson).toList() ?? [];
+  }
 
-    return episodesJson
-        .mapIndexed((i, e) => AsyncContentMediaItem(
-              number: i,
-              title: "${e["number"]} episode",
-              sourcesLoader: AniWaveSorceLoader(
-                address,
-                host,
-                e["id"] as String,
-              ),
-            ))
-        .toList();
+  AniWaveSourceLoader sourceLoader(Episode ep) {
+    return AniWaveSourceLoader(host, ep.id);
   }
 }
 
@@ -78,27 +90,36 @@ class Server {
   factory Server.fromJson(Map<String, dynamic> json) => _$ServerFromJson(json);
 }
 
-class AniWaveSorceLoader implements ContentMediaItemSourceLoader {
-  final String address;
+class AniWaveSourceLoader implements ContentMediaItemSourceLoader {
   final String host;
   final String id;
 
-  AniWaveSorceLoader(this.address, this.host, this.id);
+  AniWaveSourceLoader(this.host, this.id);
 
   @override
   FutureOr<List<ContentMediaItemSource>> call() async {
     final vrf = aniwaveVRF(id);
 
     final serversRes = await dio.get(
-      "http://$address/ajax/server/list/$id?vrf=$vrf",
+      "https://$host/ajax/server/list/$id?vrf=$vrf",
       options: Options(headers: {
         ...defaultHeaders,
         "Host": host,
       }),
     );
 
+    final servers = await scrapServers(serversRes.data["result"]);
+
+    return AggSourceLoader(
+      servers.map(
+        (s) => AniWaveServerSorceLoader(host, s),
+      ),
+    ).call();
+  }
+
+  Future<List<Server>> scrapServers(String text) async {
     final serversJson = await Scrapper.scrapFragment(
-      serversRes.data["result"],
+      text,
       ".servers",
       Flatten([
         Iterate(
@@ -128,30 +149,17 @@ class AniWaveSorceLoader implements ContentMediaItemSourceLoader {
       ]),
     );
 
-    if (serversJson == null) {
-      return [];
-    }
-
-    return AggSourceLoader(
-      serversJson.map(
-        (json) => AniWaveServerSorceLoader(
-          address,
-          host,
-          Server.fromJson(json),
-        ),
-      ),
-    ).call();
+    return serversJson?.map(Server.fromJson).toList() ?? [];
   }
 }
 
 class AniWaveServerSorceLoader
     with VidSrcToServerMixin
     implements ContentMediaItemSourceLoader {
-  final String address;
   final String host;
   final Server server;
 
-  AniWaveServerSorceLoader(this.address, this.host, this.server);
+  AniWaveServerSorceLoader(this.host, this.server);
 
   @override
   FutureOr<List<ContentMediaItemSource>> call() {
@@ -169,7 +177,7 @@ class AniWaveServerSorceLoader
     final vrf = aniwaveVRF(id);
 
     final serverRes = await dio.get(
-      "http://$address/ajax/server/$id?vrf=$vrf",
+      "https://$host/ajax/server/$id?vrf=$vrf",
       options: Options(headers: {
         ...defaultHeaders,
         "Host": host,

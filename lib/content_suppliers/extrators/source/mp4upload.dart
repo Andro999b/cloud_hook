@@ -43,4 +43,8 @@ class MP4UploadSourceLoader implements ContentMediaItemSourceLoader {
           })
     ];
   }
+
+  @override
+  String toString() =>
+      "MP4UploadSourceLoader(url: $url, referer: $referer, descriptionPrefix: $descriptionPrefix)";
 }

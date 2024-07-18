@@ -2,18 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_hook/content_suppliers/extrators/jwplayer/jwplayer.dart';
+import 'package:cloud_hook/content_suppliers/extrators/source/multi_api_keys.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
-import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
-import 'package:dio/dio.dart';
 import 'package:simple_rc4/simple_rc4.dart';
 
 class VidPlaySourceLoader implements ContentMediaItemSourceLoader {
-  static final futokenRegExp = RegExp(r"k='(?<futoken>\S+)'");
-  static final wafDetectorRegExp =
-      RegExp(r"_a = '(?<a>[a-z0-9]+)',\s+_b = '(?<b>[a-z0-9]+)'");
-
   final String url;
   final String despriptionPrefix;
 
@@ -24,98 +19,70 @@ class VidPlaySourceLoader implements ContentMediaItemSourceLoader {
 
   @override
   Future<List<ContentMediaItemSource>> call() async {
-    final host = parseUri(url).authority;
+    final uri = parseUri(url);
 
-    String id = url.substring(0, url.indexOf("?"));
-    id = id.substring(id.lastIndexOf("/") + 1);
+    final host = uri.authority;
+    final keys = await _fetchKeys();
 
-    final encodedId = _encodeId(id, await _fetchKeys());
-    final mediaUrl = await _callFutoken(encodedId, host, url);
+    final id = _extractId(url);
+    final endcodedId = _encode(_extractId(url), keys[0]);
+    final t = uri.queryParameters["t"]!;
+    final h = _encode(id, keys[1]);
 
-    if (mediaUrl == null) {
-      return [];
-    }
+    final mediaInfoUri = Uri.https(host, "/mediainfo/$endcodedId", {
+      "sub.info": uri.queryParameters["sub.info"],
+      "t": t,
+      "h": h,
+    });
 
-    final mediaInfoRes = await dio.get(
-      mediaUrl,
-      options: Options(headers: {
-        ...defaultHeaders,
-        "Accept": "application/json, text/javascript, */*; q=0.01",
-        "X-Requested-With": "XMLHttpRequest",
-        "Referer": url,
-        "Host": host,
-      }),
-    );
+    final mediaInfoRes = await dio.getUri(mediaInfoUri);
 
     if (mediaInfoRes.data["result"] is int) {
-      logger.w(
-          "[vidplay] Invalid media response: ${mediaInfoRes.data["result"]}. "
-          "Probably keys expired");
+      logger.w("[VidPlay] mediaInfo not found. Keys maybe expired");
       return [];
     }
 
+    final decodedResult = _decode(mediaInfoRes.data["result"], keys[2]);
+    final mediaInfo = json.decode(decodedResult) as Map<String, dynamic>;
+
     return JWPlayer.fromJson(
-      mediaInfoRes.data["result"],
-      despriptionPrefix: "${despriptionPrefix}VidPlay",
+      mediaInfo,
+      descriptionPrefix: "${despriptionPrefix}VidPlay",
     );
   }
 
   Future<List<String>> _fetchKeys() async {
-    // final apiKeys = await MultiApiKeys.fetch();
+    final apiKeys = await MultiApiKeys.fetch();
 
-    // return apiKeys.vidplay ?? [];
-    final res = await dio.get(
-      // "https://raw.githubusercontent.com/Ciarands/vidsrc-keys/main/keys.json",
-      "https://raw.githubusercontent.com/Inside4ndroid/vidkey-js/main/keys.json",
-    );
-
-    return json.decode(res.data).cast<String>();
+    return apiKeys.vidplay ?? [];
+    //   "https://raw.githubusercontent.com/Ciarands/vidsrc-keys/main/keys.json",
+    //   "https://raw.githubusercontent.com/Inside4ndroid/vidkey-js/main/keys.json",
   }
 
-  String _encodeId(String id, List<String> keys) {
-    final [key1, key2] = keys;
+  String _encode(String data, String key) {
+    final cipher = RC4(key);
 
-    final chiper1 = RC4(key1);
-    final chiper2 = RC4(key2);
+    var encoded = utf8.encode(data).toList();
+    encoded = cipher.encodeBytes(encoded);
 
-    List<int> encodeId = chiper1.encodeBytes(utf8.encode(id));
-    encodeId = chiper2.encodeBytes(encodeId);
-
-    return base64.encode(encodeId).replaceAll("/", "_");
+    return base64Url.encode(encoded);
   }
 
-  Future<String?> _callFutoken(String id, String host, String url) async {
-    const baseUrl = "http://$cloudWallIp";
-    final futokenRes = await dio.get(
-      "$baseUrl/futoken",
-      options: Options(headers: {
-        ...defaultHeaders,
-        "Referer": url,
-        "Host": host,
-      }),
-    );
+  String _decode(String data, String key) {
+    final cipher = RC4(key);
 
-    final page = futokenRes.data as String;
-    final futoken = futokenRegExp.firstMatch(page)?.namedGroup("futoken");
+    final decoded = cipher.decodeBytes(base64.decode(data));
 
-    if (futoken == null) {
-      logger.w("[vidplay] futoken not found");
-      return null;
-    }
+    return Uri.decodeComponent(decoded);
+  }
 
-    final a = [futoken];
-
-    final idCodes = id.codeUnits;
-    final futokenCodes = futoken.codeUnits;
-    for (var i = 0; i < id.length; i++) {
-      a.add((futokenCodes[i % futoken.length] + idCodes[i]).toString());
-    }
-
-    return "$baseUrl/mediainfo/${a.join(",")}?${url.substring(url.indexOf("?") + 1)}";
+  String _extractId(String url) {
+    String str = url.substring(0, url.indexOf("?"));
+    str = str.substring(str.lastIndexOf("/") + 1);
+    return str;
   }
 
   @override
-  String toString() {
-    return "VidPlaySourceLoader(url: $url)";
-  }
+  String toString() =>
+      "VidPlaySourceLoader(url: $url, despriptionPrefix: $despriptionPrefix)";
 }

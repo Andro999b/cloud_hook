@@ -1,5 +1,11 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
+import 'package:cloud_hook/utils/logger.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -45,13 +51,13 @@ class JWPlayer {
 
   static List<ContentMediaItemSource> fromJson(
     Map<String, dynamic> json, {
-    String despriptionPrefix = "JWPlayer",
+    String descriptionPrefix = "JWPlayer",
     Map<String, String>? headers,
   }) {
     final config = JWPlayerConfig.fromJson(json);
     return fromConfig(
       config,
-      despriptionPrefix: despriptionPrefix,
+      despriptionPrefix: descriptionPrefix,
       headers: headers,
     );
   }
@@ -81,4 +87,46 @@ class JWPlayer {
           ),
     ];
   }
+}
+
+class JWPlayerSingleFileSourceLoader implements ContentMediaItemSourceLoader {
+  static final _fileRegExp = RegExp("file:\\s?['\"](?<file>[^\"]+)['\"]");
+
+  final String url;
+  final String? referer;
+  final String descriptionPrefix;
+
+  JWPlayerSingleFileSourceLoader({
+    required this.url,
+    required this.referer,
+    this.descriptionPrefix = "",
+  });
+
+  @override
+  FutureOr<List<ContentMediaItemSource>> call() async {
+    final res = await dio.get(
+      url,
+      options: Options(
+        headers: {...defaultHeaders, "Referer": referer},
+      ),
+    );
+
+    final file = _fileRegExp.firstMatch(res.data)?.namedGroup("file");
+
+    if (file == null) {
+      logger.w("[jwplayer] sources url not found");
+      return [];
+    }
+
+    return [
+      SimpleContentMediaItemSource(
+        description: descriptionPrefix,
+        link: parseUri(file),
+      )
+    ];
+  }
+
+  @override
+  String toString() =>
+      "JWPlayerSingleFileSourceLoader(url: $url, referr: $referer, descriptionPrefix: $descriptionPrefix)";
 }

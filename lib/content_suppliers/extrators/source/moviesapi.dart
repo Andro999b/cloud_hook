@@ -37,12 +37,8 @@ class MoviesapiSourceLoader implements ContentMediaItemSourceLoader {
   final iframeBaseUrl = "https://w1.moviesapi.club";
 
   static final _aesRegExp = RegExp(r"JScripts\s+=\s+'(?<aes>[^']+)'");
-  static final _sourcesConfigRegExp = RegExp(
-    r'sources:\s+(?<arr>[^\]]+\])',
-  );
-  static final _tracksConfigRegExp = RegExp(
-    r'tracks:\s+(?<arr>[^\]]+\])',
-  );
+  static final _sourcesConfigRegExp = RegExp(r'sources:\s+(?<arr>[^\]]+\])');
+  static final _tracksConfigRegExp = RegExp(r'tracks:\s+(?<arr>[^\]]+\])');
 
   final int tmdb;
   final int? episode;

@@ -41,10 +41,12 @@ class AniTubeContentDetails extends BaseContentDetails with AsyncMediaItems {
       ? RalodePlayerExtractor(ralodePlayerParams!)
       : DLEAjaxPLaylistExtractor(
           Uri.https(_siteHost, "/engine/ajax/playlists.php", {
-          "user_hash": hash,
-          "xfield": "playlist",
-          "news_id": newsId,
-        }));
+            "user_hash": hash,
+            "xfield": "playlist",
+            "news_id": newsId,
+          }),
+          "https://$_siteHost",
+        );
 }
 
 class AniTubeSupplier extends ContentSupplier

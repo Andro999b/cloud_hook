@@ -74,17 +74,20 @@ class PlaylistResults {
 class DLEAjaxPLaylistExtractor implements ContentMediaItemLoader {
   final Uri playlistUri;
   final List<String> filterHosts;
+  final String referer;
 
-  DLEAjaxPLaylistExtractor(
-    this.playlistUri, {
-    this.filterHosts = const ["ashdi", "tortuga", "moonanime", "monstro"],
-  });
+  DLEAjaxPLaylistExtractor(this.playlistUri, this.referer,
+      {this.filterHosts = const ["ashdi", "tortuga", "moonanime", "monstro"]});
 
   @override
   FutureOr<List<ContentMediaItem>> call() async {
     final url = playlistUri.toString();
 
-    final res = await dio.get(url, options: Options(headers: defaultHeaders));
+    final res = await dio.get(url,
+        options: Options(headers: {
+          ...defaultHeaders,
+          "Referer": referer,
+        }));
 
     final result = await Scrapper.scrapFragment(
       res.data["response"] as String,

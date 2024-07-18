@@ -3,8 +3,8 @@ import 'package:test/test.dart';
 
 void main() {
   test("Should generate correct vrf", () {
-    final vrf = aniwaveVRF("561");
-    expect(vrf, equals("Q0B0Wzs8Qkw="));
+    final vrf = aniwaveVRF("596");
+    expect(vrf, equals("u--S"));
   });
 
   test("Should decrypt url", () {

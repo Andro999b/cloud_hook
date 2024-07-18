@@ -8,6 +8,7 @@ import 'package:cloud_hook/app_preferences.dart';
 import 'package:cloud_hook/app_secrets.dart';
 import 'package:cloud_hook/collection/collection_screen.dart';
 import 'package:cloud_hook/content/content_details_screen.dart';
+import 'package:cloud_hook/content/manga/manga_content_screan.dart';
 import 'package:cloud_hook/content/video/video_content_screen.dart';
 import 'package:cloud_hook/home/home_screan.dart';
 import 'package:cloud_hook/layouts/navigation_data.dart';
@@ -78,6 +79,7 @@ class MainApp extends StatelessWidget {
             // initialLocation: "/collection",
             // initialLocation: "/settings",
             // initialLocation: "/content/AniWave/death-note.z02",
+            // initialLocation: "/content/Anitaku/category%2Fisekai-suicide-squad",
             // initialLocation: "/video/TMDB/movie%2F54138",
             routes: [
               GoRoute(
@@ -117,6 +119,15 @@ class MainApp extends StatelessWidget {
                 path: "/video/:supplier/:id",
                 pageBuilder: (context, state) => NoTransitionPage(
                   child: VideoContentScreen(
+                    supplier: state.pathParameters["supplier"]!,
+                    id: state.pathParameters["id"]!,
+                  ),
+                ),
+              ),
+              GoRoute(
+                path: "/manga/:supplier/:id",
+                pageBuilder: (context, state) => NoTransitionPage(
+                  child: MangaContentScrean(
                     supplier: state.pathParameters["supplier"]!,
                     id: state.pathParameters["id"]!,
                   ),

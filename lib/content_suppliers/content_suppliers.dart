@@ -1,8 +1,10 @@
 import 'dart:isolate';
 
 import 'package:cloud_hook/content_suppliers/suppliers/animeua/animeua.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/anitaku/anitaku.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/anitube/anitube.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/aniwave/aniwave.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/aniwave/anix.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/eneyida/eneyida.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/tmdb/tmdb.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/uafilms/uafilms.dart';
@@ -19,6 +21,8 @@ class ContentSuppliers {
   final List<ContentSupplier> _suppliers = [
     TmdbSupplier(),
     AniWaveSupplier(),
+    AnixSupplier(),
+    Anitaku(),
     UAKinoClubSupplier(),
     EneyidaSupplier(),
     AniTubeSupplier(),

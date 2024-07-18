@@ -103,7 +103,7 @@ mixin VidSrcToServerMixin {
     return switch (serverName.toLowerCase()) {
       "vidplay" ||
       "vidstream" ||
-      // "megaf" ||
+      "megaf" ||
       "f2cloud" =>
         await _extractVidplay(serverId, descriptionPrefix),
       "filemoon" =>

@@ -96,7 +96,8 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
 
   @override
   Future<ContentDetails?> detailsById(String id) async {
-    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html").toString());
+    var detailsUrl = Uri.https(host, "/$id.html").toString();
+    final scrapper = Scrapper(uri: detailsUrl);
 
     final result = await scrapper.scrap(Scope(
       scope: "#dle-content",
@@ -163,8 +164,9 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
       Uri.https(host, "/engine/ajax/playlists.php", {
         "news_id": newsId,
         "xfield": "playlist",
-        "time": DateTime.now().millisecond.toString()
+        "time": DateTime.now().millisecondsSinceEpoch.toString(),
       }),
+      detailsUrl,
     ).call();
 
     return details;

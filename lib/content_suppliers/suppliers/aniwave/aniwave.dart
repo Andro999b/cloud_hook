@@ -1,7 +1,7 @@
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/aniwave/aniwave_extractor.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/aniwave/aniwave_loader.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/utils.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:dio/dio.dart';
@@ -30,15 +30,13 @@ class AniWaveContentDetails extends BaseContentDetails with AsyncMediaItems {
       _$AniWaveContentDetailsFromJson(json);
 
   @override
-  ContentMediaItemLoader get mediaExtractor => AniWaveExtractor(
-        AniWaveSupplier.address,
+  ContentMediaItemLoader get mediaExtractor => AniWaveMediaItemLoader(
         AniWaveSupplier.host,
         mediaId,
       );
 }
 
 class AniWaveSupplier extends ContentSupplier {
-  static const String address = cloudWallIp;
   static const String host = "aniwave.to";
   static final _idRegExp = RegExp(r'\/watch\/(?<id>[^\/]+)');
 
@@ -53,7 +51,7 @@ class AniWaveSupplier extends ContentSupplier {
 
   @override
   Future<List<ContentInfo>> search(String query, Set<ContentType> type) async {
-    final uri = Uri.http(address, "filter", {"keyword": query});
+    final uri = Uri.https(host, "filter", {"keyword": query});
 
     final scrapper = Scrapper(uri: uri.toString(), headers: {"Host": host});
     final results = await scrapper.scrap(
@@ -78,7 +76,7 @@ class AniWaveSupplier extends ContentSupplier {
 
   @override
   Future<ContentDetails?> detailsById(String id) async {
-    final uri = Uri.http(address, "/watch/$id");
+    final uri = Uri.https(host, "/watch/$id");
 
     final scrapper = Scrapper(uri: uri.toString(), headers: {"Host": host});
     final results = await scrapper.scrap(
@@ -145,7 +143,7 @@ class AniWaveSupplier extends ContentSupplier {
       return [];
     }
 
-    final uri = Uri.http(cloudWallIp, path, {
+    final uri = Uri.https(host, path, {
       "page": page.toString(),
     });
 

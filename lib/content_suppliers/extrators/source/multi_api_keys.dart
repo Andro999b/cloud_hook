@@ -19,8 +19,7 @@ class ApiKeys {
 }
 
 class MultiApiKeys {
-  static const url =
-      "https://raw.githubusercontent.com/rushi-chavan/multi-keys/keys/keys.json";
+  static const url = "https://rowdy-avocado.github.io/multi-keys/";
 
   static const refreshInterval = Duration(seconds: 3600);
   static DateTime? _lastRefresh;

@@ -46,14 +46,16 @@ class FileMoonSourceLoader implements ContentMediaItemSourceLoader {
 
     return [
       SimpleContentMediaItemSource(
-        description: "${despriptionPrefix}Filemoon",
-        link: parseUri(file),
-      )
+          description: "${despriptionPrefix}Filemoon",
+          link: parseUri(file),
+          headers: {
+            "Referer": referer,
+          })
     ];
   }
 
   @override
   String toString() {
-    return "FileMoonSourceLoader(url: $url, referer: $referer)";
+    return "FileMoonSourceLoader(url: $url, referer: $referer, despriptionPrefix: $despriptionPrefix)";
   }
 }
