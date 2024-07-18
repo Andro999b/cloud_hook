@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 final dio = Dio(BaseOptions(
   connectTimeout: const Duration(seconds: 30),
 ));
+// ..interceptors.add(LogInterceptor(responseBody: false));
 
 // todo: add sentry integration
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_hook/content_suppliers/extrators/jwplayer/jwplayer.dart';
+import 'package:cloud_hook/content_suppliers/extrators/source/doodstream.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/mp4upload.dart';
 import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
@@ -97,6 +98,10 @@ class AnitakuSourceLoader implements ContentMediaItemSourceLoader {
     String referer,
   ) {
     return switch (name.toLowerCase()) {
+      "doodstream" => DoodStreamSourceLoader(
+          url: video,
+          referer: referer,
+        ),
       "streamwish" => JWPlayerSingleFileSourceLoader(
           url: video,
           referer: referer,
