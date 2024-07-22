@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_hook/app_secrets.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/moviesapi.dart';
+import 'package:cloud_hook/content_suppliers/extrators/source/multiembed.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/two_embed.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/vidsrcto.dart';
 import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
@@ -42,8 +43,7 @@ class TmdbContentInfo implements ContentInfo {
       id: "$type/${json["id"]}",
       title: title,
       secondaryTitle: title != originalTitle ? originalTitle : null,
-      image:
-          json["poster_path"] != null ? _posterImage(json["poster_path"]) : "",
+      image: json["poster_path"] != null ? _posterImage(json["poster_path"]) : "",
     );
   }
 }
@@ -96,32 +96,21 @@ class TmdbContentDetails implements ContentDetails {
       id: id,
       title: title,
       originalTitle: originalTitle,
-      image: json["poster_path"] != null
-          ? _originalPosterImage(json["poster_path"])
-          : "",
+      image: json["poster_path"] != null ? _originalPosterImage(json["poster_path"]) : "",
       description: json["overview"],
       additionalInfo: [
         json["vote_average"].toString(),
-        if (json["created_by"] != null)
-          "Created by: ${json["created_by"].map((e) => e["name"]).join(", ")}",
-        if (json["release_date"] != null)
-          "Realise date: ${json["release_date"]}",
-        if (json["first_air_date"] != null)
-          "First air date: ${json["first_air_date"]}",
-        if (json["last_air_date"] != null)
-          "Last air date: ${json["last_air_date"]}",
-        if (json["next_air_date"] != null)
-          "Next air date: ${json["next_air_date"]}",
-        if (json["genres"] != null)
-          "Genres: ${json["genres"].map((e) => e["name"]).join(", ")}",
+        if (json["created_by"] != null) "Created by: ${json["created_by"].map((e) => e["name"]).join(", ")}",
+        if (json["release_date"] != null) "Realise date: ${json["release_date"]}",
+        if (json["first_air_date"] != null) "First air date: ${json["first_air_date"]}",
+        if (json["last_air_date"] != null) "Last air date: ${json["last_air_date"]}",
+        if (json["next_air_date"] != null) "Next air date: ${json["next_air_date"]}",
+        if (json["genres"] != null) "Genres: ${json["genres"].map((e) => e["name"]).join(", ")}",
         if (json["production_countries"] != null)
           "Country: ${json["production_countries"].map((e) => e["name"]).join(", ")}",
-        if (json["credits"]?["cast"] != null)
-          "Cast: ${json["credits"]["cast"].map((e) => e["name"]).join(", ")}",
+        if (json["credits"]?["cast"] != null) "Cast: ${json["credits"]["cast"].map((e) => e["name"]).join(", ")}",
       ],
-      similar: recommendations != null
-          ? _TmdbSearchResponse.fromJson(recommendations).results
-          : [],
+      similar: recommendations != null ? _TmdbSearchResponse.fromJson(recommendations).results : [],
       mediaItems: mediaItems,
     );
   }
@@ -145,10 +134,7 @@ class TmdbSupplier extends ContentSupplier {
 
   final Dio dio;
 
-  TmdbSupplier()
-      : dio = Dio()
-          ..options.headers["Authorization"] =
-              "Bearer ${AppSecrets.getString("tmdb")}"
+  TmdbSupplier() : dio = Dio()..options.headers["Authorization"] = "Bearer ${AppSecrets.getString("tmdb")}"
   // ..interceptors.add(LogInterceptor(
   //   requestBody: true,
   //   responseBody: true,
@@ -168,8 +154,7 @@ class TmdbSupplier extends ContentSupplier {
       };
 
   @override
-  Set<ContentLanguage> get supportedLanguages =>
-      const {ContentLanguage.english};
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.english};
 
   @override
   Future<ContentDetails> detailsById(String id) async {
@@ -194,8 +179,7 @@ class TmdbSupplier extends ContentSupplier {
       final episodes = await Stream.fromIterable(seasons)
           .where((s) => s["season_number"] != 0)
           .asyncMap((s) async {
-            var seasonUri =
-                Uri.https(api, "/3/$id/season/${s["season_number"]}");
+            var seasonUri = Uri.https(api, "/3/$id/season/${s["season_number"]}");
             final seasonRes = await dio.get(seasonUri.toString());
             final season = _TmdbSeason.fromJson(seasonRes.data);
 
@@ -213,8 +197,7 @@ class TmdbSupplier extends ContentSupplier {
                 seasonName: "Season ${ep.seasonNumber}",
                 episode: ep.episodeNumber,
                 episodeName: "${ep.episodeNumber}. ${ep.name}",
-                episodePoster:
-                    ep.stillPath != null ? _posterImage(ep.stillPath!) : null,
+                episodePoster: ep.stillPath != null ? _posterImage(ep.stillPath!) : null,
               ))
           .toList();
     }
@@ -239,6 +222,7 @@ class TmdbSupplier extends ContentSupplier {
       image: episodePoster,
       sourcesLoader: AggSourceLoader([
         MoviesapiSourceLoader(tmdb: tmdb, season: season, episode: episode),
+        MultiembedSourceLoader(tmdb: tmdb, season: season, episode: episode),
         if (imdb != null) ...[
           VidSrcToSourceLoader(imdb: imdb, season: season, episode: episode),
           TwoEmbedSourceLoader(imdb: imdb, season: season, episode: episode),
@@ -315,8 +299,7 @@ class _TmdbSearchResponse {
 
   _TmdbSearchResponse({required this.results});
 
-  factory _TmdbSearchResponse.fromJson(Map<String, dynamic> json) =>
-      _$TmdbSearchResponseFromJson(json);
+  factory _TmdbSearchResponse.fromJson(Map<String, dynamic> json) => _$TmdbSearchResponseFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -325,8 +308,7 @@ class _TmdbSeason {
 
   _TmdbSeason(this.episodes);
 
-  factory _TmdbSeason.fromJson(Map<String, dynamic> json) =>
-      _$TmdbSeasonFromJson(json);
+  factory _TmdbSeason.fromJson(Map<String, dynamic> json) => _$TmdbSeasonFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -346,6 +328,5 @@ class _TmdbEpisode {
     this.stillPath,
   });
 
-  factory _TmdbEpisode.fromJson(Map<String, dynamic> json) =>
-      _$TmdbEpisodeFromJson(json);
+  factory _TmdbEpisode.fromJson(Map<String, dynamic> json) => _$TmdbEpisodeFromJson(json);
 }

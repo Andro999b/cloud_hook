@@ -1,6 +1,7 @@
 import 'package:cloud_hook/content_suppliers/extrators/source/filemoon.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/mp4upload.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/vidplay.dart';
+import 'package:cloud_hook/content_suppliers/extrators/source/vidsrcto_api_keys.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
@@ -9,10 +10,7 @@ import 'package:cloud_hook/utils/logger.dart';
 import 'package:dio/dio.dart';
 import 'package:simple_rc4/simple_rc4.dart';
 
-class VidSrcToSourceLoader
-    with VidSrcToServerMixin
-    implements ContentMediaItemSourceLoader {
-  final rc4key = "WXrUARXb1aDLaZjI";
+class VidSrcToSourceLoader with VidSrcToServerMixin implements ContentMediaItemSourceLoader {
   final host = "vidsrc.to";
   final String imdb;
   final int? episode;
@@ -35,8 +33,10 @@ class VidSrcToSourceLoader
       url = "$baseUrl/embed/tv/$imdb/$season/$episode";
     }
 
-    final mediaId = await Scrapper(uri: url, headers: {"Host": host})
-        .scrap(Attribute.forScope("ul.episodes li a", "data-id"));
+    final keys = await VidsrcToApiKeys.fetch();
+
+    final mediaId =
+        await Scrapper(uri: url, headers: {...defaultHeaders}).scrap(Attribute.forScope("ul.episodes li a", "data-id"));
 
     if (mediaId == null) {
       logger.w("[vidsrc.to] mediaId not found");
@@ -44,9 +44,9 @@ class VidSrcToSourceLoader
     }
 
     final sourcesRes = await dio.get(
-      "$baseUrl/ajax/embed/episode/$mediaId/sources",
+      "$baseUrl/ajax/embed/episode/$mediaId/sources?token=${_encryptToken(mediaId, keys)}",
       options: Options(
-        headers: {...defaultHeaders, "Host": host},
+        headers: {...defaultHeaders},
       ),
     );
 
@@ -70,7 +70,9 @@ class VidSrcToSourceLoader
 
   @override
   Future<String?> loadSource(String id) async {
-    final sourceRes = await dio.get("$baseUrl/ajax/embed/source/$id",
+    final keys = await VidsrcToApiKeys.fetch();
+
+    final sourceRes = await dio.get("$baseUrl/ajax/embed/source/$id?token=${_encryptToken(id, keys)}",
         options: Options(
           headers: {
             ...defaultHeaders,
@@ -84,33 +86,40 @@ class VidSrcToSourceLoader
       return null;
     }
 
-    final rc4 = RC4(rc4key);
-    return Uri.decodeComponent(rc4.decodeString(encUrl, true, false));
+    final rc4 = RC4(keys.decrypt[0]);
+    return Uri.decodeComponent(rc4.decodeString(encUrl));
   }
 
   @override
   String toString() {
     return "VidSrcToSourceLoader(imdb: $imdb, episode: $episode, season: $season)";
   }
+
+  String _encryptToken(String id, ApiKeys keys) {
+    final chipher = RC4(keys.encrypt[0]);
+
+    final encoded = chipher.encodeString(id);
+
+    return encoded.replaceAll("/", "_");
+  }
 }
 
 mixin VidSrcToServerMixin {
   Future<String?> loadSource(String id);
 
-  Future<List<ContentMediaItemSource>> extractServer(
-      String serverName, String serverId, String referer,
+  Future<List<ContentMediaItemSource>> extractServer(String serverName, String serverId, String referer,
       {String descriptionPrefix = ""}) async {
-    return switch (serverName.toLowerCase()) {
-      "vidplay" ||
-      "vidstream" ||
-      "megaf" ||
-      "f2cloud" =>
-        await _extractVidplay(serverId, descriptionPrefix),
-      "filemoon" =>
-        await _extractFilemoon(serverId, referer, descriptionPrefix),
-      "mp4upload" => await _extractMp4upload(serverId, descriptionPrefix),
-      _ => <ContentMediaItemSource>[]
-    };
+    try {
+      return switch (serverName.toLowerCase()) {
+        "vidplay" || "vidstream" || "megaf" || "f2cloud" => await _extractVidplay(serverId, descriptionPrefix),
+        "filemoon" => await _extractFilemoon(serverId, referer, descriptionPrefix),
+        "mp4upload" => await _extractMp4upload(serverId, descriptionPrefix),
+        _ => <ContentMediaItemSource>[]
+      };
+    } catch (error, stackTrace) {
+      logger.w("[vidsrcto] server $serverName failed. Error: $error", stackTrace: stackTrace);
+      return <ContentMediaItemSource>[];
+    }
   }
 
   Future<List<ContentMediaItemSource>> _extractVidplay(

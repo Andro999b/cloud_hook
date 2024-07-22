@@ -8,8 +8,7 @@ part 'animeua.g.dart';
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
-class AnimeUAContentDetails extends BaseContentDetails
-    with PLayerJSIframe, AsyncMediaItems {
+class AnimeUAContentDetails extends BaseContentDetails with PLayerJSIframe, AsyncMediaItems {
   @override
   final String iframe;
 
@@ -25,12 +24,10 @@ class AnimeUAContentDetails extends BaseContentDetails
     required this.iframe,
   });
 
-  factory AnimeUAContentDetails.fromJson(Map<String, dynamic> json) =>
-      _$AnimeUAContentDetailsFromJson(json);
+  factory AnimeUAContentDetails.fromJson(Map<String, dynamic> json) => _$AnimeUAContentDetailsFromJson(json);
 }
 
-class AnimeUASupplier extends ContentSupplier
-    with DLEChannelsLoader, DLESearch {
+class AnimeUASupplier extends ContentSupplier with PageableChannelsLoader, DLEChannelsLoader, DLESearch {
   @override
   final String host = "animeua.club";
 
@@ -41,8 +38,7 @@ class AnimeUASupplier extends ContentSupplier
   Set<ContentType> get supportedTypes => const {ContentType.anime};
 
   @override
-  Set<ContentLanguage> get supportedLanguages =>
-      const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.ukrainian};
 
   @override
   late final contentInfoSelector = Iterate(
@@ -71,15 +67,12 @@ class AnimeUASupplier extends ContentSupplier
           "id": Const(id),
           "supplier": Const(name),
           "title": TextSelector.forScope(".page__subcol-main > h1"),
-          "originalTitle": TextSelector.forScope(
-              ".page__subcol-main > .pmovie__original-title"),
-          "image": Image.forScope(
-              ".pmovie__poster > img", attribute: "data-src", host),
+          "originalTitle": TextSelector.forScope(".page__subcol-main > .pmovie__original-title"),
+          "image": Image.forScope(".pmovie__poster > img", attribute: "data-src", host),
           "description": TextSelector.forScope(".page__text"),
           "additionalInfo": Flatten([
             Join([
-              TextSelector.forScope(
-                  ".page__subcol-main .pmovie__subrating--site"),
+              TextSelector.forScope(".page__subcol-main .pmovie__subrating--site"),
               TextSelector.forScope(".page__subcol-main > .pmovie__year"),
               TextSelector.forScope(".page__subcol-main > .pmovie__genres"),
             ]),
@@ -88,8 +81,7 @@ class AnimeUASupplier extends ContentSupplier
               item: TextSelector(inline: true),
             )
           ]),
-          "similar":
-              Scope(scope: ".pmovie__related", item: contentInfoSelector),
+          "similar": Scope(scope: ".pmovie__related", item: contentInfoSelector),
           "iframe": Attribute.forScope(
             ".pmovie__player .video-inside iframe",
             "data-src",

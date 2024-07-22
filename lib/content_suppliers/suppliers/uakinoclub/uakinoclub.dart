@@ -23,8 +23,7 @@ class UAKinoContentDetails extends BaseContentDetails {
     required super.similar,
   });
 
-  factory UAKinoContentDetails.fromJson(Map<String, dynamic> json) =>
-      _$UAKinoContentDetailsFromJson(json);
+  factory UAKinoContentDetails.fromJson(Map<String, dynamic> json) => _$UAKinoContentDetailsFromJson(json);
 
   // ignore: prefer_final_fields
   Iterable<ContentMediaItem> _mediaItems = const [];
@@ -36,9 +35,9 @@ class UAKinoContentDetails extends BaseContentDetails {
   MediaType get mediaType => MediaType.video;
 }
 
-class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
+class UAKinoClubSupplier extends ContentSupplier with PageableChannelsLoader, DLEChannelsLoader {
   @override
-  final host = "uakino.club";
+  final host = "uakino.me";
 
   @override
   String get name => "UAKinoClub";
@@ -52,8 +51,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
       };
 
   @override
-  Set<ContentLanguage> get supportedLanguages =>
-      const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.ukrainian};
 
   @override
   late final contentInfoSelector = Iterate(
@@ -70,8 +68,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
   );
 
   @override
-  Future<List<ContentSearchResult>> search(
-      String query, Set<ContentType> type) async {
+  Future<List<ContentSearchResult>> search(String query, Set<ContentType> type) async {
     final uri = Uri.https(host, "/index.php");
     final scrapper = Scrapper(
       uri: uri.toString(),
@@ -89,8 +86,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
 
     return results
         .map(ContentSearchResult.fromJson)
-        .whereNot(
-            (e) => e.id.startsWith("news") || e.id.startsWith("franchise"))
+        .whereNot((e) => e.id.startsWith("news") || e.id.startsWith("franchise"))
         .toList();
   }
 
@@ -113,10 +109,7 @@ class UAKinoClubSupplier extends ContentSupplier with DLEChannelsLoader {
             Iterate(
               itemScope: ".film-info > *",
               item: Concat.selectors(
-                [
-                  TextSelector.forScope(".fi-label"),
-                  TextSelector.forScope(".fi-desc")
-                ],
+                [TextSelector.forScope(".fi-label"), TextSelector.forScope(".fi-desc")],
                 separator: " ",
               ),
             ),

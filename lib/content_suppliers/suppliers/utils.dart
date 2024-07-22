@@ -13,8 +13,7 @@ mixin PLayerJSIframe {
     includeFromJson: false,
     includeToJson: false,
   )
-  ContentMediaItemLoader get mediaExtractor =>
-      PlayerJSExtractor(iframe, DubSeasonEpisodeConvertStrategy());
+  ContentMediaItemLoader get mediaExtractor => PlayerJSExtractor(iframe, DubSeasonEpisodeConvertStrategy());
 }
 
 mixin AsyncMediaItems on ContentDetails {
@@ -41,7 +40,15 @@ mixin AsyncMediaItems on ContentDetails {
   }
 }
 
-mixin DLEChannelsLoader on ContentSupplier {
+mixin DLEChannelsLoader on PageableChannelsLoader {
+  @override
+  String nextChannelPage(String path, int page) => path + page.toString();
+
+  @override
+  bool isChannelPageable(String path) => path.endsWith("/page/");
+}
+
+mixin PageableChannelsLoader on ContentSupplier {
   String get host;
   Selector<List<Map<String, dynamic>>> get contentInfoSelector;
   Map<String, String> get channelsPath;
@@ -58,8 +65,8 @@ mixin DLEChannelsLoader on ContentSupplier {
     }
 
     var tragetPath = path;
-    if (path.endsWith("/page/")) {
-      tragetPath += page.toString();
+    if (isChannelPageable(path)) {
+      tragetPath = nextChannelPage(path, page);
     } else if (page > 1) {
       return [];
     }
@@ -69,6 +76,10 @@ mixin DLEChannelsLoader on ContentSupplier {
 
     return results.map(ContentSearchResult.fromJson).toList();
   }
+
+  String nextChannelPage(String path, int page);
+
+  bool isChannelPageable(String path);
 }
 
 mixin DLESearch on ContentSupplier {

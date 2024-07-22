@@ -54,7 +54,7 @@ class _RecomendationChannel extends HookConsumerWidget {
     final provider = recomendationChannelProvider(supplierName, channel);
     final state = ref.watch(provider).valueOrNull;
 
-    if (state == null) {
+    if (state == null || state.recomendations.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -63,8 +63,7 @@ class _RecomendationChannel extends HookConsumerWidget {
     useEffect(() {
       void onScroll() {
         var position = scrollController.position;
-        if (position.pixels >=
-            scrollController.position.maxScrollExtent - 200) {
+        if (position.pixels >= scrollController.position.maxScrollExtent - 200) {
           ref.read(provider.notifier).loadNext();
         }
       }

@@ -33,8 +33,7 @@ class AniTubeContentDetails extends BaseContentDetails with AsyncMediaItems {
     this.ralodePlayerParams,
   });
 
-  factory AniTubeContentDetails.fromJson(Map<String, dynamic> json) =>
-      _$AniTubeContentDetailsFromJson(json);
+  factory AniTubeContentDetails.fromJson(Map<String, dynamic> json) => _$AniTubeContentDetailsFromJson(json);
 
   @override
   ContentMediaItemLoader get mediaExtractor => ralodePlayerParams != null
@@ -49,8 +48,7 @@ class AniTubeContentDetails extends BaseContentDetails with AsyncMediaItems {
         );
 }
 
-class AniTubeSupplier extends ContentSupplier
-    with DLESearch, DLEChannelsLoader {
+class AniTubeSupplier extends ContentSupplier with PageableChannelsLoader, DLESearch, DLEChannelsLoader {
   static final _additionaInfoSectionsPatterns = [
     RegExp(r"Рік виходу аніме:\s+.*"),
     RegExp(r"Жанр:\s+.*"),
@@ -59,10 +57,8 @@ class AniTubeSupplier extends ContentSupplier
   ];
 
   static final _originaTitlePattern = RegExp(r"Оригінальна назва:\s+.*");
-  static final _dleLoginHashPattern =
-      RegExp(r"dle_login_hash\s+=\s+'(?<hash>[a-z0-9]+)'");
-  static final _ralodePlayerPattern =
-      RegExp(r"RalodePlayer\.init\((?<params>.*)\);");
+  static final _dleLoginHashPattern = RegExp(r"dle_login_hash\s+=\s+'(?<hash>[a-z0-9]+)'");
+  static final _ralodePlayerPattern = RegExp(r"RalodePlayer\.init\((?<params>.*)\);");
 
   @override
   final host = _siteHost;
@@ -141,20 +137,15 @@ class AniTubeSupplier extends ContentSupplier
       }
 
       result["additionalInfo"] = additionalInfo;
-      result["originaTitle"] =
-          _originaTitlePattern.firstMatch(htmlMess)?.group(0);
+      result["originaTitle"] = _originaTitlePattern.firstMatch(htmlMess)?.group(0);
     }
 
-    final ralodePlayerParams = _ralodePlayerPattern
-        .firstMatch(scrapper.pageContent)
-        ?.namedGroup("params");
+    final ralodePlayerParams = _ralodePlayerPattern.firstMatch(scrapper.pageContent)?.namedGroup("params");
 
     result["ralodePlayerParams"] = ralodePlayerParams;
 
     if (ralodePlayerParams == null) {
-      result["hash"] = _dleLoginHashPattern
-          .firstMatch(scrapper.pageContent)
-          ?.namedGroup("hash");
+      result["hash"] = _dleLoginHashPattern.firstMatch(scrapper.pageContent)?.namedGroup("hash");
     }
 
     result["newsId"] = id.split("-").first;

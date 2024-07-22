@@ -28,13 +28,12 @@ class _CryptoJSParams {
     required this.s,
   });
 
-  factory _CryptoJSParams.fromJson(Map<String, dynamic> json) =>
-      _$CryptoJSParamsFromJson(json);
+  factory _CryptoJSParams.fromJson(Map<String, dynamic> json) => _$CryptoJSParamsFromJson(json);
 }
 
 class MoviesapiSourceLoader implements ContentMediaItemSourceLoader {
-  final baseUrl = "https://moviesapi.club";
-  final iframeBaseUrl = "https://w1.moviesapi.club";
+  static const baseUrl = "https://moviesapi.club";
+  static const iframeBaseUrl = "https://w1.moviesapi.club";
 
   static final _aesRegExp = RegExp(r"JScripts\s+=\s+'(?<aes>[^']+)'");
   static final _sourcesConfigRegExp = RegExp(r'sources:\s+(?<arr>[^\]]+\])');
@@ -60,8 +59,7 @@ class MoviesapiSourceLoader implements ContentMediaItemSourceLoader {
       url = "$baseUrl/tv/$tmdb-$season-$episode";
     }
 
-    final iframe =
-        await Scrapper(uri: url, headers: {"Referer": baseUrl}).scrap(
+    final iframe = await Scrapper(uri: url, headers: {"Referer": baseUrl}).scrap(
       Attribute.forScope("#frame2", "src"),
     );
 
@@ -113,8 +111,7 @@ class MoviesapiSourceLoader implements ContentMediaItemSourceLoader {
       padding: "PKCS7",
     ));
 
-    final script =
-        json.decode(encrypter.decrypt64(cryptoParams.ct, iv: encrypt.IV(iv)));
+    final script = json.decode(encrypter.decrypt64(cryptoParams.ct, iv: encrypt.IV(iv)));
 
     final sources = _sourcesConfigRegExp.firstMatch(script)?.namedGroup("arr");
     final tracks = _tracksConfigRegExp.firstMatch(script)?.namedGroup("arr");

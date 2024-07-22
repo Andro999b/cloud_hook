@@ -24,14 +24,13 @@ class UFDubContentDetails extends BaseContentDetails with AsyncMediaItems {
 
   final String iframe;
 
-  factory UFDubContentDetails.fromJson(Map<String, dynamic> json) =>
-      _$UFDubContentDetailsFromJson(json);
+  factory UFDubContentDetails.fromJson(Map<String, dynamic> json) => _$UFDubContentDetailsFromJson(json);
 
   @override
   ContentMediaItemLoader get mediaExtractor => UFDubMediaExtractor(iframe);
 }
 
-class UFDubSupplier extends ContentSupplier with DLEChannelsLoader, DLESearch {
+class UFDubSupplier extends ContentSupplier with PageableChannelsLoader, DLEChannelsLoader, DLESearch {
   @override
   final String host = "ufdub.com";
 
@@ -42,8 +41,7 @@ class UFDubSupplier extends ContentSupplier with DLEChannelsLoader, DLESearch {
   Set<ContentType> get supportedTypes => const {ContentType.anime};
 
   @override
-  Set<ContentLanguage> get supportedLanguages =>
-      const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.ukrainian};
 
   @override
   late final contentInfoSelector = Iterate(
@@ -68,8 +66,7 @@ class UFDubSupplier extends ContentSupplier with DLEChannelsLoader, DLESearch {
           "id": Const(id),
           "supplier": Const(name),
           "title": TextNode.forScope("article .full-title > h1"),
-          "originalTitle":
-              TextSelector.forScope("article > .full-title > h1 > .short-t-or"),
+          "originalTitle": TextSelector.forScope("article > .full-title > h1 > .short-t-or"),
           "image": Image.forScope(
             "article > .full-desc > .full-text > .full-poster img",
             host,
@@ -84,8 +81,7 @@ class UFDubSupplier extends ContentSupplier with DLEChannelsLoader, DLESearch {
               item: TextSelector(inline: true),
             ),
             Iterate(
-              itemScope:
-                  "article > .full-desc > .full-text > .full-poster .voices",
+              itemScope: "article > .full-desc > .full-text > .full-poster .voices",
               item: TextSelector(inline: true),
             ),
           ]),

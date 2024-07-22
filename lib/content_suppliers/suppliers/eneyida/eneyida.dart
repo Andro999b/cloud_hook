@@ -8,8 +8,7 @@ part 'eneyida.g.dart';
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
-class EneyidaContentDetails extends BaseContentDetails
-    with PLayerJSIframe, AsyncMediaItems {
+class EneyidaContentDetails extends BaseContentDetails with PLayerJSIframe, AsyncMediaItems {
   EneyidaContentDetails({
     required super.id,
     required super.supplier,
@@ -25,12 +24,10 @@ class EneyidaContentDetails extends BaseContentDetails
   @override
   final String iframe;
 
-  factory EneyidaContentDetails.fromJson(Map<String, dynamic> json) =>
-      _$EneyidaContentDetailsFromJson(json);
+  factory EneyidaContentDetails.fromJson(Map<String, dynamic> json) => _$EneyidaContentDetailsFromJson(json);
 }
 
-class EneyidaSupplier extends ContentSupplier
-    with DLEChannelsLoader, DLESearch {
+class EneyidaSupplier extends ContentSupplier with PageableChannelsLoader, DLEChannelsLoader, DLESearch {
   @override
   final String host = "eneyida.tv";
 
@@ -46,8 +43,7 @@ class EneyidaSupplier extends ContentSupplier
       };
 
   @override
-  Set<ContentLanguage> get supportedLanguages =>
-      const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.ukrainian};
 
   late final _contentInfoFieldSelector = SelectorsToMap({
     "supplier": Const(name),
@@ -78,14 +74,11 @@ class EneyidaSupplier extends ContentSupplier
           "id": Const(id),
           "supplier": Const(name),
           "title": TextSelector.forScope("#full_header-title > h1"),
-          "originalTitle": TextSelector.forScope(
-              "#full_header-title > .full_header-subtitle"),
+          "originalTitle": TextSelector.forScope("#full_header-title > .full_header-subtitle"),
           "image": Image.forScope(".full_content-poster > img", host),
           "description": TextSelector.forScope("#full_content-desc > p"),
           "additionalInfo": Flatten([
-            Join([
-              TextSelector.forScope(".full_rating > .db_rates > .r_imdb > span")
-            ]),
+            Join([TextSelector.forScope(".full_rating > .db_rates > .r_imdb > span")]),
             Filter(
               Iterate(
                 itemScope: "#full_info li",

@@ -8,8 +8,7 @@ part 'uafilms.g.dart';
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
-class UAFilmsContentDetails extends BaseContentDetails
-    with PLayerJSIframe, AsyncMediaItems {
+class UAFilmsContentDetails extends BaseContentDetails with PLayerJSIframe, AsyncMediaItems {
   UAFilmsContentDetails({
     required super.id,
     required super.supplier,
@@ -25,11 +24,10 @@ class UAFilmsContentDetails extends BaseContentDetails
   @override
   final String iframe;
 
-  factory UAFilmsContentDetails.fromJson(Map<String, dynamic> json) =>
-      _$UAFilmsContentDetailsFromJson(json);
+  factory UAFilmsContentDetails.fromJson(Map<String, dynamic> json) => _$UAFilmsContentDetailsFromJson(json);
 }
 
-class UAFilmsSupplier extends ContentSupplier with DLEChannelsLoader {
+class UAFilmsSupplier extends ContentSupplier with PageableChannelsLoader, DLEChannelsLoader {
   @override
   final String host = "uafilm.pro";
 
@@ -45,8 +43,7 @@ class UAFilmsSupplier extends ContentSupplier with DLEChannelsLoader {
       };
 
   @override
-  Set<ContentLanguage> get supportedLanguages =>
-      const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.ukrainian};
 
   @override
   late final contentInfoSelector = Iterate(
@@ -113,8 +110,7 @@ class UAFilmsSupplier extends ContentSupplier with DLEChannelsLoader {
           "id": Const(id),
           "supplier": Const(name),
           "title": TextSelector.forScope("h1[itemprop='name']"),
-          "originalTitle":
-              TextSelector.forScope("span[itemprop='alternativeHeadline']"),
+          "originalTitle": TextSelector.forScope("span[itemprop='alternativeHeadline']"),
           "image": Image.forScope(".m-img>img", host),
           "description": TextNode.forScope(".m-desc"),
           "additionalInfo": Flatten([
@@ -122,10 +118,7 @@ class UAFilmsSupplier extends ContentSupplier with DLEChannelsLoader {
             Iterate(
               itemScope: ".m-desc>.m-info>.m-info>.mi-item",
               item: Concat.selectors(
-                [
-                  TextSelector.forScope(".mi-label-desc"),
-                  TextSelector.forScope(".mi-desc")
-                ],
+                [TextSelector.forScope(".mi-label-desc"), TextSelector.forScope(".mi-desc")],
               ),
             )
           ]),

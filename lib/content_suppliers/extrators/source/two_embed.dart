@@ -34,8 +34,7 @@ class TwoEmbedSourceLoader implements ContentMediaItemSourceLoader {
 
     final scrapper = Scrapper(uri: uri);
 
-    final iframe = await scrapper
-        .scrap(Attribute.forScope("iframe#iframesrc", "data-src"));
+    final iframe = await scrapper.scrap(Attribute.forScope("iframe#iframesrc", "data-src"));
 
     if (iframe == null) {
       logger.w("[2embed] iframe not found");

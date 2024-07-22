@@ -10,7 +10,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'playerjs.g.dart';
 
-final _fileRegExp = RegExp("file:\\s?['\"](?<file>.+)['\"]");
+final playerJSFileRegExp = RegExp("file:\\s?['\"](?<file>.+)['\"]");
 
 @JsonSerializable()
 class PlayerJSFile {
@@ -28,8 +28,7 @@ class PlayerJSFile {
     required this.subtitle,
   });
 
-  factory PlayerJSFile.fromJson(Map<String, dynamic> json) =>
-      _$PlayerJSFileFromJson(json);
+  factory PlayerJSFile.fromJson(Map<String, dynamic> json) => _$PlayerJSFileFromJson(json);
 
   Map<String, dynamic> toJson() => _$PlayerJSFileToJson(this);
 }
@@ -54,8 +53,7 @@ abstract class PlaylistConvertStrategy<R> {
 
 typedef SeasonEpisodeId = Comparable Function(String season, String eposode);
 
-class DubSeasonEpisodeConvertStrategy
-    extends PlaylistConvertStrategy<ContentMediaItem> {
+class DubSeasonEpisodeConvertStrategy extends PlaylistConvertStrategy<ContentMediaItem> {
   static final RegExp digitRegExp = RegExp(r'\d+');
   static Comparable defaultSeasonEpisodeId(String season, String episode) {
     return extractDigits(season) * 10000 + extractDigits(episode);
@@ -65,8 +63,7 @@ class DubSeasonEpisodeConvertStrategy
   final subtitleRegExp = RegExp(r"^\[(?<label>[^\]]+)\](?<url>.*)");
 
   DubSeasonEpisodeConvertStrategy({
-    this.seasonEpisodeId =
-        DubSeasonEpisodeConvertStrategy.defaultSeasonEpisodeId,
+    this.seasonEpisodeId = DubSeasonEpisodeConvertStrategy.defaultSeasonEpisodeId,
   });
 
   @override
@@ -130,8 +127,7 @@ class DubSeasonEpisodeConvertStrategy
   }
 }
 
-class DubConvertStrategy
-    extends PlaylistConvertStrategy<ContentMediaItemSource> {
+class DubConvertStrategy extends PlaylistConvertStrategy<ContentMediaItemSource> {
   @override
   List<ContentMediaItemSource> convertPlayerJsFiles(
     Iterable<PlayerJSFile> playlist,
@@ -157,8 +153,7 @@ class DubConvertStrategy
   }
 }
 
-class SimpleUrlConvertStrategy
-    extends PlaylistConvertStrategy<ContentMediaItemSource> {
+class SimpleUrlConvertStrategy extends PlaylistConvertStrategy<ContentMediaItemSource> {
   final String prefix;
 
   SimpleUrlConvertStrategy({this.prefix = ""});
@@ -167,10 +162,7 @@ class SimpleUrlConvertStrategy
   List<ContentMediaItemSource> convertPlayerJsFiles(
     Iterable<PlayerJSFile> playlist,
   ) {
-    return playlist
-        .expand((file) =>
-            convertSingleFile(file.file!) + convertSubtitle(file.subtitle))
-        .toList();
+    return playlist.expand((file) => convertSingleFile(file.file!) + convertSubtitle(file.subtitle)).toList();
   }
 
   @override
@@ -251,7 +243,7 @@ class PlayerJSScrapper {
           if (referer != null) "Referer": referer!,
         }));
 
-    final match = _fileRegExp.firstMatch(response.data);
+    final match = playerJSFileRegExp.firstMatch(response.data);
     final fileEncodedJson = match?.namedGroup("file");
 
     if (fileEncodedJson == null) {
@@ -287,8 +279,7 @@ class PlayerJSSourceLoader implements ContentMediaItemSourceLoader {
 
   @override
   Future<List<ContentMediaItemSource>> call() {
-    return PlayerJSScrapper(uri: parseUri(iframe))
-        .scrapSources(convertStrategy);
+    return PlayerJSScrapper(uri: parseUri(iframe)).scrapSources(convertStrategy);
   }
 
   @override
