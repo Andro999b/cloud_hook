@@ -100,18 +100,11 @@ class MoviesapiSourceLoader implements ContentMediaItemSourceLoader {
       return [];
     }
 
-    final (key, iv) = deriveKeyAndIV(
-      utf8.encode(apiKeys.chillx!.first),
-      hexToBytes(cryptoParams.s),
-    );
-
-    final encrypter = encrypt.Encrypter(encrypt.AES(
-      encrypt.Key(key),
-      mode: encrypt.AESMode.cbc,
-      padding: "PKCS7",
+    final script = json.decode(cryptoJSDecrypt(
+      apiKeys.chillx!.first,
+      cryptoParams.s,
+      cryptoParams.ct,
     ));
-
-    final script = json.decode(encrypter.decrypt64(cryptoParams.ct, iv: encrypt.IV(iv)));
 
     final sources = _sourcesConfigRegExp.firstMatch(script)?.namedGroup("arr");
     final tracks = _tracksConfigRegExp.firstMatch(script)?.namedGroup("arr");
