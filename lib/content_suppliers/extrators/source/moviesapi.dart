@@ -4,14 +4,12 @@ import 'dart:convert';
 import 'package:cloud_hook/content_suppliers/extrators/cryptojs.dart';
 import 'package:cloud_hook/content_suppliers/extrators/jwplayer/jwplayer.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/multi_api_keys.dart';
-import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:dio/dio.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:json_annotation/json_annotation.dart';
 
 part 'moviesapi.g.dart';
@@ -28,7 +26,8 @@ class _CryptoJSParams {
     required this.s,
   });
 
-  factory _CryptoJSParams.fromJson(Map<String, dynamic> json) => _$CryptoJSParamsFromJson(json);
+  factory _CryptoJSParams.fromJson(Map<String, dynamic> json) =>
+      _$CryptoJSParamsFromJson(json);
 }
 
 class MoviesapiSourceLoader implements ContentMediaItemSourceLoader {
@@ -59,7 +58,8 @@ class MoviesapiSourceLoader implements ContentMediaItemSourceLoader {
       url = "$baseUrl/tv/$tmdb-$season-$episode";
     }
 
-    final iframe = await Scrapper(uri: url, headers: {"Referer": baseUrl}).scrap(
+    final iframe =
+        await Scrapper(uri: url, headers: {"Referer": baseUrl}).scrap(
       Attribute.forScope("#frame2", "src"),
     );
 

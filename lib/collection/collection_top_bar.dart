@@ -17,12 +17,10 @@ class CollectionTopBar extends HookConsumerWidget {
       text: ref.read(collectionFilterQueryProvider),
     );
     final focusNode = useFocusNode();
-    final showFilter = useState(false);
 
     return Column(
       children: [
-        _renderSearhBar(context, ref, controller, showFilter, focusNode),
-        if (showFilter.value) _StatusFilter(),
+        _renderSearhBar(context, ref, controller, focusNode),
       ],
     );
   }
@@ -31,7 +29,6 @@ class CollectionTopBar extends HookConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     TextEditingController controller,
-    ValueNotifier<bool> showFilter,
     FocusNode focusNode,
   ) {
     return Padding(
@@ -49,7 +46,7 @@ class CollectionTopBar extends HookConsumerWidget {
                 leading: const Icon(Icons.search),
                 trailing: AndroidTVDetector.isTV
                     ? null
-                    : [_renderFilterSwitcher(showFilter)],
+                    : [_renderFilterSwitcher(context)],
                 onSubmitted: (value) {
                   ref.read(collectionFilterQueryProvider.notifier).state =
                       value;
@@ -61,7 +58,7 @@ class CollectionTopBar extends HookConsumerWidget {
           if (AndroidTVDetector.isTV)
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
-              child: _renderFilterSwitcher(showFilter),
+              child: _renderFilterSwitcher(context),
             ),
           if (isMobile(context))
             const Padding(
@@ -73,23 +70,51 @@ class CollectionTopBar extends HookConsumerWidget {
     );
   }
 
-  IconButton _renderFilterSwitcher(ValueNotifier<bool> showFilter) {
+  IconButton _renderFilterSwitcher(BuildContext context) {
     return IconButton(
       onPressed: () {
-        showFilter.value = !showFilter.value;
+        showDialog(
+            context: context, builder: (context) => _StatusFilterDialog());
       },
       icon: const Icon(Icons.tune),
     );
   }
 }
 
+class _StatusFilterDialog extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    return Dialog(
+      insetPadding: EdgeInsets.only(left: isMobile(context) ? 0 : 80.0),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 800),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.status,
+              style: theme.textTheme.headlineSmall,
+            ),
+            const _StatusFilter(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _StatusFilter extends ConsumerWidget {
+  const _StatusFilter();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(collectionItemStatusFilterProvider);
-
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8),
+      padding: const EdgeInsets.only(top: 8.0),
       child: Wrap(
         spacing: 6,
         runSpacing: 6,

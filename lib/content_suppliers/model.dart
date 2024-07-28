@@ -64,13 +64,21 @@ abstract interface class ContentMediaItem {
   String? get image;
 }
 
-enum FileKind { video, image, subtitle }
+enum FileKind { video, manga, subtitle }
 
 abstract interface class ContentMediaItemSource {
   FileKind get kind;
   String get description;
+}
+
+abstract interface class MediaFileItemSource extends ContentMediaItemSource {
   FutureOr<Uri> get link;
   Map<String, String>? get headers;
+}
+
+abstract interface class MangaMediaItemSource extends ContentMediaItemSource {
+  int get pageNambers;
+  FutureOr<List<ImageProvider>> allPages();
 }
 
 abstract interface class ContentDetails {
@@ -111,13 +119,17 @@ class ContentSearchResult extends Equatable implements ContentInfo {
   factory ContentSearchResult.fromJson(Map<String, dynamic> json) =>
       _$ContentSearchResultFromJson(json);
 
+  static List<ContentSearchResult> fromJsonList(List<dynamic> json) =>
+      json.map((e) => ContentSearchResult.fromJson(e)).toList();
+
   Map<String, dynamic> toJson() => _$ContentSearchResultToJson(this);
 
   @override
   List<Object?> get props => [id, supplier, image, title, secondaryTitle];
 }
 
-abstract class BaseContentDetails extends Equatable implements ContentDetails {
+abstract class AbstractContentDetails extends Equatable
+    implements ContentDetails {
   @override
   final String id;
   @override
@@ -136,14 +148,15 @@ abstract class BaseContentDetails extends Equatable implements ContentDetails {
   @override
   @JsonKey(
     defaultValue: [],
+    fromJson: ContentSearchResult.fromJsonList,
   )
-  final List<ContentSearchResult> similar;
+  final List<ContentInfo> similar;
   @override
   MediaType get mediaType => MediaType.video;
   @override
   FutureOr<Iterable<ContentMediaItem>> get mediaItems => const [];
 
-  const BaseContentDetails({
+  const AbstractContentDetails({
     required this.id,
     required this.supplier,
     required this.title,
@@ -167,7 +180,7 @@ abstract class BaseContentDetails extends Equatable implements ContentDetails {
       ];
 }
 
-abstract class BasicContentMediaItem extends Equatable
+abstract class AbstractContentMediaItem extends Equatable
     implements ContentMediaItem {
   @override
   final int number;
@@ -178,7 +191,7 @@ abstract class BasicContentMediaItem extends Equatable
   @override
   final String? image;
 
-  const BasicContentMediaItem({
+  const AbstractContentMediaItem({
     required this.number,
     required this.title,
     this.section,
@@ -198,7 +211,7 @@ abstract interface class ContentMediaItemSourceLoader {
 }
 
 // ignore: must_be_immutable
-class AsyncContentMediaItem extends BasicContentMediaItem {
+class AsyncContentMediaItem extends AbstractContentMediaItem {
   List<ContentMediaItemSource>? _cachedSources;
 
   @override
@@ -217,7 +230,7 @@ class AsyncContentMediaItem extends BasicContentMediaItem {
 }
 
 @immutable
-class SimpleContentMediaItem extends BasicContentMediaItem {
+class SimpleContentMediaItem extends AbstractContentMediaItem {
   @override
   final List<ContentMediaItemSource> sources;
 
@@ -232,7 +245,7 @@ class SimpleContentMediaItem extends BasicContentMediaItem {
 
 @immutable
 class SimpleContentMediaItemSource extends Equatable
-    implements ContentMediaItemSource {
+    implements MediaFileItemSource {
   @override
   final FileKind kind;
   @override
@@ -257,7 +270,7 @@ typedef ContentItemMediaSourceLinkLoader = Future<Uri> Function();
 
 // ignore: must_be_immutable
 class AsyncContentMediaItemSource extends Equatable
-    implements ContentMediaItemSource {
+    implements MediaFileItemSource {
   @override
   final FileKind kind;
   @override

@@ -10,7 +10,9 @@ import 'package:cloud_hook/utils/logger.dart';
 import 'package:dio/dio.dart';
 import 'package:simple_rc4/simple_rc4.dart';
 
-class VidSrcToSourceLoader with VidSrcToServerMixin implements ContentMediaItemSourceLoader {
+class VidSrcToSourceLoader
+    with VidSrcToServerMixin
+    implements ContentMediaItemSourceLoader {
   final host = "vidsrc.to";
   final String imdb;
   final int? episode;
@@ -35,8 +37,8 @@ class VidSrcToSourceLoader with VidSrcToServerMixin implements ContentMediaItemS
 
     final keys = await VidsrcToApiKeys.fetch();
 
-    final mediaId =
-        await Scrapper(uri: url, headers: {...defaultHeaders}).scrap(Attribute.forScope("ul.episodes li a", "data-id"));
+    final mediaId = await Scrapper(uri: url, headers: {...defaultHeaders})
+        .scrap(Attribute.forScope("ul.episodes li a", "data-id"));
 
     if (mediaId == null) {
       logger.w("[vidsrc.to] mediaId not found");
@@ -72,7 +74,8 @@ class VidSrcToSourceLoader with VidSrcToServerMixin implements ContentMediaItemS
   Future<String?> loadSource(String id) async {
     final keys = await VidsrcToApiKeys.fetch();
 
-    final sourceRes = await dio.get("$baseUrl/ajax/embed/source/$id?token=${_encryptToken(id, keys)}",
+    final sourceRes = await dio.get(
+        "$baseUrl/ajax/embed/source/$id?token=${_encryptToken(id, keys)}",
         options: Options(
           headers: {
             ...defaultHeaders,
@@ -107,24 +110,31 @@ class VidSrcToSourceLoader with VidSrcToServerMixin implements ContentMediaItemS
 mixin VidSrcToServerMixin {
   Future<String?> loadSource(String id);
 
-  Future<List<ContentMediaItemSource>> extractServer(String serverName, String serverId, String referer,
-      {String descriptionPrefix = ""}) async {
+  Future<List<ContentMediaItemSource>> extractServer(
+      String serverName, String serverId, String referer,
+      [String? descriptionPrefix]) async {
     try {
       return switch (serverName.toLowerCase()) {
-        "vidplay" || "vidstream" || "megaf" || "f2cloud" => await _extractVidplay(serverId, descriptionPrefix),
-        "filemoon" => await _extractFilemoon(serverId, referer, descriptionPrefix),
+        "vidplay" ||
+        "vidstream" ||
+        "megaf" ||
+        "f2cloud" =>
+          await _extractVidplay(serverId, descriptionPrefix),
+        "filemoon" =>
+          await _extractFilemoon(serverId, referer, descriptionPrefix),
         "mp4upload" => await _extractMp4upload(serverId, descriptionPrefix),
         _ => <ContentMediaItemSource>[]
       };
     } catch (error, stackTrace) {
-      logger.w("[vidsrcto] server $serverName failed. Error: $error", stackTrace: stackTrace);
+      logger.w("[vidsrcto] server $serverName failed. Error: $error",
+          stackTrace: stackTrace);
       return <ContentMediaItemSource>[];
     }
   }
 
   Future<List<ContentMediaItemSource>> _extractVidplay(
     String serverId,
-    String descriptionPrefix,
+    String? descriptionPrefix,
   ) async {
     final finalUrl = await loadSource(serverId);
 
@@ -141,7 +151,7 @@ mixin VidSrcToServerMixin {
   Future<List<ContentMediaItemSource>> _extractFilemoon(
     String serverId,
     String url,
-    String descriptionPrefix,
+    String? descriptionPrefix,
   ) async {
     final finalUrl = await loadSource(serverId);
 
@@ -158,7 +168,7 @@ mixin VidSrcToServerMixin {
 
   Future<List<ContentMediaItemSource>> _extractMp4upload(
     String serverId,
-    String descriptionPrefix,
+    String? descriptionPrefix,
   ) async {
     final finalUrl = await loadSource(serverId);
 

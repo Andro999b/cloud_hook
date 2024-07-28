@@ -26,23 +26,23 @@ class CollectionItem extends _$CollectionItem {
     state = await AsyncValue.guard(() => _saveNewValue(newValue));
   }
 
-  void setCurrentSource(int sourceIdx) async {
+  void setCurrentSource(String? sourceName) async {
     final value = state.requireValue;
-    final newValue = value.copyWith(currentSource: sourceIdx);
+    final newValue = value.copyWith(currentSourceName: () => sourceName);
 
     state = await AsyncValue.guard(() => _saveNewValue(newValue));
   }
 
-  void setCurrentSubtitle(int? subtitleIdx) async {
+  void setCurrentSubtitle(String? subtitleName) async {
     final value = state.requireValue;
-    final newValue = value.copyWith(currentSubtitle: () => subtitleIdx);
+    final newValue = value.copyWith(currentSubtitleName: () => subtitleName);
 
     state = await AsyncValue.guard(() => _saveNewValue(newValue));
   }
 
-  void setCurrentPosition(int position, int length) async {
+  void setCurrentPosition(int position, [int? length]) async {
     final value = state.requireValue;
-    final currentItemPosition = value.currentItemPosition;
+    final currentItemPosition = value.currentMediaItemPosition;
 
     if (value.mediaType == MediaType.video) {
       if ((currentItemPosition.position - position).abs() > 10) {
@@ -58,7 +58,36 @@ class CollectionItem extends _$CollectionItem {
 
         state = await AsyncValue.guard(() => _saveNewValue(newValue));
       }
+    } else {
+      final newValue = value.copyWith(
+        positions: {
+          value.currentItem: currentItemPosition.copyWith(
+            position: position,
+            length: length,
+          ),
+        },
+        status: MediaCollectionItemStatus.inProgress,
+      );
+
+      state = await AsyncValue.guard(() => _saveNewValue(newValue));
     }
+  }
+
+  void setCurrentLength(int length) async {
+    final value = state.requireValue;
+    final currentItemPosition = value.currentMediaItemPosition;
+
+    final newValue = value.copyWith(
+      positions: {
+        value.currentItem: currentItemPosition.copyWith(
+          length: length,
+          position: currentItemPosition.position >= length ? 0 : null,
+        ),
+      },
+      status: MediaCollectionItemStatus.inProgress,
+    );
+
+    state = await AsyncValue.guard(() => _saveNewValue(newValue));
   }
 
   void setStatus(MediaCollectionItemStatus status) async {
@@ -87,4 +116,31 @@ class CollectionItem extends _$CollectionItem {
 
     return newValue;
   }
+}
+
+@riverpod
+Future<int> collectionItemCurrentItem(
+  CollectionItemCurrentItemRef ref,
+  ContentDetails contentDetails,
+) {
+  return ref.watch(collectionItemProvider(contentDetails)
+      .selectAsync((value) => value.currentItem));
+}
+
+@riverpod
+Future<String?> collectionItemCurrentSource(
+  CollectionItemCurrentSourceRef ref,
+  ContentDetails contentDetails,
+) async {
+  return ref.watch(collectionItemProvider(contentDetails)
+      .selectAsync((value) => value.currentSourceName));
+}
+
+@riverpod
+Future<int> collectionItemCurrentPosition(
+  CollectionItemCurrentPositionRef ref,
+  ContentDetails contentDetails,
+) async {
+  return ref.watch(collectionItemProvider(contentDetails)
+      .selectAsync((value) => value.currentPosition));
 }

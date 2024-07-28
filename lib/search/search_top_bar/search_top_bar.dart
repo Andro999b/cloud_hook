@@ -22,7 +22,6 @@ class SearchTopBar extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final searchController = useSearchController();
-    final showFilter = useState(false);
 
     useEffect(() {
       final query = ref.read(searchProvider).query ?? "";
@@ -40,7 +39,6 @@ class SearchTopBar extends HookConsumerWidget {
                 child: Center(
                   child: _renderSearchBar(
                     searchController,
-                    showFilter,
                     context,
                     ref,
                   ),
@@ -49,19 +47,17 @@ class SearchTopBar extends HookConsumerWidget {
               if (AndroidTVDetector.isTV)
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
-                  child: _renderFilterSwitcher(showFilter),
+                  child: _renderFilterSwitcher(context),
                 ),
             ],
           ),
         ),
-        if (showFilter.value) const _FilterSelectors(),
       ],
     );
   }
 
   Widget _renderSearchBar(
     SearchController searchController,
-    ValueNotifier<bool> showFilter,
     BuildContext context,
     WidgetRef ref,
   ) {
@@ -94,9 +90,7 @@ class SearchTopBar extends HookConsumerWidget {
           onSubmitted: (value) {
             _search(ref, value);
           },
-          trailing: AndroidTVDetector.isTV
-              ? null
-              : [_renderFilterSwitcher(showFilter)],
+          trailing: AndroidTVDetector.isTV ? null : [_renderFilterSwitcher(context)],
         );
       },
       viewBuilder: (suggestions) => _TopSearchSuggestions(
@@ -107,25 +101,49 @@ class SearchTopBar extends HookConsumerWidget {
     );
   }
 
-  IconButton _renderFilterSwitcher(ValueNotifier<bool> showFilter) {
+  IconButton _renderFilterSwitcher(BuildContext context) {
     return IconButton(
       onPressed: () {
-        showFilter.value = !showFilter.value;
+        showDialog(
+          context: context,
+          builder: (context) => const _FilterSelectorsDialog(),
+        );
       },
       icon: const Icon(Icons.tune),
     );
   }
 }
 
-class _FilterSelectors extends ConsumerWidget {
-  const _FilterSelectors();
+class _FilterSelectorsDialog extends ConsumerWidget {
+  const _FilterSelectorsDialog();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const Column(children: [
-      _ContentTypeSelector(),
-      _SuppliersSelector(),
-    ]);
+    final theme = Theme.of(context);
+
+    return Dialog(
+      insetPadding: EdgeInsets.only(left: isMobile(context) ? 0 : 80.0),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 800),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.contentType,
+              style: theme.textTheme.headlineSmall,
+            ),
+            const _ContentTypeSelector(),
+            Text(
+              AppLocalizations.of(context)!.suppliers,
+              style: theme.textTheme.headlineSmall,
+            ),
+            const _SuppliersSelector(),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -137,9 +155,9 @@ class _ContentTypeSelector extends ConsumerWidget {
     final selectedContentType = ref.watch(selectedContentProvider);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Wrap(
-        alignment: WrapAlignment.center,
+        alignment: WrapAlignment.start,
         spacing: 6,
         runSpacing: 6,
         children: [
@@ -173,9 +191,9 @@ class _SuppliersSelector extends ConsumerWidget {
     final selectedContentType = ref.watch(selectedContentProvider);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8),
+      padding: const EdgeInsets.only(top: 8.0),
       child: Wrap(
-        alignment: WrapAlignment.center,
+        alignment: WrapAlignment.start,
         spacing: 6,
         runSpacing: 6,
         children: [
@@ -199,8 +217,7 @@ class _SuppliersSelector extends ConsumerWidget {
     WidgetRef ref,
   ) {
     final supplier = ContentSuppliers.instance.getSupplier(name)!;
-    final enabled =
-        supplier.supportedTypes.intersection(selectedContentType).isNotEmpty;
+    final enabled = supplier.supportedTypes.intersection(selectedContentType).isNotEmpty;
 
     return FilterChip(
       selected: selectedSuppliers.contains(name),
@@ -220,8 +237,7 @@ class _SuppliersSelector extends ConsumerWidget {
 }
 
 class _TopSearchSuggestions extends HookConsumerWidget {
-  const _TopSearchSuggestions(
-      {required this.searchController, required this.onSelect});
+  const _TopSearchSuggestions({required this.searchController, required this.onSelect});
 
   final SearchController searchController;
   final Function(String) onSelect;
@@ -233,9 +249,7 @@ class _TopSearchSuggestions extends HookConsumerWidget {
     return suggestionsValue.maybeWhen(
       data: (suggestions) {
         return ListView(
-          children: suggestions
-              .map((suggestion) => _renderSuggestion(suggestion, ref))
-              .toList(),
+          children: suggestions.map((suggestion) => _renderSuggestion(suggestion, ref)).toList(),
         );
       },
       orElse: () => ListView(),
@@ -260,9 +274,7 @@ class _TopSearchSuggestions extends HookConsumerWidget {
             child: IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () {
-                ref
-                    .read(suggestionsProvider.notifier)
-                    .deleteSuggestion(suggestion);
+                ref.read(suggestionsProvider.notifier).deleteSuggestion(suggestion);
               },
             ),
           ),

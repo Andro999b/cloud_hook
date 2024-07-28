@@ -53,8 +53,7 @@ class AppVersionSettings extends ConsumerWidget {
     if (hasNewVersion) {
       return FilledButton(
         onPressed: () => _downloadNewVersion(context, latestAppVersionInfo),
-        child: Text(AppLocalizations.of(context)!
-            .settingsDownloadUpdate(latestAppVersionInfo.version)),
+        child: Text(AppLocalizations.of(context)!.settingsDownloadUpdate(latestAppVersionInfo.version)),
       );
     }
 
@@ -72,24 +71,16 @@ class AppVersionSettings extends ConsumerWidget {
     if (Platform.isLinux || Platform.isWindows) {
       final platform = Platform.isLinux ? "linux" : "windows";
 
-      asset = latestAppVersionInfo.assets
-          .where((a) => a.name.contains(platform))
-          .firstOrNull;
+      asset = latestAppVersionInfo.assets.where((a) => a.name.contains(platform)).firstOrNull;
     } else if (Platform.isAndroid) {
       final deviceInfo = await DeviceInfoPlugin().androidInfo;
 
-      if (deviceInfo.supportedAbis.contains("arm64")) {
-        asset = latestAppVersionInfo.assets
-            .where((a) => a.name.contains("app-arm64-v8a-release.apk"))
-            .firstOrNull;
-      } else if (deviceInfo.supportedAbis.contains("arm7")) {
-        asset = latestAppVersionInfo.assets
-            .where((a) => a.name.contains("app-armeabi-v7a-release.apk"))
-            .firstOrNull;
+      if (deviceInfo.supportedAbis.contains("arm64-v8a")) {
+        asset = latestAppVersionInfo.assets.where((a) => a.name.contains("app-arm64-v8a-release.apk")).firstOrNull;
+      } else if (deviceInfo.supportedAbis.contains("armeabi-v7a")) {
+        asset = latestAppVersionInfo.assets.where((a) => a.name.contains("app-armeabi-v7a-release.apk")).firstOrNull;
       } else {
-        asset = latestAppVersionInfo.assets
-            .where((a) => a.name.contains("app-release.apk"))
-            .firstOrNull;
+        asset = latestAppVersionInfo.assets.where((a) => a.name.contains("app-release.apk")).firstOrNull;
       }
     }
 

@@ -12,6 +12,7 @@ import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -29,20 +30,21 @@ extension PlayerExt on Player {
 }
 
 class PlaylistController {
-  final CollectionItemProvider provider;
   final Player player;
+  final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
-  final WidgetRef ref;
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
 
   List<ContentMediaItemSource>? currentSources;
 
+  final WidgetRef _ref;
+
   PlaylistController({
-    required this.provider,
     required this.player,
+    required this.contentDetails,
     required this.mediaItems,
-    required this.ref,
-  });
+    required WidgetRef ref,
+  }) : _ref = ref;
 
   Future<void> play(ContentProgress progress) async {
     try {
@@ -50,14 +52,16 @@ class PlaylistController {
       await player.stop();
 
       final itemIdx = progress.currentItem;
-      final sourceIdx = progress.currentSource;
+      final sourceName = progress.currentSourceName;
 
       final item = mediaItems[itemIdx];
       final sources = await item.sources;
       final videos = sources.where((s) => s.kind == FileKind.video).toList();
 
-      final sourceIndex = sourceIdx >= sources.length ? 0 : sourceIdx;
-      final video = videos.elementAtOrNull(sourceIndex);
+      final video = sourceName == null
+          ? videos.firstOrNull as MediaFileItemSource?
+          : videos.firstWhereOrNull((s) => s.description == sourceName)
+              as MediaFileItemSource?;
 
       if (video == null) {
         throw Exception("Video not found");
@@ -66,7 +70,7 @@ class PlaylistController {
       final link = await video.link;
 
       Duration? start;
-      final currentItemPosition = progress.currentItemPosition;
+      final currentItemPosition = progress.currentMediaItemPosition;
       if (currentItemPosition.length > 0 &&
           currentItemPosition.position > currentItemPosition.length - 60) {
         start = Duration(seconds: currentItemPosition.length - 60);
@@ -85,7 +89,7 @@ class PlaylistController {
 
       currentSources = sources;
 
-      await setSubtitle(progress.currentSubtitle);
+      await setSubtitle(progress.currentSubtitleName);
     } on Exception catch (e, stackTrace) {
       logger.e("Fail to play", error: e, stackTrace: stackTrace);
       player.stop();
@@ -95,7 +99,7 @@ class PlaylistController {
     }
   }
 
-  Future<void> setSubtitle(int? currentSubtitle) async {
+  Future<void> setSubtitle(String? currentSubtitle) async {
     if (currentSources == null) {
       return;
     }
@@ -108,7 +112,9 @@ class PlaylistController {
     final subtitles =
         currentSources!.where((s) => s.kind == FileKind.subtitle).toList();
 
-    final subtitle = subtitles.elementAtOrNull(currentSubtitle);
+    final subtitle =
+        subtitles.firstWhereOrNull((s) => s.description == currentSubtitle)
+            as MediaFileItemSource?;
 
     if (subtitle != null) {
       await player.setSubtitleTrack(SubtitleTrack.uri(
@@ -119,7 +125,7 @@ class PlaylistController {
   }
 
   void nextItem() {
-    final asyncValue = ref.read(provider);
+    final asyncValue = _ref.read(collectionItemProvider(contentDetails));
 
     asyncValue.whenData((value) {
       selectItem(value.currentItem + 1);
@@ -127,7 +133,7 @@ class PlaylistController {
   }
 
   void prevItem() {
-    final asyncValue = ref.read(provider);
+    final asyncValue = _ref.read(collectionItemProvider(contentDetails));
 
     asyncValue.whenData((value) {
       selectItem(value.currentItem - 1);
@@ -139,7 +145,7 @@ class PlaylistController {
       return;
     }
 
-    final notifier = ref.read(provider.notifier);
+    final notifier = _ref.read(collectionItemProvider(contentDetails).notifier);
 
     notifier.setCurrentItem(itemIdx);
   }
@@ -150,12 +156,12 @@ class PlaylistController {
 }
 
 class VideoContentView extends ConsumerStatefulWidget {
-  final ContentDetails details;
+  final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
 
   const VideoContentView({
     super.key,
-    required this.details,
+    required this.contentDetails,
     required this.mediaItems,
   });
 
@@ -167,7 +173,6 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
   final player = Player();
   late final VideoController videoController;
   late final PlaylistController playlistController;
-  late final provider = collectionItemProvider(widget.details);
   late ProviderSubscription subscription;
 
   @override
@@ -189,12 +194,13 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
         : VideoController(player);
 
     playlistController = PlaylistController(
-      provider: provider,
+      contentDetails: widget.contentDetails,
       player: player,
       mediaItems: widget.mediaItems,
       ref: ref,
     );
 
+    final provider = collectionItemProvider(widget.contentDetails);
     final notifier = ref.read(provider.notifier);
 
     // track current episode
@@ -206,11 +212,12 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
 
         if (nextValue != null) {
           if ((previousValue?.currentItem != nextValue.currentItem ||
-              previousValue?.currentSource != nextValue.currentSource)) {
+              previousValue?.currentSourceName !=
+                  nextValue.currentSourceName)) {
             await _playMediaItems(nextValue);
-          } else if (previousValue?.currentSubtitle !=
-              nextValue.currentSubtitle) {
-            await playlistController.setSubtitle(nextValue.currentSubtitle);
+          } else if (previousValue?.currentSubtitleName !=
+              nextValue.currentSubtitleName) {
+            await playlistController.setSubtitle(nextValue.currentSubtitleName);
           }
         }
       },
@@ -328,8 +335,6 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
 
   Widget _renderTvView() {
     return VideoContentTVView(
-      provider: provider,
-      details: widget.details,
       player: player,
       videoController: videoController,
       playlistController: playlistController,
@@ -338,8 +343,6 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
 
   Widget _renderMobileView() {
     return VideoContentMobileView(
-      provider: provider,
-      details: widget.details,
       player: player,
       videoController: videoController,
       playlistController: playlistController,
@@ -348,8 +351,6 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
 
   Widget _renderDesktopView() {
     return VideoContentDesktopView(
-      provider: provider,
-      details: widget.details,
       player: player,
       videoController: videoController,
       playlistController: playlistController,

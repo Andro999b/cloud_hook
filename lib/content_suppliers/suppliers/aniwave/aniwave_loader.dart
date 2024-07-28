@@ -111,9 +111,11 @@ class AniWaveSourceLoader implements ContentMediaItemSourceLoader {
     final servers = await scrapServers(serversRes.data["result"]);
 
     return AggSourceLoader(
-      servers.map(
-        (s) => AniWaveServerSorceLoader(host, s),
-      ),
+      servers
+          .mapIndexed(
+            (idx, s) => AniWaveServerSorceLoader(host, s),
+          )
+          .toList(),
     ).call();
   }
 
@@ -163,12 +165,12 @@ class AniWaveServerSorceLoader
 
   @override
   FutureOr<List<ContentMediaItemSource>> call() {
-    final prefix = "[${server.prefix}]";
+    final prefix = "[${server.prefix}] ${server.title}";
     return extractServer(
       server.title,
       server.id,
       "https://$host",
-      descriptionPrefix: prefix,
+      prefix,
     );
   }
 

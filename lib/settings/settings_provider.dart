@@ -1,4 +1,5 @@
 import 'package:cloud_hook/app_preferences.dart';
+import 'package:cloud_hook/content/manga/model.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -27,5 +28,18 @@ class ColorSettings extends _$ColorSettings {
   void select(Color color) {
     AppPreferences.themeColor = color;
     state = color;
+  }
+}
+
+@riverpod
+class MangaReaderImageModeSettings extends _$MangaReaderImageModeSettings {
+  @override
+  MangaReaderImageMode build() {
+    return AppPreferences.mangaReaderImageMode;
+  }
+
+  void select(MangaReaderImageMode mode) {
+    AppPreferences.mangaReaderImageMode = mode;
+    state = mode;
   }
 }

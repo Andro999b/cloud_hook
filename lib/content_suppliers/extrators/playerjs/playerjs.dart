@@ -28,7 +28,8 @@ class PlayerJSFile {
     required this.subtitle,
   });
 
-  factory PlayerJSFile.fromJson(Map<String, dynamic> json) => _$PlayerJSFileFromJson(json);
+  factory PlayerJSFile.fromJson(Map<String, dynamic> json) =>
+      _$PlayerJSFileFromJson(json);
 
   Map<String, dynamic> toJson() => _$PlayerJSFileToJson(this);
 }
@@ -53,7 +54,8 @@ abstract class PlaylistConvertStrategy<R> {
 
 typedef SeasonEpisodeId = Comparable Function(String season, String eposode);
 
-class DubSeasonEpisodeConvertStrategy extends PlaylistConvertStrategy<ContentMediaItem> {
+class DubSeasonEpisodeConvertStrategy
+    extends PlaylistConvertStrategy<ContentMediaItem> {
   static final RegExp digitRegExp = RegExp(r'\d+');
   static Comparable defaultSeasonEpisodeId(String season, String episode) {
     return extractDigits(season) * 10000 + extractDigits(episode);
@@ -63,7 +65,8 @@ class DubSeasonEpisodeConvertStrategy extends PlaylistConvertStrategy<ContentMed
   final subtitleRegExp = RegExp(r"^\[(?<label>[^\]]+)\](?<url>.*)");
 
   DubSeasonEpisodeConvertStrategy({
-    this.seasonEpisodeId = DubSeasonEpisodeConvertStrategy.defaultSeasonEpisodeId,
+    this.seasonEpisodeId =
+        DubSeasonEpisodeConvertStrategy.defaultSeasonEpisodeId,
   });
 
   @override
@@ -127,7 +130,8 @@ class DubSeasonEpisodeConvertStrategy extends PlaylistConvertStrategy<ContentMed
   }
 }
 
-class DubConvertStrategy extends PlaylistConvertStrategy<ContentMediaItemSource> {
+class DubConvertStrategy
+    extends PlaylistConvertStrategy<ContentMediaItemSource> {
   @override
   List<ContentMediaItemSource> convertPlayerJsFiles(
     Iterable<PlayerJSFile> playlist,
@@ -153,7 +157,8 @@ class DubConvertStrategy extends PlaylistConvertStrategy<ContentMediaItemSource>
   }
 }
 
-class SimpleUrlConvertStrategy extends PlaylistConvertStrategy<ContentMediaItemSource> {
+class SimpleUrlConvertStrategy
+    extends PlaylistConvertStrategy<ContentMediaItemSource> {
   final String prefix;
 
   SimpleUrlConvertStrategy({this.prefix = ""});
@@ -162,7 +167,10 @@ class SimpleUrlConvertStrategy extends PlaylistConvertStrategy<ContentMediaItemS
   List<ContentMediaItemSource> convertPlayerJsFiles(
     Iterable<PlayerJSFile> playlist,
   ) {
-    return playlist.expand((file) => convertSingleFile(file.file!) + convertSubtitle(file.subtitle)).toList();
+    return playlist
+        .expand((file) =>
+            convertSingleFile(file.file!) + convertSubtitle(file.subtitle))
+        .toList();
   }
 
   @override
@@ -279,7 +287,8 @@ class PlayerJSSourceLoader implements ContentMediaItemSourceLoader {
 
   @override
   Future<List<ContentMediaItemSource>> call() {
-    return PlayerJSScrapper(uri: parseUri(iframe)).scrapSources(convertStrategy);
+    return PlayerJSScrapper(uri: parseUri(iframe))
+        .scrapSources(convertStrategy);
   }
 
   @override

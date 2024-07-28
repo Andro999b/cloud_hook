@@ -47,9 +47,9 @@ class MediaCollectionItem with ContentProgress implements ContentInfo {
   @override
   int currentItem;
   @override
-  int currentSource;
+  String? currentSourceName;
   @override
-  int? currentSubtitle;
+  String? currentSubtitleName;
   @override
   Map<int, MediaItemPosition> positions;
 
@@ -69,8 +69,8 @@ class MediaCollectionItem with ContentProgress implements ContentInfo {
     required this.image,
     required this.mediaType,
     this.currentItem = 0,
-    this.currentSource = 0,
-    this.currentSubtitle,
+    this.currentSourceName,
+    this.currentSubtitleName,
     this.positions = const {},
     this.status = MediaCollectionItemStatus.none,
     this.priority = 1,
@@ -91,8 +91,8 @@ class MediaCollectionItem with ContentProgress implements ContentInfo {
     String? title,
     String? image,
     int? currentItem,
-    int? currentSource,
-    ValueGetter<int?>? currentSubtitle,
+    ValueGetter<String?>? currentSourceName,
+    ValueGetter<String?>? currentSubtitleName,
     Map<int, MediaItemPosition>? positions,
     MediaCollectionItemStatus? status,
     int? priority,
@@ -104,9 +104,12 @@ class MediaCollectionItem with ContentProgress implements ContentInfo {
       image: image ?? this.image,
       mediaType: mediaType,
       currentItem: currentItem ?? this.currentItem,
-      currentSource: currentSource ?? this.currentSource,
-      currentSubtitle:
-          currentSubtitle != null ? currentSubtitle() : this.currentSubtitle,
+      currentSourceName: currentSourceName != null
+          ? currentSourceName()
+          : this.currentSourceName,
+      currentSubtitleName: currentSubtitleName != null
+          ? currentSubtitleName()
+          : this.currentSubtitleName,
       positions: positions != null
           ? {...this.positions, ...positions}
           : this.positions,
@@ -165,12 +168,12 @@ mixin ContentProgress {
   String get supplier;
 
   int get currentItem;
-  int get currentSource;
-  int? get currentSubtitle;
+  String? get currentSourceName;
+  String? get currentSubtitleName;
 
   Map<int, MediaItemPosition> get positions;
 
   int get currentPosition => positions[currentItem]?.position ?? 0;
-  MediaItemPosition get currentItemPosition =>
+  MediaItemPosition get currentMediaItemPosition =>
       positions[currentItem] ?? MediaItemPosition.zero;
 }

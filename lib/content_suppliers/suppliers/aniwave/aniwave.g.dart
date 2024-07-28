@@ -19,10 +19,8 @@ AniWaveContentDetails _$AniWaveContentDetailsFromJson(
               ?.map((e) => e as String)
               .toList() ??
           [],
-      similar: (json['similar'] as List<dynamic>?)
-              ?.map((e) =>
-                  ContentSearchResult.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
+      similar: json['similar'] == null
+          ? []
+          : ContentSearchResult.fromJsonList(json['similar'] as List),
       mediaId: json['mediaId'] as String,
     );

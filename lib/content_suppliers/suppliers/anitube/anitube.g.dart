@@ -19,11 +19,9 @@ AniTubeContentDetails _$AniTubeContentDetailsFromJson(
               ?.map((e) => e as String)
               .toList() ??
           [],
-      similar: (json['similar'] as List<dynamic>?)
-              ?.map((e) =>
-                  ContentSearchResult.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
+      similar: json['similar'] == null
+          ? []
+          : ContentSearchResult.fromJsonList(json['similar'] as List),
       newsId: json['newsId'] as String,
       hash: json['hash'] as String?,
       ralodePlayerParams: json['ralodePlayerParams'] as String?,

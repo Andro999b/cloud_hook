@@ -10,12 +10,12 @@ class FileMoonSourceLoader implements ContentMediaItemSourceLoader {
 
   final String url;
   final String referer;
-  final String despriptionPrefix;
+  final String? despriptionPrefix;
 
   const FileMoonSourceLoader({
     required this.url,
     required this.referer,
-    this.despriptionPrefix = "",
+    this.despriptionPrefix,
   });
 
   @override
@@ -46,7 +46,7 @@ class FileMoonSourceLoader implements ContentMediaItemSourceLoader {
 
     return [
       SimpleContentMediaItemSource(
-          description: "${despriptionPrefix}Filemoon",
+          description: despriptionPrefix ?? "Filemoon",
           link: parseUri(file),
           headers: {
             "Referer": referer,

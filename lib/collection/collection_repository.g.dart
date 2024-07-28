@@ -23,15 +23,15 @@ const IsarMediaCollectionItemSchema = CollectionSchema(
       name: r'currentItem',
       type: IsarType.long,
     ),
-    r'currentSource': PropertySchema(
+    r'currentSourceName': PropertySchema(
       id: 1,
-      name: r'currentSource',
-      type: IsarType.long,
+      name: r'currentSourceName',
+      type: IsarType.string,
     ),
-    r'currentSubtitle': PropertySchema(
+    r'currentSubtitleName': PropertySchema(
       id: 2,
-      name: r'currentSubtitle',
-      type: IsarType.long,
+      name: r'currentSubtitleName',
+      type: IsarType.string,
     ),
     r'fts': PropertySchema(
       id: 3,
@@ -146,6 +146,18 @@ int _isarMediaCollectionItemEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  {
+    final value = object.currentSourceName;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.currentSubtitleName;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.fts.length * 3;
   {
     for (var i = 0; i < object.fts.length; i++) {
@@ -187,8 +199,8 @@ void _isarMediaCollectionItemSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeLong(offsets[0], object.currentItem);
-  writer.writeLong(offsets[1], object.currentSource);
-  writer.writeLong(offsets[2], object.currentSubtitle);
+  writer.writeString(offsets[1], object.currentSourceName);
+  writer.writeString(offsets[2], object.currentSubtitleName);
   writer.writeStringList(offsets[3], object.fts);
   writer.writeString(offsets[4], object.id);
   writer.writeString(offsets[5], object.image);
@@ -215,8 +227,8 @@ IsarMediaCollectionItem _isarMediaCollectionItemDeserialize(
 ) {
   final object = IsarMediaCollectionItem(
     currentItem: reader.readLongOrNull(offsets[0]),
-    currentSource: reader.readLongOrNull(offsets[1]),
-    currentSubtitle: reader.readLongOrNull(offsets[2]),
+    currentSourceName: reader.readStringOrNull(offsets[1]),
+    currentSubtitleName: reader.readStringOrNull(offsets[2]),
     id: reader.readString(offsets[4]),
     image: reader.readString(offsets[5]),
     isarId: id,
@@ -251,9 +263,9 @@ P _isarMediaCollectionItemDeserializeProp<P>(
     case 0:
       return (reader.readLongOrNull(offset)) as P;
     case 1:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 2:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 3:
       return (reader.readStringList(offset) ?? []) as P;
     case 4:
@@ -815,149 +827,313 @@ extension IsarMediaCollectionItemQueryFilter on QueryBuilder<
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSourceIsNull() {
+      QAfterFilterCondition> currentSourceNameIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'currentSource',
+        property: r'currentSourceName',
       ));
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSourceIsNotNull() {
+      QAfterFilterCondition> currentSourceNameIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'currentSource',
+        property: r'currentSourceName',
       ));
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSourceEqualTo(int? value) {
+      QAfterFilterCondition> currentSourceNameEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'currentSource',
+        property: r'currentSourceName',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSourceGreaterThan(
-    int? value, {
+      QAfterFilterCondition> currentSourceNameGreaterThan(
+    String? value, {
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'currentSource',
+        property: r'currentSourceName',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSourceLessThan(
-    int? value, {
+      QAfterFilterCondition> currentSourceNameLessThan(
+    String? value, {
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'currentSource',
+        property: r'currentSourceName',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSourceBetween(
-    int? lower,
-    int? upper, {
+      QAfterFilterCondition> currentSourceNameBetween(
+    String? lower,
+    String? upper, {
     bool includeLower = true,
     bool includeUpper = true,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'currentSource',
+        property: r'currentSourceName',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSubtitleIsNull() {
+      QAfterFilterCondition> currentSourceNameStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'currentSubtitle',
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'currentSourceName',
+        value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSubtitleIsNotNull() {
+      QAfterFilterCondition> currentSourceNameEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'currentSubtitle',
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'currentSourceName',
+        value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSubtitleEqualTo(int? value) {
+          QAfterFilterCondition>
+      currentSourceNameContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'currentSourceName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+          QAfterFilterCondition>
+      currentSourceNameMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'currentSourceName',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentSourceNameIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'currentSubtitle',
-        value: value,
+        property: r'currentSourceName',
+        value: '',
       ));
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSubtitleGreaterThan(
-    int? value, {
+      QAfterFilterCondition> currentSourceNameIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'currentSourceName',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentSubtitleNameIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'currentSubtitleName',
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentSubtitleNameIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'currentSubtitleName',
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentSubtitleNameEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'currentSubtitleName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentSubtitleNameGreaterThan(
+    String? value, {
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'currentSubtitle',
+        property: r'currentSubtitleName',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSubtitleLessThan(
-    int? value, {
+      QAfterFilterCondition> currentSubtitleNameLessThan(
+    String? value, {
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'currentSubtitle',
+        property: r'currentSubtitleName',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
-      QAfterFilterCondition> currentSubtitleBetween(
-    int? lower,
-    int? upper, {
+      QAfterFilterCondition> currentSubtitleNameBetween(
+    String? lower,
+    String? upper, {
     bool includeLower = true,
     bool includeUpper = true,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'currentSubtitle',
+        property: r'currentSubtitleName',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentSubtitleNameStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'currentSubtitleName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentSubtitleNameEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'currentSubtitleName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+          QAfterFilterCondition>
+      currentSubtitleNameContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'currentSubtitleName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+          QAfterFilterCondition>
+      currentSubtitleNameMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'currentSubtitleName',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentSubtitleNameIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'currentSubtitleName',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem,
+      QAfterFilterCondition> currentSubtitleNameIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'currentSubtitleName',
+        value: '',
       ));
     });
   }
@@ -2370,30 +2546,30 @@ extension IsarMediaCollectionItemQuerySortBy
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
-      sortByCurrentSource() {
+      sortByCurrentSourceName() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currentSource', Sort.asc);
+      return query.addSortBy(r'currentSourceName', Sort.asc);
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
-      sortByCurrentSourceDesc() {
+      sortByCurrentSourceNameDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currentSource', Sort.desc);
+      return query.addSortBy(r'currentSourceName', Sort.desc);
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
-      sortByCurrentSubtitle() {
+      sortByCurrentSubtitleName() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currentSubtitle', Sort.asc);
+      return query.addSortBy(r'currentSubtitleName', Sort.asc);
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
-      sortByCurrentSubtitleDesc() {
+      sortByCurrentSubtitleNameDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currentSubtitle', Sort.desc);
+      return query.addSortBy(r'currentSubtitleName', Sort.desc);
     });
   }
 
@@ -2541,30 +2717,30 @@ extension IsarMediaCollectionItemQuerySortThenBy on QueryBuilder<
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
-      thenByCurrentSource() {
+      thenByCurrentSourceName() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currentSource', Sort.asc);
+      return query.addSortBy(r'currentSourceName', Sort.asc);
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
-      thenByCurrentSourceDesc() {
+      thenByCurrentSourceNameDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currentSource', Sort.desc);
+      return query.addSortBy(r'currentSourceName', Sort.desc);
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
-      thenByCurrentSubtitle() {
+      thenByCurrentSubtitleName() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currentSubtitle', Sort.asc);
+      return query.addSortBy(r'currentSubtitleName', Sort.asc);
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QAfterSortBy>
-      thenByCurrentSubtitleDesc() {
+      thenByCurrentSubtitleNameDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currentSubtitle', Sort.desc);
+      return query.addSortBy(r'currentSubtitleName', Sort.desc);
     });
   }
 
@@ -2719,16 +2895,18 @@ extension IsarMediaCollectionItemQueryWhereDistinct on QueryBuilder<
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QDistinct>
-      distinctByCurrentSource() {
+      distinctByCurrentSourceName({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'currentSource');
+      return query.addDistinctBy(r'currentSourceName',
+          caseSensitive: caseSensitive);
     });
   }
 
   QueryBuilder<IsarMediaCollectionItem, IsarMediaCollectionItem, QDistinct>
-      distinctByCurrentSubtitle() {
+      distinctByCurrentSubtitleName({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'currentSubtitle');
+      return query.addDistinctBy(r'currentSubtitleName',
+          caseSensitive: caseSensitive);
     });
   }
 
@@ -2820,17 +2998,17 @@ extension IsarMediaCollectionItemQueryProperty on QueryBuilder<
     });
   }
 
-  QueryBuilder<IsarMediaCollectionItem, int?, QQueryOperations>
-      currentSourceProperty() {
+  QueryBuilder<IsarMediaCollectionItem, String?, QQueryOperations>
+      currentSourceNameProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'currentSource');
+      return query.addPropertyName(r'currentSourceName');
     });
   }
 
-  QueryBuilder<IsarMediaCollectionItem, int?, QQueryOperations>
-      currentSubtitleProperty() {
+  QueryBuilder<IsarMediaCollectionItem, String?, QQueryOperations>
+      currentSubtitleNameProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'currentSubtitle');
+      return query.addPropertyName(r'currentSubtitleName');
     });
   }
 

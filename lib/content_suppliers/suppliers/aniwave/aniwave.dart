@@ -11,7 +11,7 @@ part 'aniwave.g.dart';
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
-class AniWaveContentDetails extends BaseContentDetails with AsyncMediaItems {
+class AniWaveContentDetails extends AbstractContentDetails with AsyncMediaItems {
   final String mediaId;
 
   AniWaveContentDetails({
@@ -26,8 +26,7 @@ class AniWaveContentDetails extends BaseContentDetails with AsyncMediaItems {
     required this.mediaId,
   });
 
-  factory AniWaveContentDetails.fromJson(Map<String, dynamic> json) =>
-      _$AniWaveContentDetailsFromJson(json);
+  factory AniWaveContentDetails.fromJson(Map<String, dynamic> json) => _$AniWaveContentDetailsFromJson(json);
 
   @override
   ContentMediaItemLoader get mediaExtractor => AniWaveMediaItemLoader(
@@ -88,8 +87,7 @@ class AniWaveSupplier extends ContentSupplier {
           "mediaId": Attribute.forScope("#watch-main", "data-id"),
           "image": Attribute.forScope(".binfo .poster img", "src"),
           "title": TextSelector.forScope(".binfo h1.title"),
-          "description":
-              TextSelector.forScope(".binfo .info .synopsis .content"),
+          "description": TextSelector.forScope(".binfo .info .synopsis .content"),
           "additionalInfo": Iterate(
             itemScope: ".bmeta .meta > div",
             item: Concat.selectors(

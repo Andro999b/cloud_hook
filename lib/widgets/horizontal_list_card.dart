@@ -10,6 +10,7 @@ class HorizontalListCard extends HookWidget {
   final Decoration? decoration;
   final Widget? child;
   final Widget? corner;
+  final Widget? badge;
   final bool autofocus;
 
   const HorizontalListCard({
@@ -20,6 +21,7 @@ class HorizontalListCard extends HookWidget {
     this.decoration,
     this.child,
     this.corner,
+    this.badge,
     this.autofocus = false,
   });
 
@@ -75,6 +77,16 @@ class HorizontalListCard extends HookWidget {
               ),
             ),
           ),
+          if (badge != null)
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: badge,
+                ),
+              ),
+            ),
         ],
       ),
     );

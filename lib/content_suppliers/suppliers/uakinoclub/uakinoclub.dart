@@ -11,7 +11,7 @@ part 'uakinoclub.g.dart';
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
-class UAKinoContentDetails extends BaseContentDetails {
+class UAKinoContentDetails extends AbstractContentDetails {
   UAKinoContentDetails({
     required super.id,
     required super.supplier,

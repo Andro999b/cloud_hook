@@ -14,7 +14,7 @@ const _siteHost = "anitube.in.ua";
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
-class AniTubeContentDetails extends BaseContentDetails with AsyncMediaItems {
+class AniTubeContentDetails extends AbstractContentDetails with AsyncMediaItems {
   final String? hash;
   final String newsId;
   final String? ralodePlayerParams;

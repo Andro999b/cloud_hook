@@ -1,11 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/widgets/horizontal_list_card.dart';
-import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class ContentInfoCard extends StatelessWidget {
   final bool autofocus;
+  final bool showSupplier;
 
   final ValueChanged<bool>? onHover;
   final GestureLongPressCallback? onLongPress;
@@ -21,10 +22,13 @@ class ContentInfoCard extends StatelessWidget {
     this.onHover,
     this.onLongPress,
     this.autofocus = false,
+    this.showSupplier = true,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return HorizontalListCard(
       autofocus: autofocus,
       onTap: onTap ??
@@ -36,12 +40,20 @@ class ContentInfoCard extends StatelessWidget {
       onLongPress: onLongPress,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: FastCachedImageProvider(contentInfo.image),
+          image: CachedNetworkImageProvider(contentInfo.image),
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
         ),
       ),
       corner: corner,
+      badge: showSupplier
+          ? Badge(
+              label: Text(contentInfo.supplier),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              backgroundColor: theme.colorScheme.primary,
+              textColor: theme.colorScheme.onPrimary,
+            )
+          : null,
       child: Column(
         children: [
           const Spacer(),

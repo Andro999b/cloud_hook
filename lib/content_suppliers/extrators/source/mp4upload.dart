@@ -11,12 +11,12 @@ class MP4UploadSourceLoader implements ContentMediaItemSourceLoader {
 
   final String url;
   final String? referer;
-  final String descriptionPrefix;
+  final String? descriptionPrefix;
 
   MP4UploadSourceLoader({
     required this.url,
     this.referer,
-    this.descriptionPrefix = "",
+    this.descriptionPrefix,
   });
 
   @override
@@ -36,7 +36,7 @@ class MP4UploadSourceLoader implements ContentMediaItemSourceLoader {
 
     return [
       SimpleContentMediaItemSource(
-          description: "${descriptionPrefix}MP4Upload",
+          description: descriptionPrefix ?? "MP4Upload",
           link: Uri.parse(link),
           headers: {
             "Referer": url,

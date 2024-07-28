@@ -88,7 +88,8 @@ class AnitakuSourceLoader implements ContentMediaItemSourceLoader {
               uri.toString(),
             ),
           )
-          .nonNulls,
+          .nonNulls
+          .toList(),
     ).call();
   }
 

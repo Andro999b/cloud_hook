@@ -5,40 +5,15 @@ import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/media_items_list.dart';
 import 'package:cloud_hook/content/video/video_content_view.dart';
+import 'package:cloud_hook/content/widgets.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/utils/visual.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:media_kit_video/media_kit_video_controls/src/controls/methods/fullscreen.dart';
 import 'package:media_kit_video/media_kit_video_controls/src/controls/methods/video_state.dart';
-
-abstract class _MediaCollectionItemConsumerWidger extends ConsumerWidget {
-  final CollectionItemProvider provider;
-
-  const _MediaCollectionItemConsumerWidger({
-    super.key,
-    required this.provider,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentProgress = ref.watch(provider);
-
-    return currentProgress.maybeWhen(
-      data: (data) => render(context, ref, data),
-      orElse: () => const SizedBox.shrink(),
-    );
-  }
-
-  Widget render(
-    BuildContext context,
-    WidgetRef ref,
-    MediaCollectionItem collectionItem,
-  );
-}
 
 // custom exit button to ensure exit fullscreen
 
@@ -68,15 +43,13 @@ class ExitButton extends StatelessWidget {
 
 // Title
 
-class MediaTitle extends _MediaCollectionItemConsumerWidger {
-  final ContentDetails details;
+class MediaTitle extends MediaCollectionItemConsumerWidger {
   final int playlistSize;
 
   const MediaTitle({
     super.key,
-    required this.details,
     required this.playlistSize,
-    required super.provider,
+    required super.contentDetails,
   });
 
   @override
@@ -85,7 +58,7 @@ class MediaTitle extends _MediaCollectionItemConsumerWidger {
     WidgetRef ref,
     MediaCollectionItem collectionItem,
   ) {
-    var title = details.title;
+    var title = contentDetails.title;
 
     if (playlistSize > 1) {
       title += " - ${collectionItem.currentItem + 1} / $playlistSize";
@@ -108,25 +81,26 @@ class MediaTitle extends _MediaCollectionItemConsumerWidger {
 
 // Playlist and source selection
 
-class PlaylistButton extends ConsumerWidget {
+class PlayerPlaylistButton extends MediaCollectionItemConsumerWidger {
   final PlaylistController playlistController;
-  final CollectionItemProvider provider;
 
-  const PlaylistButton({
+  const PlayerPlaylistButton({
     super.key,
     required this.playlistController,
-    required this.provider,
+    required super.contentDetails,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget render(
+    BuildContext context,
+    WidgetRef ref,
+    MediaCollectionItem collectionItem,
+  ) {
     return IconButton(
       onPressed: () {
-        final contentProgress = ref.read(provider).valueOrNull;
-
         Navigator.of(context).push(MediaItemsListRoute(
           mediaItems: playlistController.mediaItems,
-          contentProgress: contentProgress,
+          contentProgress: collectionItem,
           onSelect: (item) => playlistController.selectItem(item.number),
         ));
       },
@@ -140,12 +114,12 @@ class PlaylistButton extends ConsumerWidget {
 
 class SourceSelector extends StatelessWidget {
   final List<ContentMediaItem> mediaItems;
-  final CollectionItemProvider provider;
+  final ContentDetails contentDetails;
 
   const SourceSelector({
     super.key,
     required this.mediaItems,
-    required this.provider,
+    required this.contentDetails,
   });
 
   @override
@@ -156,7 +130,7 @@ class SourceSelector extends StatelessWidget {
           context: context,
           builder: (context) => _SourceSelectDialog(
             mediaItems: mediaItems,
-            provider: provider,
+            contentDetails: contentDetails,
           ),
         );
       },
@@ -168,83 +142,73 @@ class SourceSelector extends StatelessWidget {
   }
 }
 
-class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
+class _SourceSelectDialog extends MediaCollectionItemConsumerWidger {
   final List<ContentMediaItem> mediaItems;
 
   const _SourceSelectDialog({
     required this.mediaItems,
-    required super.provider,
+    required super.contentDetails,
   });
 
   @override
   render(BuildContext context, WidgetRef ref, MediaCollectionItem data) {
     return AppTheme(
-      child: BackButtonListener(
-        onBackButtonPressed: () async {
-          Navigator.of(context).maybePop();
-          return true;
-        },
-        child: Center(
-          child: Card(
-            clipBehavior: Clip.antiAlias,
-            child: FutureBuilder(
-              future: Future.value(mediaItems[data.currentItem].sources),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: Center(child: CircularProgressIndicator()),
+      child: Dialog(
+        clipBehavior: Clip.antiAlias,
+        child: FutureBuilder(
+          future: Future.value(mediaItems[data.currentItem].sources),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox(
+                width: 60,
+                height: 60,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            final videos =
+                snapshot.data?.where((e) => e.kind == FileKind.video) ?? [];
+            final subtitles =
+                snapshot.data?.where((e) => e.kind == FileKind.subtitle) ?? [];
+
+            if (videos.isEmpty) {
+              return Container(
+                width: 250,
+                constraints: const BoxConstraints.tightFor(height: 60),
+                child: Center(
+                  child: Text(AppLocalizations.of(context)!.videoNoSources),
+                ),
+              );
+            }
+
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth < mobileWidth) {
+                  return SingleChildScrollView(
+                    child: Column(children: [
+                      _renderVideoSources(context, ref, videos, data),
+                      if (subtitles.isNotEmpty)
+                        _renderSubtitlesSources(context, ref, subtitles, data),
+                    ]),
+                  );
+                } else {
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SingleChildScrollView(
+                          child:
+                              _renderVideoSources(context, ref, videos, data)),
+                      if (subtitles.isNotEmpty)
+                        SingleChildScrollView(
+                          child: _renderSubtitlesSources(
+                              context, ref, subtitles, data),
+                        ),
+                    ],
                   );
                 }
-
-                final videos =
-                    snapshot.data?.where((e) => e.kind == FileKind.video) ?? [];
-                final subtitles =
-                    snapshot.data?.where((e) => e.kind == FileKind.subtitle) ??
-                        [];
-
-                if (videos.isEmpty) {
-                  return Container(
-                    width: 250,
-                    constraints: const BoxConstraints.tightFor(height: 60),
-                    child: Center(
-                      child: Text(AppLocalizations.of(context)!.videoNoSources),
-                    ),
-                  );
-                }
-
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (constraints.maxWidth < mobileWidth) {
-                      return SingleChildScrollView(
-                        child: Column(children: [
-                          _renderVideoSources(context, ref, videos, data),
-                          if (subtitles.isNotEmpty)
-                            _renderSubtitlesSources(
-                                context, ref, subtitles, data),
-                        ]),
-                      );
-                    } else {
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SingleChildScrollView(
-                              child: _renderVideoSources(
-                                  context, ref, videos, data)),
-                          if (subtitles.isNotEmpty)
-                            SingleChildScrollView(
-                              child: _renderSubtitlesSources(
-                                  context, ref, subtitles, data),
-                            ),
-                        ],
-                      );
-                    }
-                  },
-                );
               },
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
@@ -262,15 +226,17 @@ class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: sources
-            .mapIndexed(
-              (idx, e) => MenuItemButton(
+            .map(
+              (e) => MenuItemButton(
                 leadingIcon: const Icon(Icons.music_note),
-                trailingIcon:
-                    data.currentSource == idx ? const Icon(Icons.check) : null,
+                trailingIcon: data.currentSourceName == e.description
+                    ? const Icon(Icons.check)
+                    : null,
                 onPressed: () {
                   context.pop();
-                  final notifier = ref.read(provider.notifier);
-                  notifier.setCurrentSource(idx);
+                  final notifier =
+                      ref.read(collectionItemProvider(contentDetails).notifier);
+                  notifier.setCurrentSource(e.description);
                 },
                 child: Text(e.description),
               ),
@@ -294,23 +260,27 @@ class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
         children: [
           MenuItemButton(
             leadingIcon: const Icon(Icons.subtitles),
-            trailingIcon:
-                data.currentSubtitle == null ? const Icon(Icons.check) : null,
+            trailingIcon: data.currentSubtitleName == null
+                ? const Icon(Icons.check)
+                : null,
             onPressed: () {
-              final notifier = ref.read(provider.notifier);
+              final notifier =
+                  ref.read(collectionItemProvider(contentDetails).notifier);
               notifier.setCurrentSubtitle(null);
               context.pop();
             },
             child: Text(AppLocalizations.of(context)!.videoSubtitlesOff),
           ),
-          ...sources.mapIndexed(
-            (idx, e) => MenuItemButton(
+          ...sources.map(
+            (e) => MenuItemButton(
               leadingIcon: const Icon(Icons.subtitles),
-              trailingIcon:
-                  data.currentSubtitle == idx ? const Icon(Icons.check) : null,
+              trailingIcon: data.currentSubtitleName == e.description
+                  ? const Icon(Icons.check)
+                  : null,
               onPressed: () {
-                final notifier = ref.read(provider.notifier);
-                notifier.setCurrentSubtitle(idx);
+                final notifier =
+                    ref.read(collectionItemProvider(contentDetails).notifier);
+                notifier.setCurrentSubtitle(e.description);
                 context.pop();
               },
               child: Text(e.description),
@@ -324,12 +294,12 @@ class _SourceSelectDialog extends _MediaCollectionItemConsumerWidger {
 
 // Prev and Next navigation buttons
 
-class SkipPrevButton extends _MediaCollectionItemConsumerWidger {
+class SkipPrevButton extends MediaCollectionItemConsumerWidger {
   final double? iconSize;
 
   const SkipPrevButton({
     super.key,
-    required super.provider,
+    required super.contentDetails,
     this.iconSize,
   });
 
@@ -343,7 +313,7 @@ class SkipPrevButton extends _MediaCollectionItemConsumerWidger {
       onPressed: collectionItem.currentItem > 0
           ? () {
               ref
-                  .read(provider.notifier)
+                  .read(collectionItemProvider(contentDetails).notifier)
                   .setCurrentItem(collectionItem.currentItem - 1);
             }
           : null,
@@ -356,7 +326,7 @@ class SkipPrevButton extends _MediaCollectionItemConsumerWidger {
   }
 }
 
-class SkipNextButton extends _MediaCollectionItemConsumerWidger {
+class SkipNextButton extends MediaCollectionItemConsumerWidger {
   final List<ContentMediaItem> mediaItems;
   final double? iconSize;
   final FocusNode? focusNode;
@@ -364,7 +334,7 @@ class SkipNextButton extends _MediaCollectionItemConsumerWidger {
   const SkipNextButton({
     super.key,
     required this.mediaItems,
-    required super.provider,
+    required super.contentDetails,
     this.iconSize,
     this.focusNode,
   });
@@ -379,7 +349,7 @@ class SkipNextButton extends _MediaCollectionItemConsumerWidger {
       onPressed: collectionItem.currentItem < mediaItems.length - 1
           ? () {
               ref
-                  .read(provider.notifier)
+                  .read(collectionItemProvider(contentDetails).notifier)
                   .setCurrentItem(collectionItem.currentItem + 1);
             }
           : null,

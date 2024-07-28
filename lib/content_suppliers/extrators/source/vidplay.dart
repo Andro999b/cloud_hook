@@ -10,11 +10,11 @@ import 'package:simple_rc4/simple_rc4.dart';
 
 class VidPlaySourceLoader implements ContentMediaItemSourceLoader {
   final String url;
-  final String despriptionPrefix;
+  final String? despriptionPrefix;
 
   const VidPlaySourceLoader({
     required this.url,
-    this.despriptionPrefix = "",
+    this.despriptionPrefix,
   });
 
   @override
@@ -26,12 +26,10 @@ class VidPlaySourceLoader implements ContentMediaItemSourceLoader {
 
     final id = _extractId(url);
     final endcodedId = _encode(_extractId(url), keys[0]);
-    final t = uri.queryParameters["t"]!;
     final h = _encode(id, keys[1]);
 
     final mediaInfoUri = Uri.https(host, "/mediainfo/$endcodedId", {
-      "sub.info": uri.queryParameters["sub.info"],
-      "t": t,
+      ...uri.queryParameters,
       "h": h,
     });
 
@@ -47,7 +45,7 @@ class VidPlaySourceLoader implements ContentMediaItemSourceLoader {
 
     return JWPlayer.fromJson(
       mediaInfo,
-      descriptionPrefix: "${despriptionPrefix}VidPlay",
+      descriptionPrefix: despriptionPrefix ?? "VidPlay",
     );
   }
 

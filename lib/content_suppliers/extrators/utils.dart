@@ -6,7 +6,7 @@ import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/logger.dart';
 
 class AggSourceLoader implements ContentMediaItemSourceLoader {
-  final Iterable<ContentMediaItemSourceLoader> sourceLoaders;
+  final List<ContentMediaItemSourceLoader> sourceLoaders;
 
   AggSourceLoader(this.sourceLoaders);
 

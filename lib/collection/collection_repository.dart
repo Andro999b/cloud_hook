@@ -21,8 +21,8 @@ class IsarMediaCollectionItem {
     required this.status,
     required this.mediaType,
     this.currentItem,
-    this.currentSource,
-    this.currentSubtitle,
+    this.currentSourceName,
+    this.currentSubtitleName,
     this.positions,
     this.priority,
     this.lastSeen,
@@ -44,8 +44,8 @@ class IsarMediaCollectionItem {
   @Enumerated(EnumType.ordinal)
   MediaType mediaType;
   int? currentItem;
-  int? currentSource;
-  int? currentSubtitle;
+  String? currentSourceName;
+  String? currentSubtitleName;
   List<IsarMediaItemPosition>? positions;
 
   @Enumerated(EnumType.ordinal)
@@ -67,8 +67,8 @@ class IsarMediaCollectionItem {
       image: collectionItem.image,
       mediaType: collectionItem.mediaType,
       currentItem: collectionItem.currentItem,
-      currentSource: collectionItem.currentSource,
-      currentSubtitle: collectionItem.currentSubtitle,
+      currentSourceName: collectionItem.currentSourceName,
+      currentSubtitleName: collectionItem.currentSubtitleName,
       positions: collectionItem.positions.entries
           .map(
             (e) => IsarMediaItemPosition()
@@ -92,8 +92,8 @@ class IsarMediaCollectionItem {
       image: image,
       mediaType: mediaType,
       currentItem: currentItem ?? 0,
-      currentSource: currentSource ?? 0,
-      currentSubtitle: currentSubtitle,
+      currentSourceName: currentSourceName,
+      currentSubtitleName: currentSubtitleName,
       positions: Map.fromEntries(
         positions?.map(
               (e) => MapEntry(

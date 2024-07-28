@@ -18,10 +18,8 @@ UFDubContentDetails _$UFDubContentDetailsFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           [],
-      similar: (json['similar'] as List<dynamic>?)
-              ?.map((e) =>
-                  ContentSearchResult.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
+      similar: json['similar'] == null
+          ? []
+          : ContentSearchResult.fromJsonList(json['similar'] as List),
       iframe: json['iframe'] as String,
     );

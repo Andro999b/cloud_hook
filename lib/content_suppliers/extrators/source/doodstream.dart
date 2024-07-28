@@ -13,12 +13,12 @@ class DoodStreamSourceLoader implements ContentMediaItemSourceLoader {
 
   final String url;
   final String referer;
-  final String despriptionPrefix;
+  final String? despriptionPrefix;
 
   DoodStreamSourceLoader({
     required this.url,
     required this.referer,
-    this.despriptionPrefix = "",
+    this.despriptionPrefix,
   });
 
   @override
@@ -50,7 +50,7 @@ class DoodStreamSourceLoader implements ContentMediaItemSourceLoader {
 
     return [
       SimpleContentMediaItemSource(
-        description: "${despriptionPrefix}doodstream",
+        description: despriptionPrefix ?? "doodstream",
         link: parseUri(mediaUrl),
         headers: {"Referer": uri.toString()},
       )

@@ -8,7 +8,7 @@ part 'eneyida.g.dart';
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
-class EneyidaContentDetails extends BaseContentDetails with PLayerJSIframe, AsyncMediaItems {
+class EneyidaContentDetails extends AbstractContentDetails with PLayerJSIframe, AsyncMediaItems {
   EneyidaContentDetails({
     required super.id,
     required super.supplier,

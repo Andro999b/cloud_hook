@@ -9,7 +9,7 @@ part 'ufdub.g.dart';
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
-class UFDubContentDetails extends BaseContentDetails with AsyncMediaItems {
+class UFDubContentDetails extends AbstractContentDetails with AsyncMediaItems {
   UFDubContentDetails({
     required super.id,
     required super.supplier,

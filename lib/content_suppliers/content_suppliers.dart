@@ -5,7 +5,7 @@ import 'package:cloud_hook/content_suppliers/suppliers/anitaku/anitaku.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/anitube/anitube.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/aniwave/aniwave.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/aniwave/anix.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/eneyida/eneyida.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/mangadex/mangadex.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/tmdb/tmdb.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/uafilms/uafilms.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/uakinoclub/uakinoclub.dart';
@@ -23,8 +23,8 @@ class ContentSuppliers {
     AniWaveSupplier(),
     AnixSupplier(),
     Anitaku(),
+    MangaDexSupllier(),
     UAKinoClubSupplier(),
-    EneyidaSupplier(),
     AniTubeSupplier(),
     AnimeUASupplier(),
     UAFilmsSupplier(),
@@ -48,8 +48,7 @@ class ContentSuppliers {
     for (var supplierName in contentSuppliers) {
       final supplier = getSupplier(supplierName);
 
-      if (supplier == null ||
-          supplier.supportedTypes.intersection(contentTypes).isEmpty) {
+      if (supplier == null || supplier.supportedTypes.intersection(contentTypes).isEmpty) {
         continue;
       }
 
@@ -60,19 +59,15 @@ class ContentSuppliers {
         results[supplier.name] = res;
         yield results;
       } catch (error, stackTrace) {
-        logger.e("Supplier ${supplier.name} fail",
-            error: error, stackTrace: stackTrace);
+        logger.e("Supplier ${supplier.name} fail", error: error, stackTrace: stackTrace);
       }
     }
 
     yield results;
   }
 
-  Future<List<ContentInfo>> loadRecomendationsChannel(
-      String supplierName, String channel,
-      {page = 1}) async {
-    logger.i(
-        "Loading content supplier: $supplierName recommendations channel: $channel");
+  Future<List<ContentInfo>> loadRecomendationsChannel(String supplierName, String channel, {page = 1}) async {
+    logger.i("Loading content supplier: $supplierName recommendations channel: $channel");
 
     final supplier = getSupplier(supplierName);
 
@@ -86,8 +81,7 @@ class ContentSuppliers {
   Future<ContentDetails> detailsById(String supplierName, String id) async {
     logger.i("Load content details supplier: $supplierName id: $id");
 
-    final supplier =
-        _suppliers.where((e) => e.name == supplierName).firstOrNull;
+    final supplier = _suppliers.where((e) => e.name == supplierName).firstOrNull;
 
     if (supplier == null) {
       throw Exception("No supplier $supplierName found");
@@ -97,8 +91,7 @@ class ContentSuppliers {
     try {
       details = await Isolate.run(() => supplier.detailsById(id));
     } catch (error, stackTrace) {
-      logger.e("Supplier $supplier fail with $id",
-          error: error, stackTrace: stackTrace);
+      logger.e("Supplier $supplier fail with $id", error: error, stackTrace: stackTrace);
 
       rethrow;
     }

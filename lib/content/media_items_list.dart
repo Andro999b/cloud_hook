@@ -1,15 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/utils/visual.dart';
 import 'package:collection/collection.dart';
-import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 typedef SelectCallback = void Function(ContentMediaItem item);
+
+// todo: video items list
 
 class MediaItemsListRoute<T> extends PopupRoute<T> {
   final List<ContentMediaItem> mediaItems;
@@ -280,7 +282,7 @@ class _MediaItemsListItem extends StatelessWidget {
               decoration: BoxDecoration(
                 image: image != null
                     ? DecorationImage(
-                        image: FastCachedImageProvider(image!),
+                        image: CachedNetworkImageProvider(image!),
                         fit: BoxFit.cover,
                       )
                     : null,

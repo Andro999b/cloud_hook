@@ -1,7 +1,5 @@
-import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/video/video_content_view.dart';
 import 'package:cloud_hook/content/video/widgets.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -10,16 +8,12 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:window_manager/window_manager.dart';
 
 class VideoContentDesktopView extends StatefulWidget {
-  final CollectionItemProvider provider;
-  final ContentDetails details;
   final Player player;
   final VideoController videoController;
   final PlaylistController playlistController;
 
   const VideoContentDesktopView({
     super.key,
-    required this.provider,
-    required this.details,
     required this.player,
     required this.videoController,
     required this.playlistController,
@@ -118,21 +112,20 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
         const ExitButton(),
         const SizedBox(width: 8),
         MediaTitle(
-          details: widget.details,
           playlistSize: playlistController.mediaItems.length,
-          provider: widget.provider,
+          contentDetails: playlistController.contentDetails,
         ),
         if (playlistController.mediaItems.length > 1)
-          PlaylistButton(
+          PlayerPlaylistButton(
             playlistController: playlistController,
-            provider: widget.provider,
+            contentDetails: playlistController.contentDetails,
           )
       ],
       bottomButtonBar: [
-        SkipPrevButton(provider: widget.provider),
+        SkipPrevButton(contentDetails: playlistController.contentDetails),
         const PlayOrPauseButton(),
         SkipNextButton(
-          provider: widget.provider,
+          contentDetails: playlistController.contentDetails,
           mediaItems: playlistController.mediaItems,
         ),
         const MaterialDesktopVolumeButton(),
@@ -145,7 +138,7 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
           ),
         SourceSelector(
           mediaItems: playlistController.mediaItems,
-          provider: widget.provider,
+          contentDetails: playlistController.contentDetails,
         ),
         const MaterialDesktopFullscreenButton(),
       ],

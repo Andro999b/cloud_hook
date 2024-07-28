@@ -8,7 +8,7 @@ part 'uafilms.g.dart';
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
-class UAFilmsContentDetails extends BaseContentDetails with PLayerJSIframe, AsyncMediaItems {
+class UAFilmsContentDetails extends AbstractContentDetails with PLayerJSIframe, AsyncMediaItems {
   UAFilmsContentDetails({
     required super.id,
     required super.supplier,

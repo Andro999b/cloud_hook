@@ -38,5 +38,23 @@ final colorSettingsProvider =
 );
 
 typedef _$ColorSettings = AutoDisposeNotifier<Color>;
+String _$mangaReaderImageModeSettingsHash() =>
+    r'ee286661f1a1d5e658039c5d796646dd1c64bd28';
+
+/// See also [MangaReaderImageModeSettings].
+@ProviderFor(MangaReaderImageModeSettings)
+final mangaReaderImageModeSettingsProvider = AutoDisposeNotifierProvider<
+    MangaReaderImageModeSettings, MangaReaderImageMode>.internal(
+  MangaReaderImageModeSettings.new,
+  name: r'mangaReaderImageModeSettingsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$mangaReaderImageModeSettingsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$MangaReaderImageModeSettings
+    = AutoDisposeNotifier<MangaReaderImageMode>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -77,10 +77,10 @@ class JWPlayer {
       ),
       ...config.tracks
           .where((t) => t.kind == "captions" || t.kind == "subtitles")
-          .map(
-            (e) => SimpleContentMediaItemSource(
+          .mapIndexed(
+            (idx, e) => SimpleContentMediaItemSource(
               kind: FileKind.subtitle,
-              description: "[$despriptionPrefix] ${e.label}",
+              description: "[$despriptionPrefix] ${idx + 1}. ${e.label}",
               link: parseUri(e.file),
               headers: headers,
             ),

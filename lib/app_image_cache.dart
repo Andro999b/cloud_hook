@@ -13,7 +13,7 @@ class AppImageCache {
 
     await FastCachedImageConfig.init(
       subDir: storageLocation,
-      clearCacheAfter: const Duration(days: 15),
+      clearCacheAfter: const Duration(days: 7),
     );
   }
 }

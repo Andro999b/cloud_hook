@@ -11,7 +11,7 @@ const _siteHost = "anix.to";
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
-class AnixContentDetails extends BaseContentDetails with AsyncMediaItems {
+class AnixContentDetails extends AbstractContentDetails with AsyncMediaItems {
   final String mediaId;
 
   AnixContentDetails({

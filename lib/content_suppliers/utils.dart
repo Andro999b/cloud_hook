@@ -3,15 +3,17 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 
 // todo: add sentry integration
-final dio = Dio(BaseOptions(
-  connectTimeout: const Duration(seconds: 30),
-)) //;
-  ..interceptors.add(LogInterceptor(responseBody: false));
+final dio = Dio()
+  // ..interceptors.add(LogInterceptor(responseBody: false))
+  ..options.sendTimeout = const Duration(seconds: 30)
+  ..options.receiveTimeout = const Duration(seconds: 30);
 
-Uri parseUri(String url) => url.startsWith("//") ? Uri.parse("https:$url") : Uri.parse(url);
+Uri parseUri(String url) =>
+    url.startsWith("//") ? Uri.parse("https:$url") : Uri.parse(url);
 
 int _hunterDef(String d, int e, int f) {
-  const charset = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/";
+  const charset =
+      "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/";
   final sourceBase = charset.substring(0, e).codeUnits;
   final targetBase = charset.substring(0, f);
 

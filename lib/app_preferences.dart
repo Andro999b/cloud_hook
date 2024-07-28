@@ -1,4 +1,5 @@
 import 'package:cloud_hook/collection/collection_item_model.dart';
+import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -109,4 +110,16 @@ class AppPreferences {
 
   static Set<String>? getSupplierChannels(String supplierName) =>
       instance.getStringList("suppliers.$supplierName.channels")?.toSet();
+
+  static set mangaReaderImageMode(MangaReaderImageMode mode) =>
+      instance.setString("manga_reader_image_mode", mode.name);
+
+  static MangaReaderImageMode get mangaReaderImageMode =>
+      MangaReaderImageMode.values
+          .where(
+            (type) =>
+                type.name == instance.getString("manga_reader_image_mode"),
+          )
+          .firstOrNull ??
+      MangaReaderImageMode.original;
 }

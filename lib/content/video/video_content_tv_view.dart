@@ -13,16 +13,12 @@ import 'package:media_kit_video/media_kit_video_controls/src/controls/extensions
 import 'package:media_kit_video/media_kit_video_controls/src/controls/methods/video_state.dart';
 
 class VideoContentTVView extends StatelessWidget {
-  final CollectionItemProvider provider;
-  final ContentDetails details;
   final Player player;
   final VideoController videoController;
   final PlaylistController playlistController;
 
   const VideoContentTVView({
     super.key,
-    required this.provider,
-    required this.details,
     required this.player,
     required this.videoController,
     required this.playlistController,
@@ -39,9 +35,7 @@ class VideoContentTVView extends StatelessWidget {
   Widget _renderControls(BuildContext context, VideoState state) {
     return AndroidTVControls(
       player: player,
-      details: details,
       playlistController: playlistController,
-      provider: provider,
     );
   }
 }
@@ -52,15 +46,11 @@ class AndroidTVControls extends StatefulWidget {
   const AndroidTVControls({
     super.key,
     required this.player,
-    required this.details,
     required this.playlistController,
-    required this.provider,
   });
 
   final Player player;
-  final ContentDetails details;
   final PlaylistController playlistController;
-  final CollectionItemProvider provider;
 
   @override
   State<AndroidTVControls> createState() => _AndroidTVControlsState();
@@ -212,8 +202,11 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
                             child: MaterialSeekBar(),
                           ),
                           _AndroidTVBottomBar(
-                              widget: widget,
-                              playPauseFocusNode: playPauseFocusNode)
+                            contentDetails:
+                                widget.playlistController.contentDetails,
+                            playlistController: widget.playlistController,
+                            playPauseFocusNode: playPauseFocusNode,
+                          )
                         ],
                       )
                     : const SizedBox.shrink(),
@@ -274,9 +267,8 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
         children: [
           const SizedBox(width: 8),
           MediaTitle(
-            details: widget.details,
+            contentDetails: widget.playlistController.contentDetails,
             playlistSize: widget.playlistController.mediaItems.length,
-            provider: widget.provider,
           ),
           const Spacer(),
         ],
@@ -327,19 +319,21 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
 
 class _AndroidTVBottomBar extends ConsumerWidget {
   const _AndroidTVBottomBar({
-    required this.widget,
+    required this.contentDetails,
+    required this.playlistController,
     required this.playPauseFocusNode,
   });
 
-  final AndroidTVControls widget;
+  final ContentDetails contentDetails;
+  final PlaylistController playlistController;
   final FocusNode playPauseFocusNode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentProgress = ref.watch(widget.provider);
+    final currentProgress = ref.watch(collectionItemProvider(contentDetails));
 
     final isLastItem = currentProgress.valueOrNull?.currentItem !=
-        widget.playlistController.mediaItems.length - 1;
+        playlistController.mediaItems.length - 1;
 
     return Container(
       decoration: const BoxDecoration(
@@ -362,24 +356,24 @@ class _AndroidTVBottomBar extends ConsumerWidget {
           children: [
             const MaterialDesktopPositionIndicator(),
             const Spacer(),
-            SkipPrevButton(provider: widget.provider),
+            SkipPrevButton(contentDetails: contentDetails),
             PlayOrPauseButton(
               focusNode: !isLastItem ? playPauseFocusNode : null,
             ),
             SkipNextButton(
-              provider: widget.provider,
-              mediaItems: widget.playlistController.mediaItems,
+              contentDetails: contentDetails,
+              mediaItems: playlistController.mediaItems,
               focusNode: isLastItem ? playPauseFocusNode : null,
             ),
             const Spacer(),
             SourceSelector(
-              mediaItems: widget.playlistController.mediaItems,
-              provider: widget.provider,
+              mediaItems: playlistController.mediaItems,
+              contentDetails: contentDetails,
             ),
-            if (widget.playlistController.mediaItems.length > 1)
-              PlaylistButton(
-                playlistController: widget.playlistController,
-                provider: widget.provider,
+            if (playlistController.mediaItems.length > 1)
+              PlayerPlaylistButton(
+                playlistController: playlistController,
+                contentDetails: contentDetails,
               )
           ],
         ),

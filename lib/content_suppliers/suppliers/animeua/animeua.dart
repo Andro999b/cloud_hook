@@ -8,7 +8,7 @@ part 'animeua.g.dart';
 
 @JsonSerializable(createToJson: false)
 // ignore: must_be_immutable
-class AnimeUAContentDetails extends BaseContentDetails with PLayerJSIframe, AsyncMediaItems {
+class AnimeUAContentDetails extends AbstractContentDetails with PLayerJSIframe, AsyncMediaItems {
   @override
   final String iframe;
 

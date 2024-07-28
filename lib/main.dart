@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:cloud_hook/app_database.dart';
-import 'package:cloud_hook/app_image_cache.dart';
 import 'package:cloud_hook/app_init_firebase.dart';
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/app_preferences.dart';
@@ -32,7 +31,7 @@ void main() async {
 
   await AppSecrets.init();
   await AppDatabase.init();
-  await AppImageCache.init();
+  // await AppImageCache.init();
   await AppPreferences.init();
   await AndroidTVDetector.detect();
 
@@ -80,6 +79,8 @@ class MainApp extends StatelessWidget {
             // initialLocation: "/settings",
             // initialLocation: "/content/AniWave/death-note.z02",
             // initialLocation: "/content/Anitaku/category%2Fisekai-suicide-squad",
+            // initialLocation:
+            //     "/manga/MangaDex/ef3a66a4-010f-4930-b6d4-0ff28b0ceed5",
             // initialLocation: "/video/TMDB/movie%2F54138",
             routes: [
               GoRoute(
