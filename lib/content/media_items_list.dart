@@ -1,6 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
+import 'package:cloud_hook/content/video/widgets.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/utils/visual.dart';
@@ -9,22 +8,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-typedef SelectCallback = void Function(ContentMediaItem item);
+typedef SelectCallback = void Function(ContentMediaItem);
+typedef ItemBuilder = Widget Function(
+  ContentMediaItem,
+  ContentProgress?,
+  SelectCallback,
+);
 
 // todo: video items list
 
 class MediaItemsListRoute<T> extends PopupRoute<T> {
+  final String title;
   final List<ContentMediaItem> mediaItems;
   final ContentProgress? contentProgress;
+  final ItemBuilder itemBuilder;
   final SelectCallback onSelect;
 
   MediaItemsListRoute({
     super.settings,
     super.filter,
     super.traversalEdgeBehavior,
+    required this.title,
     required this.mediaItems,
     this.contentProgress,
     required this.onSelect,
+    this.itemBuilder = videoItemBuilder,
   });
 
   @override
@@ -56,12 +64,14 @@ class MediaItemsListRoute<T> extends PopupRoute<T> {
           child: AppTheme(
             child: SafeArea(
               child: _MediaItemsListView(
+                title: title,
                 mediaItems: mediaItems,
                 contentProgress: contentProgress,
                 onSelect: (item) {
                   Navigator.of(context).pop();
                   onSelect(item);
                 },
+                itemBuilder: itemBuilder,
               ),
             ),
           ),
@@ -72,14 +82,18 @@ class MediaItemsListRoute<T> extends PopupRoute<T> {
 }
 
 class _MediaItemsListView extends StatelessWidget {
+  final String title;
   final List<ContentMediaItem> mediaItems;
   final ContentProgress? contentProgress;
   final SelectCallback onSelect;
+  final ItemBuilder itemBuilder;
 
   const _MediaItemsListView({
+    required this.title,
     required this.mediaItems,
     required this.contentProgress,
     required this.onSelect,
+    required this.itemBuilder,
   });
 
   @override
@@ -110,6 +124,7 @@ class _MediaItemsListView extends StatelessWidget {
                 mediaItems: mediaItems,
                 contentProgress: contentProgress,
                 onSelect: onSelect,
+                itemBuilder: itemBuilder,
               ),
             )
           ],
@@ -125,9 +140,12 @@ class _MediaItemsListView extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(
-          AppLocalizations.of(context)!.episodesList,
-          style: theme.textTheme.headlineMedium,
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0),
+          child: Text(
+            title,
+            style: theme.textTheme.headlineMedium,
+          ),
         ),
         Padding(
           padding: const EdgeInsets.all(4.0),
@@ -147,11 +165,13 @@ class _MediaItemsList extends HookWidget {
   final List<ContentMediaItem> mediaItems;
   final ContentProgress? contentProgress;
   final SelectCallback onSelect;
+  final ItemBuilder itemBuilder;
 
   const _MediaItemsList({
     required this.mediaItems,
     required this.contentProgress,
     required this.onSelect,
+    required this.itemBuilder,
   });
 
   @override
@@ -165,6 +185,7 @@ class _MediaItemsList extends HookWidget {
         list: groups.values.first,
         contentProgress: contentProgress,
         onSelect: onSelect,
+        itemBuilder: itemBuilder,
       );
     }
 
@@ -186,6 +207,7 @@ class _MediaItemsList extends HookWidget {
                       list: e,
                       contentProgress: contentProgress,
                       onSelect: onSelect,
+                      itemBuilder: itemBuilder,
                     ),
                   )
                   .toList(),
@@ -210,11 +232,13 @@ class _MediaItemsListSection extends HookWidget {
   final List<ContentMediaItem> list;
   final ContentProgress? contentProgress;
   final SelectCallback onSelect;
+  final ItemBuilder itemBuilder;
 
   const _MediaItemsListSection({
     required this.list,
     required this.contentProgress,
     required this.onSelect,
+    required this.itemBuilder,
   });
 
   @override
@@ -229,93 +253,10 @@ class _MediaItemsListSection extends HookWidget {
       initialScrollIndex: index,
       itemBuilder: (context, index) {
         final item = list[index];
-        final image = item.image;
-        final title = item.title;
-        final progress = contentProgress?.positions[item.number]?.progress ?? 0;
 
-        return _MediaItemsListItem(
-          title: title,
-          image: image,
-          selected: item.number == contentProgress?.currentItem,
-          progress: progress,
-          onTap: () {
-            onSelect(item);
-          },
-        );
+        return itemBuilder(item, contentProgress, onSelect);
       },
       itemCount: list.length,
-    );
-  }
-}
-
-class _MediaItemsListItem extends StatelessWidget {
-  final String title;
-  final String? image;
-  final bool selected;
-  final double progress;
-  final VoidCallback onTap;
-
-  const _MediaItemsListItem({
-    required this.title,
-    this.image,
-    required this.selected,
-    required this.progress,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card.filled(
-      clipBehavior: Clip.antiAlias,
-      color: selected ? theme.colorScheme.onInverseSurface : null,
-      child: InkWell(
-        autofocus: selected,
-        mouseCursor: SystemMouseCursors.click,
-        onTap: onTap,
-        child: Row(
-          children: [
-            Container(
-              width: 96,
-              height: 72,
-              decoration: BoxDecoration(
-                image: image != null
-                    ? DecorationImage(
-                        image: CachedNetworkImageProvider(image!),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
-                color: image == null
-                    ? theme.colorScheme.surfaceTint.withOpacity(0.5)
-                    : null,
-              ),
-              child: selected
-                  ? const Center(
-                      child: Icon(
-                        Icons.play_arrow_rounded,
-                        color: Colors.white,
-                        size: 48,
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-            Expanded(
-              child: ListTile(
-                mouseCursor: SystemMouseCursors.click,
-                title: Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                subtitle: LinearProgressIndicator(
-                  value: progress,
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
     );
   }
 }

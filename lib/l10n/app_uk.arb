@@ -11,6 +11,7 @@
     "watchButton": "Дивитись",
     "readButton": "Читати",
     "episodesList": "Список епізодів",
+    "mangaChapter": "Розділи",
     "status": "Статус",
     "statusLableWatchingNow": "Дивлюсь зараз",
     "statusLableComplete": "Завершено",
@@ -44,5 +45,13 @@
     "videoSubtitlesOff": "Без субтитрів",
     "settingsUnableDownloadNewVersion": "Не вдається завантажити нову версію",
     "settingsCheckForUpdate": "Перевірити оновлення",
-    "settingsDownloadUpdate": "Завантажити оновлення {update}"
+    "settingsDownloadUpdate": "Завантажити оновлення {update}",
+    "mangaUnableToLoadPage": "Неможливо відобразити сторінку",
+    "mangaPageLoading": "Завантаження сторінки",
+    "mangaImageReaderMode": "Розміщеня зображення",
+    "mangaImageReaderModeOriginal": "Оригинільне зображеня",
+    "mangaImageReaderModeFit": "Розтягнути",
+    "mangaImageReaderModeFitWidth": "Розтягнути по ширині",
+    "mangaImageReaderModeFitHeight": "Розтягнути по висоті",
+    "mangaTranslation": "Переклад"
 }

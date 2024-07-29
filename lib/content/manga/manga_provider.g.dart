@@ -334,7 +334,7 @@ class _CurrentMangaChapterProviderElement
       (origin as CurrentMangaChapterProvider).mediaItems;
 }
 
-String _$currentMangaPageHash() => r'df7ad192765f7ce962fa4eb6d8af90598ccfb874';
+String _$currentMangaPageHash() => r'279df0ba0a7b2fdb8f78639b42b85873843d2f4f';
 
 /// See also [currentMangaPage].
 @ProviderFor(currentMangaPage)

@@ -137,7 +137,7 @@ class MediaItemPosition extends Equatable {
     required this.length,
   });
 
-  double get progress => length != 0 ? position / length : 0;
+  double get progress => length != 0 ? (position + 1) / length : 0;
 
   MediaItemPosition copyWith({
     int? position,

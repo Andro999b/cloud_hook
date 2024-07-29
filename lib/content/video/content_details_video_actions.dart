@@ -73,6 +73,7 @@ class _ContentPlaylistButton extends ConsumerWidget {
       onPressed: () {
         Navigator.of(context).push(
           MediaItemsListRoute(
+            title: AppLocalizations.of(context)!.episodesList,
             mediaItems: mediaItems,
             contentProgress: collectionItem,
             onSelect: (item) {

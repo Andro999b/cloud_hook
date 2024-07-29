@@ -1,3 +1,4 @@
+import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/content/manga/manga_content_view.dart';
 import 'package:cloud_hook/content/manga/manga_provider.dart';
 import 'package:cloud_hook/content/manga/model.dart';
@@ -38,7 +39,9 @@ class MangaChapterViewer extends ConsumerWidget {
 
   Widget _renderReader(BuildContext context, MangaChapterPages? chapterPages) {
     if (chapterPages == null) {
-      return const Center(child: Text("Неможливо відобразити сторінку"));
+      return Center(
+        child: Text(AppLocalizations.of(context)!.mangaUnableToLoadPage),
+      );
     }
 
     // final haflLen = (chapterPages.pages.length / 2).ceil();
@@ -101,35 +104,41 @@ class _SinglePageViewer extends HookConsumerWidget {
               onInvoke: (_) => _scrollTo(scrollController, -100),
             )
           },
-          child: Focus(
-            autofocus: true,
-            child: InteractiveViewer(
-              scaleEnabled: imageMode == MangaReaderImageMode.fit,
-              child: SingleChildScrollView(
-                controller: scrollController,
-                child: Image(
-                  image: image,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const Center(child: Text("Завантаження сторінки"));
-                  },
-                  fit: switch (imageMode) {
-                    MangaReaderImageMode.fitHeight => BoxFit.fitHeight,
-                    MangaReaderImageMode.fitWidth => BoxFit.fitWidth,
-                    _ => BoxFit.contain
-                  },
-                  width: switch (imageMode) {
-                    MangaReaderImageMode.fitWidth ||
-                    MangaReaderImageMode.fit =>
-                      constraints.maxWidth,
-                    _ => null
-                  },
-                  height: switch (imageMode) {
-                    MangaReaderImageMode.fitHeight ||
-                    MangaReaderImageMode.fit =>
-                      constraints.maxHeight,
-                    _ => null
-                  },
+          child: FocusScope(
+            child: Focus(
+              autofocus: true,
+              child: InteractiveViewer(
+                scaleEnabled: imageMode == MangaReaderImageMode.fit,
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Image(
+                    image: image,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: Text(
+                          AppLocalizations.of(context)!.mangaPageLoading,
+                        ),
+                      );
+                    },
+                    fit: switch (imageMode) {
+                      MangaReaderImageMode.fitHeight => BoxFit.fitHeight,
+                      MangaReaderImageMode.fitWidth => BoxFit.fitWidth,
+                      _ => BoxFit.contain
+                    },
+                    width: switch (imageMode) {
+                      MangaReaderImageMode.fitWidth ||
+                      MangaReaderImageMode.fit =>
+                        constraints.maxWidth,
+                      _ => null
+                    },
+                    height: switch (imageMode) {
+                      MangaReaderImageMode.fitHeight ||
+                      MangaReaderImageMode.fit =>
+                        constraints.maxHeight,
+                      _ => null
+                    },
+                  ),
                 ),
               ),
             ),

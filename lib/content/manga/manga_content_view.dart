@@ -76,7 +76,7 @@ class MangaContentView extends ConsumerWidget {
             Column(children: [
               _renderTopBar(context, ref),
               const Spacer(),
-              _BottomBar(
+              MangaReaderBottomBar(
                 contentDetails: contentDetails,
                 mediaItems: mediaItems,
               ),
@@ -126,64 +126,13 @@ class MangaContentView extends ConsumerWidget {
         if (contentProgress.currentItem > 0) {
           notifier.setCurrentItem(contentProgress.currentItem - 1);
         }
-      } else if (newPos >= contentProgress.currentMediaItemPosition.length) {
+      } else if (newPos >= chapter.pageNambers) {
         if (contentProgress.currentItem < mediaItems.length) {
           notifier.setCurrentItem(contentProgress.currentItem + 1);
         }
       } else {
-        notifier.setCurrentPosition(newPos);
+        notifier.setCurrentPosition(newPos, chapter.pageNambers);
       }
     }
-  }
-}
-
-class _BottomBar extends MediaCollectionItemConsumerWidger {
-  final List<ContentMediaItem> mediaItems;
-
-  const _BottomBar({
-    required super.contentDetails,
-    required this.mediaItems,
-  });
-
-  @override
-  Widget render(
-    BuildContext context,
-    WidgetRef ref,
-    MediaCollectionItem collectionItem,
-  ) {
-    final pos = collectionItem.currentMediaItemPosition;
-
-    final curPage = pos.position + 1;
-    final pageNumbers = pos.length;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Text("$curPage / $pageNumbers"),
-              const Spacer(),
-              IconButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => MangaReaderSettingsDialog(
-                      contentDetails: contentDetails,
-                      mediaItems: mediaItems,
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.settings),
-              )
-            ],
-          ),
-        ),
-        if (pageNumbers > 0)
-          LinearProgressIndicator(value: curPage / pageNumbers)
-      ],
-    );
   }
 }

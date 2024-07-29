@@ -4,6 +4,7 @@ import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/manga/manga_provider.dart';
 import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/content/media_items_list.dart';
+import 'package:cloud_hook/content/widgets.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/settings/settings_provider.dart';
 import 'package:cloud_hook/settings/theme/brightnes_switcher.dart';
@@ -11,7 +12,57 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-@immutable
+class MangaReaderBottomBar extends MediaCollectionItemConsumerWidger {
+  final List<ContentMediaItem> mediaItems;
+
+  const MangaReaderBottomBar({
+    super.key,
+    required super.contentDetails,
+    required this.mediaItems,
+  });
+
+  @override
+  Widget render(
+    BuildContext context,
+    WidgetRef ref,
+    MediaCollectionItem collectionItem,
+  ) {
+    final pos = collectionItem.currentMediaItemPosition;
+
+    final curPage = pos.position + 1;
+    final pageNumbers = pos.length;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Text("$curPage / $pageNumbers"),
+              const Spacer(),
+              IconButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => MangaReaderSettingsDialog(
+                      contentDetails: contentDetails,
+                      mediaItems: mediaItems,
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.settings),
+              )
+            ],
+          ),
+        ),
+        if (pageNumbers > 0) LinearProgressIndicator(value: pos.progress)
+      ],
+    );
+  }
+}
+
 class VolumesButton extends ConsumerWidget {
   final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
@@ -45,6 +96,7 @@ class VolumesButton extends ConsumerWidget {
       onPressed: () {
         Navigator.of(context).push(
           MediaItemsListRoute(
+            title: AppLocalizations.of(context)!.mangaChapter,
             mediaItems: mediaItems,
             contentProgress: collectionItem,
             onSelect: onSelect ??
@@ -53,11 +105,12 @@ class VolumesButton extends ConsumerWidget {
                   context.push(
                       "/${contentDetails.mediaType.name}/${contentDetails.supplier}/${Uri.encodeComponent(contentDetails.id)}");
                 },
+            itemBuilder: mangaItemBuilder,
           ),
         );
       },
       icon: const Icon(Icons.list),
-      tooltip: AppLocalizations.of(context)!.episodesList,
+      tooltip: AppLocalizations.of(context)!.mangaChapter,
     );
   }
 }
@@ -76,7 +129,7 @@ class MangaReaderSettingsDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    final imageMode = ref.watch(mangaReaderImageModeSettingsProvider);
+    final currentImageMode = ref.watch(mangaReaderImageModeSettingsProvider);
 
     return Dialog(
       child: Container(
@@ -86,7 +139,10 @@ class MangaReaderSettingsDialog extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Тема", style: theme.textTheme.headlineSmall),
+            Text(
+              AppLocalizations.of(context)!.settingsTheme,
+              style: theme.textTheme.headlineSmall,
+            ),
             const SizedBox(height: 8),
             const BrightnesSwitcher(),
             const SizedBox(height: 8),
@@ -95,53 +151,39 @@ class MangaReaderSettingsDialog extends ConsumerWidget {
               mediaItems: mediaItems,
             ),
             const SizedBox(height: 8),
-            Text("Розміщеня зображення", style: theme.textTheme.headlineSmall),
+            Text(
+              AppLocalizations.of(context)!.mangaImageReaderMode,
+              style: theme.textTheme.headlineSmall,
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 6,
               runSpacing: 6,
-              children: [
-                ChoiceChip(
-                  label: const Text("Оригинільне зображеня"),
-                  selected: imageMode == MangaReaderImageMode.original,
-                  onSelected: (value) {
-                    ref
-                        .read(mangaReaderImageModeSettingsProvider.notifier)
-                        .select(MangaReaderImageMode.original);
-                  },
-                ),
-                ChoiceChip(
-                  label: const Text("Розтягнути"),
-                  selected: imageMode == MangaReaderImageMode.fit,
-                  onSelected: (value) {
-                    ref
-                        .read(mangaReaderImageModeSettingsProvider.notifier)
-                        .select(MangaReaderImageMode.fit);
-                  },
-                ),
-                ChoiceChip(
-                  label: const Text("Розтягнути по ширині"),
-                  selected: imageMode == MangaReaderImageMode.fitWidth,
-                  onSelected: (value) {
-                    ref
-                        .read(mangaReaderImageModeSettingsProvider.notifier)
-                        .select(MangaReaderImageMode.fitWidth);
-                  },
-                ),
-                ChoiceChip(
-                  label: const Text("Розтягнути по висоті"),
-                  selected: imageMode == MangaReaderImageMode.fitHeight,
-                  onSelected: (value) {
-                    ref
-                        .read(mangaReaderImageModeSettingsProvider.notifier)
-                        .select(MangaReaderImageMode.fitHeight);
-                  },
-                ),
-              ],
+              children: MangaReaderImageMode.values
+                  .map(
+                    (mode) =>
+                        _renderImageMode(context, ref, currentImageMode, mode),
+                  )
+                  .toList(),
             )
           ],
         ),
       ),
+    );
+  }
+
+  Widget _renderImageMode(
+    BuildContext context,
+    WidgetRef ref,
+    MangaReaderImageMode currentMode,
+    MangaReaderImageMode mode,
+  ) {
+    return ChoiceChip(
+      label: Text(mangaReaderImageModeLable(context, mode)),
+      selected: currentMode == mode,
+      onSelected: (value) {
+        ref.read(mangaReaderImageModeSettingsProvider.notifier).select(mode);
+      },
     );
   }
 }
@@ -182,7 +224,10 @@ class MangaTranslationSelector extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Переклад", style: theme.textTheme.headlineSmall),
+        Text(
+          AppLocalizations.of(context)!.mangaTranslation,
+          style: theme.textTheme.headlineSmall,
+        ),
         const SizedBox(height: 8),
         Wrap(
           spacing: 6,
@@ -203,6 +248,67 @@ class MangaTranslationSelector extends ConsumerWidget {
               )
               .toList(),
         )
+      ],
+    );
+  }
+}
+
+Widget mangaItemBuilder(
+  ContentMediaItem item,
+  ContentProgress? contentProgress,
+  SelectCallback onSelect,
+) {
+  final progress = contentProgress?.positions[item.number]?.progress ?? 0;
+
+  return MangaItemsListItem(
+    item: item,
+    selected: item.number == contentProgress?.currentItem,
+    progress: progress,
+    onTap: () {
+      onSelect(item);
+    },
+  );
+}
+
+class MangaItemsListItem extends StatelessWidget {
+  final ContentMediaItem item;
+  final bool selected;
+  final double progress;
+  final VoidCallback onTap;
+
+  const MangaItemsListItem({
+    super.key,
+    required this.item,
+    required this.selected,
+    required this.progress,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final title = item.title;
+    final theme = Theme.of(context);
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: FractionallySizedBox(
+            widthFactor: progress,
+            alignment: Alignment.centerLeft,
+            child: Container(color: theme.colorScheme.surfaceVariant),
+          ),
+        ),
+        ListTile(
+          onTap: onTap,
+          autofocus: selected,
+          mouseCursor: SystemMouseCursors.click,
+          title: Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: selected ? const Icon(Icons.menu_book) : null,
+        ),
       ],
     );
   }

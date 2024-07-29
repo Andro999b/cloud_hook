@@ -1,5 +1,6 @@
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
+import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:flutter/material.dart';
 
@@ -58,5 +59,19 @@ String contentTypeLable(BuildContext context, ContentType type) {
     ContentType.movie => AppLocalizations.of(context)!.contentTypeMovie,
     ContentType.series => AppLocalizations.of(context)!.contentTypeSeries,
     ContentType.manga => AppLocalizations.of(context)!.contentTypeManga,
+  };
+}
+
+String mangaReaderImageModeLable(
+    BuildContext context, MangaReaderImageMode mode) {
+  return switch (mode) {
+    MangaReaderImageMode.original =>
+      AppLocalizations.of(context)!.mangaImageReaderModeOriginal,
+    MangaReaderImageMode.fit =>
+      AppLocalizations.of(context)!.mangaImageReaderModeFit,
+    MangaReaderImageMode.fitHeight =>
+      AppLocalizations.of(context)!.mangaImageReaderModeFitHeight,
+    MangaReaderImageMode.fitWidth =>
+      AppLocalizations.of(context)!.mangaImageReaderModeFitHeight,
   };
 }

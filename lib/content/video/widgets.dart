@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
@@ -99,6 +100,7 @@ class PlayerPlaylistButton extends MediaCollectionItemConsumerWidger {
     return IconButton(
       onPressed: () {
         Navigator.of(context).push(MediaItemsListRoute(
+          title: AppLocalizations.of(context)!.episodesList,
           mediaItems: playlistController.mediaItems,
           contentProgress: collectionItem,
           onSelect: (item) => playlistController.selectItem(item.number),
@@ -428,6 +430,94 @@ class PlayOrPauseButtonState extends State<PlayOrPauseButton>
         color: Colors.white,
         icon: AnimatedIcons.play_pause,
         size: widget.iconSize,
+      ),
+    );
+  }
+}
+
+Widget videoItemBuilder(
+  ContentMediaItem item,
+  ContentProgress? contentProgress,
+  SelectCallback onSelect,
+) {
+  final progress = contentProgress?.positions[item.number]?.progress ?? 0;
+
+  return VideoItemsListItem(
+    item: item,
+    selected: item.number == contentProgress?.currentItem,
+    progress: progress,
+    onTap: () {
+      onSelect(item);
+    },
+  );
+}
+
+class VideoItemsListItem extends StatelessWidget {
+  final ContentMediaItem item;
+  final bool selected;
+  final double progress;
+  final VoidCallback onTap;
+
+  const VideoItemsListItem({
+    super.key,
+    required this.item,
+    required this.selected,
+    required this.progress,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final title = item.title;
+    final image = item.image;
+
+    return Card.filled(
+      clipBehavior: Clip.antiAlias,
+      color: selected ? theme.colorScheme.onInverseSurface : null,
+      child: InkWell(
+        autofocus: selected,
+        mouseCursor: SystemMouseCursors.click,
+        onTap: onTap,
+        child: Row(
+          children: [
+            Container(
+              width: 96,
+              height: 72,
+              decoration: BoxDecoration(
+                image: image != null
+                    ? DecorationImage(
+                        image: CachedNetworkImageProvider(image),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+                color: image == null
+                    ? theme.colorScheme.surfaceTint.withOpacity(0.5)
+                    : null,
+              ),
+              child: selected
+                  ? const Center(
+                      child: Icon(
+                        Icons.play_arrow_rounded,
+                        color: Colors.white,
+                        size: 48,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            Expanded(
+              child: ListTile(
+                mouseCursor: SystemMouseCursors.click,
+                title: Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: LinearProgressIndicator(value: progress),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
