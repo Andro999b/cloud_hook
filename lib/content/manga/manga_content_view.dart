@@ -1,9 +1,7 @@
-import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/manga/manga_chapter_viewer.dart';
 import 'package:cloud_hook/content/manga/manga_provider.dart';
 import 'package:cloud_hook/content/manga/widgets.dart';
-import 'package:cloud_hook/content/widgets.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/widgets/back_nav_button.dart';
 import 'package:flutter/material.dart';

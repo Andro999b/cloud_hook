@@ -41,7 +41,7 @@ MangaDexChapterAttributes _$MangaDexChapterAttributesFromJson(
     MangaDexChapterAttributes(
       title: json['title'] as String?,
       volume: json['volume'] as String? ?? 'No Volume',
-      chapter: json['chapter'] as String,
+      chapter: json['chapter'] as String? ?? 'Oneshot',
       translatedLanguage: json['translatedLanguage'] as String,
       pages: (json['pages'] as num).toInt(),
     );

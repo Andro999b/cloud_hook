@@ -72,6 +72,6 @@ String mangaReaderImageModeLable(
     MangaReaderImageMode.fitHeight =>
       AppLocalizations.of(context)!.mangaImageReaderModeFitHeight,
     MangaReaderImageMode.fitWidth =>
-      AppLocalizations.of(context)!.mangaImageReaderModeFitHeight,
+      AppLocalizations.of(context)!.mangaImageReaderModeFitWidth,
   };
 }

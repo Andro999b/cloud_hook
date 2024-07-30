@@ -68,7 +68,7 @@ class MangaDexItemSource implements MangaMediaItemSource {
   Future<List<ImageProvider<Object>>> _loadPages() async {
     try {
       final chapterServerUri = Uri.https(
-        MangaDexSupllier.host,
+        MangaDexSupllier.siteHost,
         "/at-home/server/$id",
       );
 

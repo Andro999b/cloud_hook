@@ -1,5 +1,6 @@
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/mangadex/mangadex_item_source.dart';
+import 'package:cloud_hook/content_suppliers/suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
@@ -103,8 +104,9 @@ class MangaDexContentDetails extends AbstractContentDetails {
 }
 
 class MangaDexSupllier extends ContentSupplier {
-  static const host = "api.mangadex.org";
+  static const siteHost = "api.mangadex.org";
   static const userAgent = "Cloud Hook APP";
+  static const limit = 15;
 
   final Dio _dio;
 
@@ -129,9 +131,11 @@ class MangaDexSupllier extends ContentSupplier {
 
   @override
   Future<List<ContentInfo>> search(String query, Set<ContentType> type) async {
-    final uri = Uri.https(host, "/manga", {
+    final uri = Uri.https(siteHost, "/manga", {
       "title": query,
       "includes[]": "cover_art",
+      "hasAvailableChapters": "true",
+      "limit": limit.toString()
     });
 
     final res = await _dio.getUri(uri);
@@ -141,7 +145,7 @@ class MangaDexSupllier extends ContentSupplier {
 
   @override
   Future<ContentDetails?> detailsById(String id) async {
-    final uri = Uri.https(host, "/manga/$id", {
+    final uri = Uri.https(siteHost, "/manga/$id", {
       "includes[]": ["cover_art", "author"],
     });
 
@@ -164,7 +168,7 @@ class MangaDexSupllier extends ContentSupplier {
     final mediaItems = <String, SimpleContentMediaItem>{};
 
     while (requestsLeft > 0) {
-      final uri = Uri.https(host, "/manga/$id/feed", {
+      final uri = Uri.https(siteHost, "/manga/$id/feed", {
         "includes[]": "scanlation_group",
         "order[volume]": "asc",
         "order[chapter]": "asc",
@@ -210,6 +214,38 @@ class MangaDexSupllier extends ContentSupplier {
     }
 
     return mediaItems.values.toList();
+  }
+
+  Map<String, Uri> channelsPath = {
+    "Latest Updates": Uri.https(siteHost, "/manga", {
+      "order[createdAt]": "desc",
+      "includes[]": "cover_art",
+      "hasAvailableChapters": "true",
+    }),
+    "Popular Titles": Uri.https(siteHost, "/manga", {
+      "order[followedCount]": "desc",
+      "includes[]": "cover_art",
+      "hasAvailableChapters": "true",
+    }),
+  };
+
+  @override
+  Set<String> get channels => channelsPath.keys.toSet();
+
+  @override
+  Future<List<ContentInfo>> loadChannel(String channel, {int page = 0}) async {
+    final uri = channelsPath[channel];
+
+    if (uri == null) {
+      return [];
+    }
+
+    final res = await _dio.getUri(uri.replace(queryParameters: {
+      ...uri.queryParameters,
+      "offset": (limit * page).toString()
+    }));
+
+    return MangaDexSearchResponse.fromJson(res.data).data;
   }
 }
 
@@ -294,6 +330,7 @@ class MangaDexChapterAttributes {
   final String? title;
   @JsonKey(defaultValue: "No Volume")
   final String volume;
+  @JsonKey(defaultValue: "Oneshot")
   final String chapter;
   final String translatedLanguage;
   final int pages;
