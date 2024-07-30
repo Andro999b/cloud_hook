@@ -6,6 +6,7 @@ import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/settings/settings_provider.dart';
 import 'package:cloud_hook/widgets/display_error.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -65,8 +66,10 @@ class MangaChapterViewer extends ConsumerWidget {
     return GestureDetector(
       onTapUp: (details) {
         final screenWidth = MediaQuery.of(context).size.width;
-        if (details.globalPosition.dx < screenWidth / 2) {
+        if (details.globalPosition.dx < screenWidth / 3) {
           Actions.invoke(context, const PrevPageIntent());
+        } else if (details.globalPosition.dx < (screenWidth / 3) * 2) {
+          Actions.invoke(context, const ShowUIIntent());
         } else {
           Actions.invoke(context, const NextPageIntent());
         }
@@ -75,7 +78,9 @@ class MangaChapterViewer extends ConsumerWidget {
         width: size.width,
         height: size.height,
         color: theme.colorScheme.background,
-        child: _SinglePageViewer(chapterPages: chapterPages),
+        child: _SinglePageViewer(
+          chapterPages: chapterPages,
+        ),
       ),
     );
   }
@@ -84,7 +89,9 @@ class MangaChapterViewer extends ConsumerWidget {
 class _SinglePageViewer extends HookConsumerWidget {
   final MangaChapterPages chapterPages;
 
-  const _SinglePageViewer({required this.chapterPages});
+  const _SinglePageViewer({
+    required this.chapterPages,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -95,51 +102,52 @@ class _SinglePageViewer extends HookConsumerWidget {
     return Center(
       child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-        return Actions(
+        return FocusableActionDetector(
+          shortcuts: const {
+            SingleActivator(LogicalKeyboardKey.arrowUp): ScrollUpPageIntent(),
+            SingleActivator(LogicalKeyboardKey.arrowDown):
+                ScrollDownPageIntent(),
+          },
           actions: {
+            ScrollUpPageIntent: CallbackAction<ScrollUpPageIntent>(
+              onInvoke: (_) => _scrollTo(scrollController, -100),
+            ),
             ScrollDownPageIntent: CallbackAction<ScrollDownPageIntent>(
               onInvoke: (_) => _scrollTo(scrollController, 100),
             ),
-            ScrollUpPageIntent: CallbackAction<ScrollUpPageIntent>(
-              onInvoke: (_) => _scrollTo(scrollController, -100),
-            )
           },
-          child: FocusScope(
-            child: Focus(
-              autofocus: true,
-              child: InteractiveViewer(
-                scaleEnabled: imageMode == MangaReaderImageMode.fit,
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Image(
-                    image: image,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: Text(
-                          AppLocalizations.of(context)!.mangaPageLoading,
-                        ),
-                      );
-                    },
-                    fit: switch (imageMode) {
-                      MangaReaderImageMode.fitHeight => BoxFit.fitHeight,
-                      MangaReaderImageMode.fitWidth => BoxFit.fitWidth,
-                      _ => BoxFit.contain
-                    },
-                    width: switch (imageMode) {
-                      MangaReaderImageMode.fitWidth ||
-                      MangaReaderImageMode.fit =>
-                        constraints.maxWidth,
-                      _ => null
-                    },
-                    height: switch (imageMode) {
-                      MangaReaderImageMode.fitHeight ||
-                      MangaReaderImageMode.fit =>
-                        constraints.maxHeight,
-                      _ => null
-                    },
-                  ),
-                ),
+          autofocus: true,
+          child: InteractiveViewer(
+            scaleEnabled: imageMode == MangaReaderImageMode.fit,
+            child: SingleChildScrollView(
+              controller: scrollController,
+              child: Image(
+                image: image,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: Text(
+                      AppLocalizations.of(context)!.mangaPageLoading,
+                    ),
+                  );
+                },
+                fit: switch (imageMode) {
+                  MangaReaderImageMode.fitHeight => BoxFit.fitHeight,
+                  MangaReaderImageMode.fitWidth => BoxFit.fitWidth,
+                  _ => BoxFit.contain
+                },
+                width: switch (imageMode) {
+                  MangaReaderImageMode.fitWidth ||
+                  MangaReaderImageMode.fit =>
+                    constraints.maxWidth,
+                  _ => null
+                },
+                height: switch (imageMode) {
+                  MangaReaderImageMode.fitHeight ||
+                  MangaReaderImageMode.fit =>
+                    constraints.maxHeight,
+                  _ => null
+                },
               ),
             ),
           ),

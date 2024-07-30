@@ -1,9 +1,11 @@
 import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/manga/manga_chapter_viewer.dart';
 import 'package:cloud_hook/content/manga/manga_provider.dart';
-import 'package:cloud_hook/content/manga/widgets.dart';
+import 'package:cloud_hook/content/manga/manga_reader_controls.dart';
+import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
-import 'package:cloud_hook/widgets/back_nav_button.dart';
+import 'package:cloud_hook/settings/settings_provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -25,7 +27,16 @@ class ScrollUpPageIntent extends Intent {
   const ScrollUpPageIntent();
 }
 
-class MangaContentView extends ConsumerWidget {
+class ShowUIIntent extends Intent {
+  const ShowUIIntent();
+}
+
+class SwitchReaderImageMode extends Intent {
+  final MangaReaderImageMode mode;
+  const SwitchReaderImageMode(this.mode);
+}
+
+class MangaContentView extends HookConsumerWidget {
   final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
 
@@ -49,62 +60,44 @@ class MangaContentView extends ConsumerWidget {
       },
     );
 
-    return Shortcuts(
+    return FocusableActionDetector(
       shortcuts: const {
         SingleActivator(LogicalKeyboardKey.arrowLeft): PrevPageIntent(),
         SingleActivator(LogicalKeyboardKey.arrowRight): NextPageIntent(),
-        SingleActivator(LogicalKeyboardKey.arrowUp): ScrollUpPageIntent(),
-        SingleActivator(LogicalKeyboardKey.arrowDown): ScrollDownPageIntent(),
+        SingleActivator(LogicalKeyboardKey.select): ShowUIIntent(),
+        SingleActivator(LogicalKeyboardKey.enter): ShowUIIntent(),
+        SingleActivator(LogicalKeyboardKey.digit1):
+            SwitchReaderImageMode(MangaReaderImageMode.original),
+        SingleActivator(LogicalKeyboardKey.digit2):
+            SwitchReaderImageMode(MangaReaderImageMode.fit),
+        SingleActivator(LogicalKeyboardKey.digit3):
+            SwitchReaderImageMode(MangaReaderImageMode.fitHeight),
+        SingleActivator(LogicalKeyboardKey.digit4):
+            SwitchReaderImageMode(MangaReaderImageMode.fitWidth),
       },
-      child: Actions(
-        actions: {
-          PrevPageIntent: CallbackAction<PrevPageIntent>(
-            onInvoke: (_) => _movePage(-1, ref),
-          ),
-          NextPageIntent: CallbackAction<NextPageIntent>(
-            onInvoke: (_) => _movePage(1, ref),
-          )
-        },
-        child: Stack(
-          children: [
-            MangaChapterViewer(
+      actions: {
+        PrevPageIntent: CallbackAction<PrevPageIntent>(
+          onInvoke: (_) => _movePage(-1, ref),
+        ),
+        NextPageIntent: CallbackAction<NextPageIntent>(
+          onInvoke: (_) => _movePage(1, ref),
+        ),
+        ShowUIIntent: CallbackAction<ShowUIIntent>(
+          onInvoke: (_) => Navigator.of(context).push(
+            MangaReaderControlsRoute(
               contentDetails: contentDetails,
               mediaItems: mediaItems,
             ),
-            Column(children: [
-              _renderTopBar(context, ref),
-              const Spacer(),
-              MangaReaderBottomBar(
-                contentDetails: contentDetails,
-                mediaItems: mediaItems,
-              ),
-            ])
-          ],
+          ),
         ),
-      ),
-      // ),
-    );
-  }
-
-  Widget _renderTopBar(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-      child: Row(children: [
-        const BackNavButton(),
-        const Spacer(),
-        _renderVolumesBotton(context, ref),
-      ]),
-    );
-  }
-
-  Widget _renderVolumesBotton(BuildContext context, WidgetRef ref) {
-    return VolumesButton(
-      contentDetails: contentDetails,
-      mediaItems: mediaItems,
-      onSelect: (item) {
-        final provider = collectionItemProvider(contentDetails);
-        ref.read(provider.notifier).setCurrentItem(item.number);
+        SwitchReaderImageMode: CallbackAction<SwitchReaderImageMode>(
+          onInvoke: (intent) => _swithReaderImageMode(intent.mode, ref),
+        )
       },
+      child: MangaChapterViewer(
+        contentDetails: contentDetails,
+        mediaItems: mediaItems,
+      ),
     );
   }
 
@@ -132,5 +125,9 @@ class MangaContentView extends ConsumerWidget {
         notifier.setCurrentPosition(newPos, chapter.pageNambers);
       }
     }
+  }
+
+  void _swithReaderImageMode(MangaReaderImageMode mode, WidgetRef ref) {
+    ref.read(mangaReaderImageModeSettingsProvider.notifier).select(mode);
   }
 }

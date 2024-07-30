@@ -27,6 +27,7 @@ class MangaReaderBottomBar extends MediaCollectionItemConsumerWidger {
     WidgetRef ref,
     MediaCollectionItem collectionItem,
   ) {
+    final theme = Theme.of(context);
     final pos = collectionItem.currentMediaItemPosition;
 
     final curPage = pos.position + 1;
@@ -40,7 +41,10 @@ class MangaReaderBottomBar extends MediaCollectionItemConsumerWidger {
           child: Row(
             mainAxisSize: MainAxisSize.max,
             children: [
-              Text("$curPage / $pageNumbers"),
+              Text(
+                "$curPage / $pageNumbers",
+                style: theme.textTheme.bodyMedium,
+              ),
               const Spacer(),
               IconButton(
                 onPressed: () {
@@ -67,12 +71,14 @@ class VolumesButton extends ConsumerWidget {
   final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
   final SelectCallback? onSelect;
+  final bool autofocus;
 
   const VolumesButton({
     super.key,
     required this.contentDetails,
     required this.mediaItems,
     this.onSelect,
+    this.autofocus = false,
   });
 
   @override
@@ -111,6 +117,7 @@ class VolumesButton extends ConsumerWidget {
       },
       icon: const Icon(Icons.list),
       tooltip: AppLocalizations.of(context)!.mangaChapter,
+      autofocus: autofocus,
     );
   }
 }

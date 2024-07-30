@@ -187,8 +187,10 @@ class MangaDexSupllier extends ContentSupplier {
           key,
           () => SimpleContentMediaItem(
             number: mediaItems.length,
-            title: "Chapter ${attributes.chapter}",
-            section: attributes.volume,
+            title: attributes.chapter != null
+                ? "Chapter ${attributes.chapter}"
+                : " Oneshot",
+            section: attributes.volume ?? "No Volume",
             // ignore: prefer_const_literals_to_create_immutables
             sources: [],
           ),
@@ -328,10 +330,8 @@ class MangaDexChapter {
 @JsonSerializable(createToJson: false)
 class MangaDexChapterAttributes {
   final String? title;
-  @JsonKey(defaultValue: "No Volume")
-  final String volume;
-  @JsonKey(defaultValue: "Oneshot")
-  final String chapter;
+  final String? volume;
+  final String? chapter;
   final String translatedLanguage;
   final int pages;
 
