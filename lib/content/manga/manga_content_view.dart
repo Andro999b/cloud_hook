@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class NextPageIntent extends Intent {
@@ -60,10 +61,14 @@ class MangaContentView extends HookConsumerWidget {
       },
     );
 
+    final scrollController = useScrollController();
+
     return FocusableActionDetector(
       shortcuts: const {
         SingleActivator(LogicalKeyboardKey.arrowLeft): PrevPageIntent(),
         SingleActivator(LogicalKeyboardKey.arrowRight): NextPageIntent(),
+        SingleActivator(LogicalKeyboardKey.arrowUp): ScrollUpPageIntent(),
+        SingleActivator(LogicalKeyboardKey.arrowDown): ScrollDownPageIntent(),
         SingleActivator(LogicalKeyboardKey.select): ShowUIIntent(),
         SingleActivator(LogicalKeyboardKey.enter): ShowUIIntent(),
         SingleActivator(LogicalKeyboardKey.digit1):
@@ -92,11 +97,19 @@ class MangaContentView extends HookConsumerWidget {
         ),
         SwitchReaderImageMode: CallbackAction<SwitchReaderImageMode>(
           onInvoke: (intent) => _swithReaderImageMode(intent.mode, ref),
-        )
+        ),
+        ScrollUpPageIntent: CallbackAction<ScrollUpPageIntent>(
+          onInvoke: (_) => _scrollTo(scrollController, -100),
+        ),
+        ScrollDownPageIntent: CallbackAction<ScrollDownPageIntent>(
+          onInvoke: (_) => _scrollTo(scrollController, 100),
+        ),
       },
+      autofocus: true,
       child: MangaChapterViewer(
         contentDetails: contentDetails,
         mediaItems: mediaItems,
+        scrollController: scrollController,
       ),
     );
   }
@@ -129,5 +142,10 @@ class MangaContentView extends HookConsumerWidget {
 
   void _swithReaderImageMode(MangaReaderImageMode mode, WidgetRef ref) {
     ref.read(mangaReaderImageModeSettingsProvider.notifier).select(mode);
+  }
+
+  void _scrollTo(ScrollController controller, int inc) {
+    double newPos = controller.offset + inc;
+    controller.jumpTo(newPos);
   }
 }

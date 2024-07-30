@@ -4,68 +4,12 @@ import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/manga/manga_provider.dart';
 import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/content/media_items_list.dart';
-import 'package:cloud_hook/content/widgets.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/settings/settings_provider.dart';
 import 'package:cloud_hook/settings/theme/brightnes_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-class MangaReaderBottomBar extends MediaCollectionItemConsumerWidger {
-  final List<ContentMediaItem> mediaItems;
-
-  const MangaReaderBottomBar({
-    super.key,
-    required super.contentDetails,
-    required this.mediaItems,
-  });
-
-  @override
-  Widget render(
-    BuildContext context,
-    WidgetRef ref,
-    MediaCollectionItem collectionItem,
-  ) {
-    final theme = Theme.of(context);
-    final pos = collectionItem.currentMediaItemPosition;
-
-    final curPage = pos.position + 1;
-    final pageNumbers = pos.length;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Text(
-                "$curPage / $pageNumbers",
-                style: theme.textTheme.bodyMedium,
-              ),
-              const Spacer(),
-              IconButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => MangaReaderSettingsDialog(
-                      contentDetails: contentDetails,
-                      mediaItems: mediaItems,
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.settings),
-              )
-            ],
-          ),
-        ),
-        if (pageNumbers > 0) LinearProgressIndicator(value: pos.progress)
-      ],
-    );
-  }
-}
 
 class VolumesButton extends ConsumerWidget {
   final ContentDetails contentDetails;
@@ -142,38 +86,40 @@ class MangaReaderSettingsDialog extends ConsumerWidget {
       child: Container(
         constraints: const BoxConstraints(maxWidth: 800),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppLocalizations.of(context)!.settingsTheme,
-              style: theme.textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 8),
-            const BrightnesSwitcher(),
-            const SizedBox(height: 8),
-            MangaTranslationSelector(
-              contentDetails: contentDetails,
-              mediaItems: mediaItems,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              AppLocalizations.of(context)!.mangaImageReaderMode,
-              style: theme.textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: MangaReaderImageMode.values
-                  .map(
-                    (mode) =>
-                        _renderImageMode(context, ref, currentImageMode, mode),
-                  )
-                  .toList(),
-            )
-          ],
+        child: FocusScope(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.settingsTheme,
+                style: theme.textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8),
+              const BrightnesSwitcher(),
+              const SizedBox(height: 8),
+              MangaTranslationSelector(
+                contentDetails: contentDetails,
+                mediaItems: mediaItems,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                AppLocalizations.of(context)!.mangaImageReaderMode,
+                style: theme.textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: MangaReaderImageMode.values
+                    .map(
+                      (mode) => _renderImageMode(
+                          context, ref, currentImageMode, mode),
+                    )
+                    .toList(),
+              )
+            ],
+          ),
         ),
       ),
     );
