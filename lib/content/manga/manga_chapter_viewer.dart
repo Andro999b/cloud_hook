@@ -77,7 +77,7 @@ class MangaChapterViewer extends ConsumerWidget {
       child: Container(
         width: size.width,
         height: size.height,
-        color: theme.colorScheme.background,
+        color: theme.colorScheme.surface,
         child: _SinglePageViewer(
           chapterPages: chapterPages,
           scrollController: scrollController,

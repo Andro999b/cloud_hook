@@ -120,9 +120,12 @@ mixin VidSrcToServerMixin {
         "megaf" ||
         "f2cloud" =>
           await _extractVidplay(serverId, descriptionPrefix),
-        "filemoon" =>
+        "filemoon" ||
+        "moonf" =>
           await _extractFilemoon(serverId, referer, descriptionPrefix),
-        "mp4upload" => await _extractMp4upload(serverId, descriptionPrefix),
+        "mp4upload" ||
+        "mp4u" =>
+          await _extractMp4upload(serverId, descriptionPrefix),
         _ => <ContentMediaItemSource>[]
       };
     } catch (error, stackTrace) {

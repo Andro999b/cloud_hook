@@ -75,7 +75,7 @@ class SearchTopBar extends HookConsumerWidget {
       },
       builder: (context, controller) {
         return SearchBar(
-          padding: const MaterialStatePropertyAll<EdgeInsets>(
+          padding: const WidgetStatePropertyAll<EdgeInsets>(
             EdgeInsets.only(left: 16.0, right: 8.0),
           ),
           autoFocus: true,
@@ -90,7 +90,8 @@ class SearchTopBar extends HookConsumerWidget {
           onSubmitted: (value) {
             _search(ref, value);
           },
-          trailing: AndroidTVDetector.isTV ? null : [_renderFilterSwitcher(context)],
+          trailing:
+              AndroidTVDetector.isTV ? null : [_renderFilterSwitcher(context)],
         );
       },
       viewBuilder: (suggestions) => _TopSearchSuggestions(
@@ -217,7 +218,8 @@ class _SuppliersSelector extends ConsumerWidget {
     WidgetRef ref,
   ) {
     final supplier = ContentSuppliers.instance.getSupplier(name)!;
-    final enabled = supplier.supportedTypes.intersection(selectedContentType).isNotEmpty;
+    final enabled =
+        supplier.supportedTypes.intersection(selectedContentType).isNotEmpty;
 
     return FilterChip(
       selected: selectedSuppliers.contains(name),
@@ -237,7 +239,8 @@ class _SuppliersSelector extends ConsumerWidget {
 }
 
 class _TopSearchSuggestions extends HookConsumerWidget {
-  const _TopSearchSuggestions({required this.searchController, required this.onSelect});
+  const _TopSearchSuggestions(
+      {required this.searchController, required this.onSelect});
 
   final SearchController searchController;
   final Function(String) onSelect;
@@ -249,7 +252,9 @@ class _TopSearchSuggestions extends HookConsumerWidget {
     return suggestionsValue.maybeWhen(
       data: (suggestions) {
         return ListView(
-          children: suggestions.map((suggestion) => _renderSuggestion(suggestion, ref)).toList(),
+          children: suggestions
+              .map((suggestion) => _renderSuggestion(suggestion, ref))
+              .toList(),
         );
       },
       orElse: () => ListView(),
@@ -274,7 +279,9 @@ class _TopSearchSuggestions extends HookConsumerWidget {
             child: IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () {
-                ref.read(suggestionsProvider.notifier).deleteSuggestion(suggestion);
+                ref
+                    .read(suggestionsProvider.notifier)
+                    .deleteSuggestion(suggestion);
               },
             ),
           ),

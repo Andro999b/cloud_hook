@@ -109,7 +109,7 @@ class _MediaItemsListView extends StatelessWidget {
       width: mobileWidth * 0.7,
       height: size.height,
       decoration: BoxDecoration(
-        color: theme.colorScheme.background,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.only(
           topLeft: mobile ? Radius.zero : radius,
           bottomLeft: mobile ? Radius.zero : radius,

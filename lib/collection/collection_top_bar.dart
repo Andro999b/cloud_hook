@@ -39,7 +39,7 @@ class CollectionTopBar extends HookConsumerWidget {
             child: Center(
               child: SearchBar(
                 controller: controller,
-                padding: const MaterialStatePropertyAll<EdgeInsets>(
+                padding: const WidgetStatePropertyAll<EdgeInsets>(
                   EdgeInsets.only(left: 16.0, right: 8.0),
                 ),
                 focusNode: focusNode,

@@ -248,7 +248,7 @@ class MangaItemsListItem extends StatelessWidget {
           child: FractionallySizedBox(
             widthFactor: progress,
             alignment: Alignment.centerLeft,
-            child: Container(color: theme.colorScheme.surfaceVariant),
+            child: Container(color: theme.colorScheme.surfaceContainerHigh),
           ),
         ),
         ListTile(

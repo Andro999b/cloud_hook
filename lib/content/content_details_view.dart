@@ -75,7 +75,7 @@ class ContentDetailsView extends ConsumerWidget {
                 ? EdgeInsets.symmetric(horizontal: paddings)
                 : EdgeInsets.only(right: paddings),
             decoration: BoxDecoration(
-              color: mobile ? theme.colorScheme.background : Colors.transparent,
+              color: mobile ? theme.colorScheme.surface : Colors.transparent,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

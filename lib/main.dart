@@ -31,19 +31,11 @@ void main() async {
 
   await AppSecrets.init();
   await AppDatabase.init();
-  // await AppImageCache.init();
   await AppPreferences.init();
   await AndroidTVDetector.detect();
 
   // init firebase
   await AppInitFirebase.init();
-
-  if (isDesktopDevice()) {
-    windowManager.waitUntilReadyToShow(null, () async {
-      await windowManager.show();
-      await windowManager.focus();
-    });
-  }
 
   // start ui
   runApp(ProviderScope(

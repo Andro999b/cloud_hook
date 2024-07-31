@@ -87,7 +87,7 @@ class MangaReaderControlTopBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Material(
-      color: theme.colorScheme.background.withOpacity(0.7),
+      color: theme.colorScheme.surface.withOpacity(0.7),
       child: Padding(
         padding: const EdgeInsets.only(
           top: 16.0,
@@ -151,7 +151,7 @@ class MangaReaderControlBottomBar extends MediaCollectionItemConsumerWidger {
     final curPage = pos.position + 1;
     final pageNumbers = pos.length;
     return Material(
-      color: Theme.of(context).colorScheme.background.withOpacity(0.7),
+      color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
