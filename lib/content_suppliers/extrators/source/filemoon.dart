@@ -20,7 +20,10 @@ class FileMoonSourceLoader implements ContentMediaItemSourceLoader {
 
   @override
   Future<List<ContentMediaItemSource>> call() async {
-    final scrapper = Scrapper(uri: url, headers: {"Referer": referer});
+    final scrapper = Scrapper(
+      uri: Uri.parse(url),
+      headers: {"Referer": referer},
+    );
     final script = await scrapper.scrap(
       TextSelector.forScope("script[data-cfasync='false']"),
     );

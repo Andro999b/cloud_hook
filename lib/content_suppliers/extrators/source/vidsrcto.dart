@@ -37,8 +37,10 @@ class VidSrcToSourceLoader
 
     final keys = await VidsrcToApiKeys.fetch();
 
-    final mediaId = await Scrapper(uri: url, headers: {...defaultHeaders})
-        .scrap(Attribute.forScope("ul.episodes li a", "data-id"));
+    final mediaId = await Scrapper(
+      uri: Uri.parse(url),
+      headers: {...defaultHeaders},
+    ).scrap(Attribute.forScope("ul.episodes li a", "data-id"));
 
     if (mediaId == null) {
       logger.w("[vidsrc.to] mediaId not found");

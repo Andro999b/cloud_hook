@@ -58,8 +58,10 @@ class MoviesapiSourceLoader implements ContentMediaItemSourceLoader {
       url = "$baseUrl/tv/$tmdb-$season-$episode";
     }
 
-    final iframe =
-        await Scrapper(uri: url, headers: {"Referer": baseUrl}).scrap(
+    final iframe = await Scrapper(
+      uri: Uri.parse(url),
+      headers: {"Referer": baseUrl},
+    ).scrap(
       Attribute.forScope("#frame2", "src"),
     );
 

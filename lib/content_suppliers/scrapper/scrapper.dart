@@ -17,9 +17,9 @@ const defaultHeaders = {
 };
 
 class Scrapper {
-  final String uri;
+  final Uri uri;
   final String method;
-  final Map<String, String> headers;
+  final Map<String, String?> headers;
   final Object? body;
   final Map<String, Object>? form;
   // final String? encoding;
@@ -53,7 +53,7 @@ class Scrapper {
   }
 
   Future<String?> _loadPage() async {
-    final resposnse = await dio.request(
+    final resposnse = await dio.requestUri(
       uri,
       options: Options(
         method: method,

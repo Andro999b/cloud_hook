@@ -24,17 +24,18 @@ class TwoEmbedSourceLoader implements ContentMediaItemSourceLoader {
 
   @override
   Future<List<ContentMediaItemSource>> call() async {
-    String uri;
+    String url;
 
     if (episode == null) {
-      uri = "$baseUrl/embed/$imdb";
+      url = "$baseUrl/embed/$imdb";
     } else {
-      uri = "$baseUrl/embedtv/$imdb&s=$season&e=$episode";
+      url = "$baseUrl/embedtv/$imdb&s=$season&e=$episode";
     }
 
-    final scrapper = Scrapper(uri: uri);
+    final scrapper = Scrapper(uri: Uri.parse(url));
 
-    final iframe = await scrapper.scrap(Attribute.forScope("iframe#iframesrc", "data-src"));
+    final iframe = await scrapper
+        .scrap(Attribute.forScope("iframe#iframesrc", "data-src"));
 
     if (iframe == null) {
       logger.w("[2embed] iframe not found");

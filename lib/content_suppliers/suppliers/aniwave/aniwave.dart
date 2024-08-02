@@ -9,32 +9,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'aniwave.g.dart';
 
-@JsonSerializable(createToJson: false)
-// ignore: must_be_immutable
-class AniWaveContentDetails extends AbstractContentDetails with AsyncMediaItems {
-  final String mediaId;
-
-  AniWaveContentDetails({
-    required super.id,
-    required super.supplier,
-    required super.title,
-    required super.originalTitle,
-    required super.image,
-    required super.description,
-    required super.additionalInfo,
-    required super.similar,
-    required this.mediaId,
-  });
-
-  factory AniWaveContentDetails.fromJson(Map<String, dynamic> json) => _$AniWaveContentDetailsFromJson(json);
-
-  @override
-  ContentMediaItemLoader get mediaExtractor => AniWaveMediaItemLoader(
-        AniWaveSupplier.host,
-        mediaId,
-      );
-}
-
 class AniWaveSupplier extends ContentSupplier {
   static const String host = "aniwave.to";
   static final _idRegExp = RegExp(r'\/watch\/(?<id>[^\/]+)');
@@ -52,7 +26,7 @@ class AniWaveSupplier extends ContentSupplier {
   Future<List<ContentInfo>> search(String query, Set<ContentType> type) async {
     final uri = Uri.https(host, "filter", {"keyword": query});
 
-    final scrapper = Scrapper(uri: uri.toString(), headers: {"Host": host});
+    final scrapper = Scrapper(uri: uri, headers: {"Host": host});
     final results = await scrapper.scrap(
           Scope(
             scope: "#list-items",
@@ -77,7 +51,7 @@ class AniWaveSupplier extends ContentSupplier {
   Future<ContentDetails?> detailsById(String id) async {
     final uri = Uri.https(host, "/watch/$id");
 
-    final scrapper = Scrapper(uri: uri.toString(), headers: {"Host": host});
+    final scrapper = Scrapper(uri: uri, headers: {"Host": host});
     final results = await scrapper.scrap(
       Scope(
         scope: "#body",
@@ -87,7 +61,8 @@ class AniWaveSupplier extends ContentSupplier {
           "mediaId": Attribute.forScope("#watch-main", "data-id"),
           "image": Attribute.forScope(".binfo .poster img", "src"),
           "title": TextSelector.forScope(".binfo h1.title"),
-          "description": TextSelector.forScope(".binfo .info .synopsis .content"),
+          "description":
+              TextSelector.forScope(".binfo .info .synopsis .content"),
           "additionalInfo": Iterate(
             itemScope: ".bmeta .meta > div",
             item: Concat.selectors(
@@ -173,4 +148,32 @@ class AniWaveSupplier extends ContentSupplier {
 
     return results.map(ContentSearchResult.fromJson).toList();
   }
+}
+
+@JsonSerializable(createToJson: false)
+// ignore: must_be_immutable
+class AniWaveContentDetails extends AbstractContentDetails
+    with AsyncMediaItems {
+  final String mediaId;
+
+  AniWaveContentDetails({
+    required super.id,
+    required super.supplier,
+    required super.title,
+    required super.originalTitle,
+    required super.image,
+    required super.description,
+    required super.additionalInfo,
+    required super.similar,
+    required this.mediaId,
+  });
+
+  factory AniWaveContentDetails.fromJson(Map<String, dynamic> json) =>
+      _$AniWaveContentDetailsFromJson(json);
+
+  @override
+  ContentMediaItemLoader get mediaExtractor => AniWaveMediaItemLoader(
+        AniWaveSupplier.host,
+        mediaId,
+      );
 }

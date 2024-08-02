@@ -33,7 +33,7 @@ class AniWaveMediaItemLoader implements ContentMediaItemLoader {
 
   @override
   FutureOr<List<ContentMediaItem>> call() async {
-    final vrf = aniwaveVRF(mediaId);
+    final vrf = await aniwaveVRF(mediaId);
 
     final episodesRes = await dio.get(
       "https://$host/ajax/episode/list/$mediaId?vrf=$vrf",
@@ -98,7 +98,7 @@ class AniWaveSourceLoader implements ContentMediaItemSourceLoader {
 
   @override
   FutureOr<List<ContentMediaItemSource>> call() async {
-    final vrf = aniwaveVRF(id);
+    final vrf = await aniwaveVRF(id);
 
     final serversRes = await dio.get(
       "https://$host/ajax/server/list/$id?vrf=$vrf",
@@ -176,7 +176,7 @@ class AniWaveServerSorceLoader
 
   @override
   Future<String?> loadSource(String id) async {
-    final vrf = aniwaveVRF(id);
+    final vrf = await aniwaveVRF(id);
 
     final serverRes = await dio.get(
       "https://$host/ajax/server/$id?vrf=$vrf",
@@ -193,6 +193,6 @@ class AniWaveServerSorceLoader
       return null;
     }
 
-    return aniwaveDecryptURL(encUrl);
+    return await aniwaveDecryptURL(encUrl);
   }
 }

@@ -7,30 +7,8 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'ufdub.g.dart';
 
-@JsonSerializable(createToJson: false)
-// ignore: must_be_immutable
-class UFDubContentDetails extends AbstractContentDetails with AsyncMediaItems {
-  UFDubContentDetails({
-    required super.id,
-    required super.supplier,
-    required super.title,
-    required super.originalTitle,
-    required super.image,
-    required super.description,
-    required super.additionalInfo,
-    required super.similar,
-    required this.iframe,
-  });
-
-  final String iframe;
-
-  factory UFDubContentDetails.fromJson(Map<String, dynamic> json) => _$UFDubContentDetailsFromJson(json);
-
-  @override
-  ContentMediaItemLoader get mediaExtractor => UFDubMediaExtractor(iframe);
-}
-
-class UFDubSupplier extends ContentSupplier with PageableChannelsLoader, DLEChannelsLoader, DLESearch {
+class UFDubSupplier extends ContentSupplier
+    with PageableChannelsLoader, DLEChannelsLoader, DLESearch {
   @override
   final String host = "ufdub.com";
 
@@ -41,7 +19,8 @@ class UFDubSupplier extends ContentSupplier with PageableChannelsLoader, DLEChan
   Set<ContentType> get supportedTypes => const {ContentType.anime};
 
   @override
-  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> get supportedLanguages =>
+      const {ContentLanguage.ukrainian};
 
   @override
   late final contentInfoSelector = Iterate(
@@ -57,7 +36,7 @@ class UFDubSupplier extends ContentSupplier with PageableChannelsLoader, DLEChan
 
   @override
   Future<ContentDetails?> detailsById(String id) async {
-    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html").toString());
+    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html"));
 
     final result = await scrapper.scrap(Scope(
       scope: "div.cols",
@@ -66,7 +45,8 @@ class UFDubSupplier extends ContentSupplier with PageableChannelsLoader, DLEChan
           "id": Const(id),
           "supplier": Const(name),
           "title": TextNode.forScope("article .full-title > h1"),
-          "originalTitle": TextSelector.forScope("article > .full-title > h1 > .short-t-or"),
+          "originalTitle":
+              TextSelector.forScope("article > .full-title > h1 > .short-t-or"),
           "image": Image.forScope(
             "article > .full-desc > .full-text > .full-poster img",
             host,
@@ -81,7 +61,8 @@ class UFDubSupplier extends ContentSupplier with PageableChannelsLoader, DLEChan
               item: TextSelector(inline: true),
             ),
             Iterate(
-              itemScope: "article > .full-desc > .full-text > .full-poster .voices",
+              itemScope:
+                  "article > .full-desc > .full-text > .full-poster .voices",
               item: TextSelector(inline: true),
             ),
           ]),
@@ -110,6 +91,9 @@ class UFDubSupplier extends ContentSupplier with PageableChannelsLoader, DLEChan
   }
 
   @override
+  late final channelInfoSelector = contentInfoSelector;
+
+  @override
   final Map<String, String> channelsPath = const {
     "Новинки": "/page/",
     "Фільми": "/film/page/",
@@ -119,4 +103,28 @@ class UFDubSupplier extends ContentSupplier with PageableChannelsLoader, DLEChan
     "Мультсеріали": "/cartoon-serial/page/",
     "Дорами": "/cartoon-serial/page/"
   };
+}
+
+@JsonSerializable(createToJson: false)
+// ignore: must_be_immutable
+class UFDubContentDetails extends AbstractContentDetails with AsyncMediaItems {
+  UFDubContentDetails({
+    required super.id,
+    required super.supplier,
+    required super.title,
+    required super.originalTitle,
+    required super.image,
+    required super.description,
+    required super.additionalInfo,
+    required super.similar,
+    required this.iframe,
+  });
+
+  final String iframe;
+
+  factory UFDubContentDetails.fromJson(Map<String, dynamic> json) =>
+      _$UFDubContentDetailsFromJson(json);
+
+  @override
+  ContentMediaItemLoader get mediaExtractor => UFDubMediaExtractor(iframe);
 }

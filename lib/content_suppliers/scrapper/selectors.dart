@@ -90,10 +90,10 @@ class SelectorsToMap extends Selector<Map<String, Object?>> {
 typedef TransformFun<T, E> = T Function(E);
 
 class Transform<T, E> extends Selector<T> {
-  final TransformFun<T, E> map;
   final Selector<E> item;
+  final TransformFun<T, E> map;
 
-  Transform({required this.map, required this.item});
+  Transform({required this.item, required this.map});
 
   @override
   FutureOr<T> select(dom.Element element) async {

@@ -11,97 +11,6 @@ part 'mangadex.g.dart';
 const _coverArtHost = "https://uploads.mangadex.org/covers";
 const _supplierName = "MangaDex";
 
-@immutable
-class MangaDexContentInfo extends ContentSearchResult {
-  const MangaDexContentInfo({
-    required super.id,
-    required super.supplier,
-    required super.image,
-    required super.title,
-    super.secondaryTitle,
-  });
-
-  factory MangaDexContentInfo.fromJson(Map<String, dynamic> json) {
-    final id = json["id"];
-    final attributes = json["attributes"] as Map<String, dynamic>;
-    final relationships = json["relationships"] as List<dynamic>;
-    final coverFileName = _lookupCoverFile(relationships);
-
-    return MangaDexContentInfo(
-      id: id,
-      supplier: _supplierName,
-      image: "$_coverArtHost/$id/$coverFileName.512.jpg",
-      title: attributes["title"]["en"],
-    );
-  }
-}
-
-@immutable
-class MangaDexContentDetails extends AbstractContentDetails {
-  @override
-  final List<ContentMediaItem> mediaItems;
-
-  const MangaDexContentDetails({
-    required super.id,
-    required super.supplier,
-    required super.title,
-    required super.originalTitle,
-    required super.image,
-    required super.description,
-    required super.additionalInfo,
-    required super.similar,
-    required this.mediaItems,
-  });
-
-  @override
-  MediaType get mediaType => MediaType.manga;
-
-  factory MangaDexContentDetails.ctreate(
-    List<ContentMediaItem> mediaItems,
-    Map<String, dynamic> json,
-  ) {
-    final id = json["id"];
-    final attributes = json["attributes"] as Map<String, dynamic>;
-    final originalLanguage = attributes["originalLanguage"];
-    final relationships = json["relationships"] as List<dynamic>;
-    final coverFileName = _lookupCoverFile(relationships);
-
-    final altTitles = attributes["altTitles"] as List<dynamic>;
-    final originalTitle = altTitles.firstWhereOrNull(
-        (t) => t[originalLanguage] != null)?[originalLanguage];
-
-    final description = attributes["description"]["en"];
-    final title = attributes["title"]["en"];
-
-    final author = _lookupAuthor(relationships);
-    final year = attributes["year"];
-    final status = attributes["status"];
-
-    final tags = attributes["tags"] as List<dynamic>;
-    final genres = tags
-        .where((t) => t["attributes"]["group"] == "genre")
-        .map((t) => t["attributes"]["name"]["en"])
-        .join(", ");
-
-    return MangaDexContentDetails(
-      id: json["id"],
-      supplier: _supplierName,
-      title: title,
-      originalTitle: originalTitle,
-      image: "$_coverArtHost/$id/$coverFileName",
-      description: description,
-      additionalInfo: [
-        "Author: $author",
-        "Year: $year",
-        "Status: $status",
-        "Genres: $genres",
-      ],
-      similar: const [],
-      mediaItems: mediaItems,
-    );
-  }
-}
-
 class MangaDexSupllier extends ContentSupplier {
   static const siteHost = "api.mangadex.org";
   static const userAgent = "Cloud Hook APP";
@@ -123,10 +32,7 @@ class MangaDexSupllier extends ContentSupplier {
   Set<ContentType> get supportedTypes => const {ContentType.manga};
 
   @override
-  Set<ContentLanguage> get supportedLanguages => const {
-        ContentLanguage.english,
-        ContentLanguage.ukrainian,
-      };
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.multi};
 
   @override
   Future<List<ContentInfo>> search(String query, Set<ContentType> type) async {
@@ -344,4 +250,95 @@ class MangaDexChapterAttributes {
 
   factory MangaDexChapterAttributes.fromJson(Map<String, dynamic> json) =>
       _$MangaDexChapterAttributesFromJson(json);
+}
+
+@immutable
+class MangaDexContentInfo extends ContentSearchResult {
+  const MangaDexContentInfo({
+    required super.id,
+    required super.supplier,
+    required super.image,
+    required super.title,
+    super.secondaryTitle,
+  });
+
+  factory MangaDexContentInfo.fromJson(Map<String, dynamic> json) {
+    final id = json["id"];
+    final attributes = json["attributes"] as Map<String, dynamic>;
+    final relationships = json["relationships"] as List<dynamic>;
+    final coverFileName = _lookupCoverFile(relationships);
+
+    return MangaDexContentInfo(
+      id: id,
+      supplier: _supplierName,
+      image: "$_coverArtHost/$id/$coverFileName.512.jpg",
+      title: attributes["title"]["en"],
+    );
+  }
+}
+
+@immutable
+class MangaDexContentDetails extends AbstractContentDetails {
+  @override
+  final List<ContentMediaItem> mediaItems;
+
+  const MangaDexContentDetails({
+    required super.id,
+    required super.supplier,
+    required super.title,
+    required super.originalTitle,
+    required super.image,
+    required super.description,
+    required super.additionalInfo,
+    required super.similar,
+    required this.mediaItems,
+  });
+
+  @override
+  MediaType get mediaType => MediaType.manga;
+
+  factory MangaDexContentDetails.ctreate(
+    List<ContentMediaItem> mediaItems,
+    Map<String, dynamic> json,
+  ) {
+    final id = json["id"];
+    final attributes = json["attributes"] as Map<String, dynamic>;
+    final originalLanguage = attributes["originalLanguage"];
+    final relationships = json["relationships"] as List<dynamic>;
+    final coverFileName = _lookupCoverFile(relationships);
+
+    final altTitles = attributes["altTitles"] as List<dynamic>;
+    final originalTitle = altTitles.firstWhereOrNull(
+        (t) => t[originalLanguage] != null)?[originalLanguage];
+
+    final description = attributes["description"]["en"];
+    final title = attributes["title"]["en"];
+
+    final author = _lookupAuthor(relationships);
+    final year = attributes["year"];
+    final status = attributes["status"];
+
+    final tags = attributes["tags"] as List<dynamic>;
+    final genres = tags
+        .where((t) => t["attributes"]["group"] == "genre")
+        .map((t) => t["attributes"]["name"]["en"])
+        .join(", ");
+
+    return MangaDexContentDetails(
+      id: json["id"],
+      supplier: _supplierName,
+      title: title,
+      originalTitle: originalTitle,
+      image: "$_coverArtHost/$id/$coverFileName",
+      description: description,
+      additionalInfo: [
+        "Author: $author",
+        "Year: $year",
+        "Status: $status",
+        "Genres: $genres",
+      ],
+      similar: const [],
+      mediaItems: mediaItems,
+    );
+  }
 }

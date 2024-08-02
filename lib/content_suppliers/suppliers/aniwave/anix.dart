@@ -9,32 +9,6 @@ part 'anix.g.dart';
 
 const _siteHost = "anix.to";
 
-@JsonSerializable(createToJson: false)
-// ignore: must_be_immutable
-class AnixContentDetails extends AbstractContentDetails with AsyncMediaItems {
-  final String mediaId;
-
-  AnixContentDetails({
-    required super.id,
-    required super.supplier,
-    required super.title,
-    required super.originalTitle,
-    required super.image,
-    required super.description,
-    required super.additionalInfo,
-    required super.similar,
-    required this.mediaId,
-  });
-
-  factory AnixContentDetails.fromJson(Map<String, dynamic> json) => _$AnixContentDetailsFromJson(json);
-
-  @override
-  ContentMediaItemLoader get mediaExtractor => AnixMediaItemLoader(
-        _siteHost,
-        mediaId,
-      );
-}
-
 class AnixSupplier extends ContentSupplier with PageableChannelsLoader {
   static final _idRegExp = RegExp(r'\/anime\/(?<id>[^\/]+)');
 
@@ -66,7 +40,7 @@ class AnixSupplier extends ContentSupplier with PageableChannelsLoader {
   Future<List<ContentInfo>> search(String query, Set<ContentType> type) async {
     final uri = Uri.https(host, "filter", {"keyword": query});
 
-    final scrapper = Scrapper(uri: uri.toString(), headers: {"Host": host});
+    final scrapper = Scrapper(uri: uri, headers: {"Host": host});
     final results = await scrapper.scrap(contentInfoSelector) ?? [];
 
     return results.map(ContentSearchResult.fromJson).toList();
@@ -75,7 +49,7 @@ class AnixSupplier extends ContentSupplier with PageableChannelsLoader {
   @override
   Future<ContentDetails?> detailsById(String id) async {
     final uri = Uri.https(host, "/anime/$id");
-    final scrapper = Scrapper(uri: uri.toString(), headers: {"Host": host});
+    final scrapper = Scrapper(uri: uri, headers: {"Host": host});
 
     final results = await scrapper.scrap(
       Scope(
@@ -84,9 +58,12 @@ class AnixSupplier extends ContentSupplier with PageableChannelsLoader {
           "supplier": Const(name),
           "id": Const(id),
           "mediaId": Attribute.forScope(">.watch-wrap", "data-id"),
-          "image": Attribute.forScope("#ani-detail-info .ani-data .poster-wrap img", "src"),
-          "title": TextSelector.forScope("#ani-detail-info .ani-data .maindata h1.ani-name"),
-          "description": TextSelector.forScope("#ani-detail-info .ani-data .maindata .description .full"),
+          "image": Attribute.forScope(
+              "#ani-detail-info .ani-data .poster-wrap img", "src"),
+          "title": TextSelector.forScope(
+              "#ani-detail-info .ani-data .maindata h1.ani-name"),
+          "description": TextSelector.forScope(
+              "#ani-detail-info .ani-data .maindata .description .full"),
           "additionalInfo": Iterate(
             itemScope: "#ani-detail-info .metadata .limiter > div",
             item: Concat.selectors(
@@ -121,6 +98,9 @@ class AnixSupplier extends ContentSupplier with PageableChannelsLoader {
   }
 
   @override
+  late final channelInfoSelector = contentInfoSelector;
+
+  @override
   Map<String, String> get channelsPath => const {
         "All": "/home",
         "Ongoing": "/ongoing?page",
@@ -135,4 +115,31 @@ class AnixSupplier extends ContentSupplier with PageableChannelsLoader {
 
   @override
   String nextChannelPage(String path, int page) => "$path=$page";
+}
+
+@JsonSerializable(createToJson: false)
+// ignore: must_be_immutable
+class AnixContentDetails extends AbstractContentDetails with AsyncMediaItems {
+  final String mediaId;
+
+  AnixContentDetails({
+    required super.id,
+    required super.supplier,
+    required super.title,
+    required super.originalTitle,
+    required super.image,
+    required super.description,
+    required super.additionalInfo,
+    required super.similar,
+    required this.mediaId,
+  });
+
+  factory AnixContentDetails.fromJson(Map<String, dynamic> json) =>
+      _$AnixContentDetailsFromJson(json);
+
+  @override
+  ContentMediaItemLoader get mediaExtractor => AnixMediaItemLoader(
+        _siteHost,
+        mediaId,
+      );
 }

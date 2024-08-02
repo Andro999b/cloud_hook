@@ -12,43 +12,8 @@ part 'anitube.g.dart';
 
 const _siteHost = "anitube.in.ua";
 
-@JsonSerializable(createToJson: false)
-// ignore: must_be_immutable
-class AniTubeContentDetails extends AbstractContentDetails with AsyncMediaItems {
-  final String? hash;
-  final String newsId;
-  final String? ralodePlayerParams;
-
-  AniTubeContentDetails({
-    required super.id,
-    required super.supplier,
-    required super.title,
-    required super.originalTitle,
-    required super.image,
-    required super.description,
-    required super.additionalInfo,
-    required super.similar,
-    required this.newsId,
-    this.hash,
-    this.ralodePlayerParams,
-  });
-
-  factory AniTubeContentDetails.fromJson(Map<String, dynamic> json) => _$AniTubeContentDetailsFromJson(json);
-
-  @override
-  ContentMediaItemLoader get mediaExtractor => ralodePlayerParams != null
-      ? RalodePlayerExtractor(ralodePlayerParams!)
-      : DLEAjaxPLaylistExtractor(
-          Uri.https(_siteHost, "/engine/ajax/playlists.php", {
-            "user_hash": hash,
-            "xfield": "playlist",
-            "news_id": newsId,
-          }),
-          "https://$_siteHost",
-        );
-}
-
-class AniTubeSupplier extends ContentSupplier with PageableChannelsLoader, DLESearch, DLEChannelsLoader {
+class AniTubeSupplier extends ContentSupplier
+    with PageableChannelsLoader, DLESearch, DLEChannelsLoader {
   static final _additionaInfoSectionsPatterns = [
     RegExp(r"Рік виходу аніме:\s+.*"),
     RegExp(r"Жанр:\s+.*"),
@@ -57,17 +22,16 @@ class AniTubeSupplier extends ContentSupplier with PageableChannelsLoader, DLESe
   ];
 
   static final _originaTitlePattern = RegExp(r"Оригінальна назва:\s+.*");
-  static final _dleLoginHashPattern = RegExp(r"dle_login_hash\s+=\s+'(?<hash>[a-z0-9]+)'");
-  static final _ralodePlayerPattern = RegExp(r"RalodePlayer\.init\((?<params>.*)\);");
+  static final _dleLoginHashPattern =
+      RegExp(r"dle_login_hash\s+=\s+'(?<hash>[a-z0-9]+)'");
+  static final _ralodePlayerPattern =
+      RegExp(r"RalodePlayer\.init\((?<params>.*)\);");
 
   @override
   final host = _siteHost;
 
   @override
   String get name => "AniTube";
-
-  @override
-  Map<String, String> channelsPath = const {"Новинки": "/anime/page/"};
 
   @override
   Selector<List<Map<String, dynamic>>> get contentInfoSelector => Iterate(
@@ -88,7 +52,7 @@ class AniTubeSupplier extends ContentSupplier with PageableChannelsLoader, DLESe
 
   @override
   Future<ContentDetails?> detailsById(String id) async {
-    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html").toString());
+    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html"));
 
     final result = await scrapper.scrap(Scope(
       scope: "div.content",
@@ -137,19 +101,68 @@ class AniTubeSupplier extends ContentSupplier with PageableChannelsLoader, DLESe
       }
 
       result["additionalInfo"] = additionalInfo;
-      result["originaTitle"] = _originaTitlePattern.firstMatch(htmlMess)?.group(0);
+      result["originaTitle"] =
+          _originaTitlePattern.firstMatch(htmlMess)?.group(0);
     }
 
-    final ralodePlayerParams = _ralodePlayerPattern.firstMatch(scrapper.pageContent)?.namedGroup("params");
+    final ralodePlayerParams = _ralodePlayerPattern
+        .firstMatch(scrapper.pageContent)
+        ?.namedGroup("params");
 
     result["ralodePlayerParams"] = ralodePlayerParams;
 
     if (ralodePlayerParams == null) {
-      result["hash"] = _dleLoginHashPattern.firstMatch(scrapper.pageContent)?.namedGroup("hash");
+      result["hash"] = _dleLoginHashPattern
+          .firstMatch(scrapper.pageContent)
+          ?.namedGroup("hash");
     }
 
     result["newsId"] = id.split("-").first;
 
     return AniTubeContentDetails.fromJson(result);
   }
+
+  @override
+  late final channelInfoSelector = contentInfoSelector;
+
+  @override
+  Map<String, String> channelsPath = const {"Новинки": "/anime/page/"};
+}
+
+@JsonSerializable(createToJson: false)
+// ignore: must_be_immutable
+class AniTubeContentDetails extends AbstractContentDetails
+    with AsyncMediaItems {
+  final String? hash;
+  final String newsId;
+  final String? ralodePlayerParams;
+
+  AniTubeContentDetails({
+    required super.id,
+    required super.supplier,
+    required super.title,
+    required super.originalTitle,
+    required super.image,
+    required super.description,
+    required super.additionalInfo,
+    required super.similar,
+    required this.newsId,
+    this.hash,
+    this.ralodePlayerParams,
+  });
+
+  factory AniTubeContentDetails.fromJson(Map<String, dynamic> json) =>
+      _$AniTubeContentDetailsFromJson(json);
+
+  @override
+  ContentMediaItemLoader get mediaExtractor => ralodePlayerParams != null
+      ? RalodePlayerExtractor(ralodePlayerParams!)
+      : DLEAjaxPLaylistExtractor(
+          Uri.https(_siteHost, "/engine/ajax/playlists.php", {
+            "user_hash": hash,
+            "xfield": "playlist",
+            "news_id": newsId,
+          }),
+          "https://$_siteHost",
+        );
 }

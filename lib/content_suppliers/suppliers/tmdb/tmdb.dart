@@ -16,114 +16,6 @@ part 'tmdb.g.dart';
 
 const _supplierName = "TMDB";
 
-class TmdbContentInfo implements ContentInfo {
-  @override
-  final String id;
-  @override
-  final String title;
-  @override
-  final String? secondaryTitle;
-  @override
-  final String image;
-  @override
-  String get supplier => _supplierName;
-
-  TmdbContentInfo({
-    required this.id,
-    required this.title,
-    required this.secondaryTitle,
-    required this.image,
-  });
-
-  factory TmdbContentInfo.fromJson(Map<String, dynamic> json) {
-    final title = json["name"] ?? json["title"];
-    final originalTitle = json["original_title"];
-    final type = json["media_type"];
-
-    return TmdbContentInfo(
-      id: "$type/${json["id"]}",
-      title: title,
-      secondaryTitle: title != originalTitle ? originalTitle : null,
-      image:
-          json["poster_path"] != null ? _posterImage(json["poster_path"]) : "",
-    );
-  }
-}
-
-@immutable
-class TmdbContentDetails extends AbstractContentDetails {
-  @override
-  final List<ContentMediaItem> mediaItems;
-
-  const TmdbContentDetails({
-    required super.id,
-    required super.supplier,
-    required super.title,
-    required super.originalTitle,
-    required super.image,
-    required super.description,
-    required super.additionalInfo,
-    required super.similar,
-    required this.mediaItems,
-  });
-
-  factory TmdbContentDetails.fromJson(
-    String id,
-    List<ContentMediaItem> mediaItems,
-    Map<String, dynamic> json,
-  ) {
-    final title = json["name"] ?? json["title"];
-    final originalTitle = json["original_title"];
-    final recommendations = json["recommendations"];
-
-    return TmdbContentDetails(
-      id: id,
-      supplier: _supplierName,
-      title: title,
-      originalTitle: originalTitle,
-      image: json["poster_path"] != null
-          ? _originalPosterImage(json["poster_path"])
-          : "",
-      description: json["overview"],
-      additionalInfo: [
-        json["vote_average"].toString(),
-        if (json["created_by"] != null)
-          "Created by: ${json["created_by"].map((e) => e["name"]).join(", ")}",
-        if (json["release_date"] != null)
-          "Realise date: ${json["release_date"]}",
-        if (json["first_air_date"] != null)
-          "First air date: ${json["first_air_date"]}",
-        if (json["last_air_date"] != null)
-          "Last air date: ${json["last_air_date"]}",
-        if (json["next_air_date"] != null)
-          "Next air date: ${json["next_air_date"]}",
-        if (json["genres"] != null)
-          "Genres: ${json["genres"].map((e) => e["name"]).join(", ")}",
-        if (json["production_countries"] != null)
-          "Country: ${json["production_countries"].map((e) => e["name"]).join(", ")}",
-        if (json["credits"]?["cast"] != null)
-          "Cast: ${json["credits"]["cast"].map((e) => e["name"]).join(", ")}",
-      ],
-      similar: recommendations != null
-          ? _TmdbSearchResponse.fromJson(recommendations).results
-          : [],
-      mediaItems: mediaItems,
-    );
-  }
-}
-
-String _posterImage(String path) {
-  if (path.startsWith("/")) return "http://image.tmdb.org/t/p/w342$path";
-  return path;
-}
-
-String _originalPosterImage(String path) {
-  if (path.startsWith("/")) {
-    return "http://image.tmdb.org/t/p/original$path";
-  }
-  return path;
-}
-
 class TmdbSupplier extends ContentSupplier {
   static const secretName = "tmdb";
   static const api = "api.themoviedb.org";
@@ -336,4 +228,112 @@ class _TmdbEpisode {
 
   factory _TmdbEpisode.fromJson(Map<String, dynamic> json) =>
       _$TmdbEpisodeFromJson(json);
+}
+
+class TmdbContentInfo implements ContentInfo {
+  @override
+  final String id;
+  @override
+  final String title;
+  @override
+  final String? secondaryTitle;
+  @override
+  final String image;
+  @override
+  String get supplier => _supplierName;
+
+  TmdbContentInfo({
+    required this.id,
+    required this.title,
+    required this.secondaryTitle,
+    required this.image,
+  });
+
+  factory TmdbContentInfo.fromJson(Map<String, dynamic> json) {
+    final title = json["name"] ?? json["title"];
+    final originalTitle = json["original_title"];
+    final type = json["media_type"];
+
+    return TmdbContentInfo(
+      id: "$type/${json["id"]}",
+      title: title,
+      secondaryTitle: title != originalTitle ? originalTitle : null,
+      image:
+          json["poster_path"] != null ? _posterImage(json["poster_path"]) : "",
+    );
+  }
+}
+
+@immutable
+class TmdbContentDetails extends AbstractContentDetails {
+  @override
+  final List<ContentMediaItem> mediaItems;
+
+  const TmdbContentDetails({
+    required super.id,
+    required super.supplier,
+    required super.title,
+    required super.originalTitle,
+    required super.image,
+    required super.description,
+    required super.additionalInfo,
+    required super.similar,
+    required this.mediaItems,
+  });
+
+  factory TmdbContentDetails.fromJson(
+    String id,
+    List<ContentMediaItem> mediaItems,
+    Map<String, dynamic> json,
+  ) {
+    final title = json["name"] ?? json["title"];
+    final originalTitle = json["original_title"];
+    final recommendations = json["recommendations"];
+
+    return TmdbContentDetails(
+      id: id,
+      supplier: _supplierName,
+      title: title,
+      originalTitle: originalTitle,
+      image: json["poster_path"] != null
+          ? _originalPosterImage(json["poster_path"])
+          : "",
+      description: json["overview"],
+      additionalInfo: [
+        json["vote_average"].toString(),
+        if (json["created_by"] != null)
+          "Created by: ${json["created_by"].map((e) => e["name"]).join(", ")}",
+        if (json["release_date"] != null)
+          "Realise date: ${json["release_date"]}",
+        if (json["first_air_date"] != null)
+          "First air date: ${json["first_air_date"]}",
+        if (json["last_air_date"] != null)
+          "Last air date: ${json["last_air_date"]}",
+        if (json["next_air_date"] != null)
+          "Next air date: ${json["next_air_date"]}",
+        if (json["genres"] != null)
+          "Genres: ${json["genres"].map((e) => e["name"]).join(", ")}",
+        if (json["production_countries"] != null)
+          "Country: ${json["production_countries"].map((e) => e["name"]).join(", ")}",
+        if (json["credits"]?["cast"] != null)
+          "Cast: ${json["credits"]["cast"].map((e) => e["name"]).join(", ")}",
+      ],
+      similar: recommendations != null
+          ? _TmdbSearchResponse.fromJson(recommendations).results
+          : [],
+      mediaItems: mediaItems,
+    );
+  }
+}
+
+String _posterImage(String path) {
+  if (path.startsWith("/")) return "http://image.tmdb.org/t/p/w342$path";
+  return path;
+}
+
+String _originalPosterImage(String path) {
+  if (path.startsWith("/")) {
+    return "http://image.tmdb.org/t/p/original$path";
+  }
+  return path;
 }

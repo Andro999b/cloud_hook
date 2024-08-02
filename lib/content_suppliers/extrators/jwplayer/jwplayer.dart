@@ -111,7 +111,14 @@ class JWPlayerSingleFileSourceLoader implements ContentMediaItemSourceLoader {
       ),
     );
 
-    final file = _fileRegExp.firstMatch(res.data)?.namedGroup("file");
+    return lookuFile(res.data, descriptionPrefix: descriptionPrefix);
+  }
+
+  static List<ContentMediaItemSource> lookuFile(
+    String script, {
+    String? descriptionPrefix,
+  }) {
+    final file = _fileRegExp.firstMatch(script)?.namedGroup("file");
 
     if (file == null) {
       logger.w("[jwplayer] sources url not found");
@@ -120,7 +127,7 @@ class JWPlayerSingleFileSourceLoader implements ContentMediaItemSourceLoader {
 
     return [
       SimpleContentMediaItemSource(
-        description: descriptionPrefix,
+        description: descriptionPrefix ?? "jwplayer",
         link: parseUri(file),
       )
     ];

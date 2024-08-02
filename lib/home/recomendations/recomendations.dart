@@ -63,7 +63,8 @@ class _RecomendationChannel extends HookConsumerWidget {
     useEffect(() {
       void onScroll() {
         var position = scrollController.position;
-        if (position.pixels >= scrollController.position.maxScrollExtent - 200) {
+        if (position.pixels >=
+            scrollController.position.maxScrollExtent - 200) {
           ref.read(provider.notifier).loadNext();
         }
       }
@@ -84,6 +85,7 @@ class _RecomendationChannel extends HookConsumerWidget {
 
         return ContentInfoCard(
           contentInfo: item,
+          showSupplier: false,
         );
       },
       itemCount: state.recomendations.length,

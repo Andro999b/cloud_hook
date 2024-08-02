@@ -13,7 +13,8 @@ mixin PLayerJSIframe {
     includeFromJson: false,
     includeToJson: false,
   )
-  ContentMediaItemLoader get mediaExtractor => PlayerJSExtractor(iframe, DubSeasonEpisodeConvertStrategy());
+  ContentMediaItemLoader get mediaExtractor =>
+      PlayerJSExtractor(iframe, DubSeasonEpisodeConvertStrategy());
 }
 
 mixin AsyncMediaItems on ContentDetails {
@@ -50,7 +51,7 @@ mixin DLEChannelsLoader on PageableChannelsLoader {
 
 mixin PageableChannelsLoader on ContentSupplier {
   String get host;
-  Selector<List<Map<String, dynamic>>> get contentInfoSelector;
+  Selector get channelInfoSelector;
   Map<String, String> get channelsPath;
 
   @override
@@ -71,8 +72,9 @@ mixin PageableChannelsLoader on ContentSupplier {
       return [];
     }
 
-    final scrapper = Scrapper(uri: Uri.https(host, tragetPath).toString());
-    final results = await scrapper.scrap(contentInfoSelector) ?? [];
+    final scrapper = Scrapper(uri: Uri.https(host, tragetPath));
+    final results = (await scrapper.scrap(channelInfoSelector) ?? [])
+        as List<Map<String, dynamic>>;
 
     return results.map(ContentSearchResult.fromJson).toList();
   }
@@ -84,16 +86,15 @@ mixin PageableChannelsLoader on ContentSupplier {
 
 mixin DLESearch on ContentSupplier {
   String get host;
-  Selector<List<Map<String, dynamic>>> get contentInfoSelector;
+  Selector get contentInfoSelector;
 
   @override
   Future<List<ContentSearchResult>> search(
     String query,
     Set<ContentType> type,
   ) async {
-    final uri = Uri.https(host, "/index.php");
     final scrapper = Scrapper(
-      uri: uri.toString(),
+      uri: Uri.https(host, "/index.php"),
       method: "post",
       headers: const {"Content-Type": "application/x-www-form-urlencoded"},
       form: {
@@ -105,7 +106,8 @@ mixin DLESearch on ContentSupplier {
       },
     );
 
-    final results = await scrapper.scrap(contentInfoSelector) ?? [];
+    final results = (await scrapper.scrap(contentInfoSelector) ?? [])
+        as List<Map<String, dynamic>>;
 
     return results.map(ContentSearchResult.fromJson).toList();
   }

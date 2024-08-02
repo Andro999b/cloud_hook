@@ -1,11 +1,12 @@
 import 'dart:convert';
 
+import 'package:cloud_hook/content_suppliers/extrators/source/multi_api_keys.dart';
 import 'package:simple_rc4/simple_rc4.dart';
 
 // load separetelly
-const vrfKeys = ["p01EDKu734HJP1Tm", "ctpAbOz5u7S6OMkx"];
 
-String aniwaveVRF(String data) {
+Future<String> aniwaveVRF(String data) async {
+  final vrfKeys = (await MultiApiKeys.fetch()).aniwave!;
   final encryptKey = vrfKeys[0];
 
   final chiper = RC4(encryptKey);
@@ -24,7 +25,8 @@ String aniwaveVRF(String data) {
   // return base64.encode(vrf);
 }
 
-String aniwaveDecryptURL(String data) {
+Future<String> aniwaveDecryptURL(String data) async {
+  final vrfKeys = (await MultiApiKeys.fetch()).aniwave!;
   final decryptKey = vrfKeys[1];
 
   final chiper = RC4(decryptKey);

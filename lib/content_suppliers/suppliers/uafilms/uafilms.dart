@@ -6,28 +6,8 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'uafilms.g.dart';
 
-@JsonSerializable(createToJson: false)
-// ignore: must_be_immutable
-class UAFilmsContentDetails extends AbstractContentDetails with PLayerJSIframe, AsyncMediaItems {
-  UAFilmsContentDetails({
-    required super.id,
-    required super.supplier,
-    required super.title,
-    required super.originalTitle,
-    required super.image,
-    required super.description,
-    required super.additionalInfo,
-    required super.similar,
-    required this.iframe,
-  });
-
-  @override
-  final String iframe;
-
-  factory UAFilmsContentDetails.fromJson(Map<String, dynamic> json) => _$UAFilmsContentDetailsFromJson(json);
-}
-
-class UAFilmsSupplier extends ContentSupplier with PageableChannelsLoader, DLEChannelsLoader {
+class UAFilmsSupplier extends ContentSupplier
+    with PageableChannelsLoader, DLEChannelsLoader {
   @override
   final String host = "uafilm.pro";
 
@@ -43,7 +23,8 @@ class UAFilmsSupplier extends ContentSupplier with PageableChannelsLoader, DLECh
       };
 
   @override
-  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> get supportedLanguages =>
+      const {ContentLanguage.ukrainian};
 
   @override
   late final contentInfoSelector = Iterate(
@@ -72,7 +53,7 @@ class UAFilmsSupplier extends ContentSupplier with PageableChannelsLoader, DLECh
     final uri = Uri.https(host, "/index.php", {"do": "search"});
 
     final scrapper = Scrapper(
-      uri: uri.toString(),
+      uri: uri,
       method: "post",
       headers: const {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -101,7 +82,7 @@ class UAFilmsSupplier extends ContentSupplier with PageableChannelsLoader, DLECh
 
   @override
   Future<ContentDetails?> detailsById(String id) async {
-    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html").toString());
+    final scrapper = Scrapper(uri: Uri.https(host, "/$id.html"));
 
     final result = await scrapper.scrap(Scope(
       scope: "#dle-content",
@@ -110,7 +91,8 @@ class UAFilmsSupplier extends ContentSupplier with PageableChannelsLoader, DLECh
           "id": Const(id),
           "supplier": Const(name),
           "title": TextSelector.forScope("h1[itemprop='name']"),
-          "originalTitle": TextSelector.forScope("span[itemprop='alternativeHeadline']"),
+          "originalTitle":
+              TextSelector.forScope("span[itemprop='alternativeHeadline']"),
           "image": Image.forScope(".m-img>img", host),
           "description": TextNode.forScope(".m-desc"),
           "additionalInfo": Flatten([
@@ -118,7 +100,10 @@ class UAFilmsSupplier extends ContentSupplier with PageableChannelsLoader, DLECh
             Iterate(
               itemScope: ".m-desc>.m-info>.m-info>.mi-item",
               item: Concat.selectors(
-                [TextSelector.forScope(".mi-label-desc"), TextSelector.forScope(".mi-desc")],
+                [
+                  TextSelector.forScope(".mi-label-desc"),
+                  TextSelector.forScope(".mi-desc")
+                ],
               ),
             )
           ]),
@@ -144,6 +129,9 @@ class UAFilmsSupplier extends ContentSupplier with PageableChannelsLoader, DLECh
   }
 
   @override
+  late final channelInfoSelector = contentInfoSelector;
+
+  @override
   final Map<String, String> channelsPath = {
     "Новинки": "/year/${DateTime.now().year}/page/",
     "Фільми": "/filmys/page/",
@@ -152,4 +140,27 @@ class UAFilmsSupplier extends ContentSupplier with PageableChannelsLoader, DLECh
     "Мультфільми": "/cartoons/page/",
     "Мультсеріали": "/multserialy/page/",
   };
+}
+
+@JsonSerializable(createToJson: false)
+// ignore: must_be_immutable
+class UAFilmsContentDetails extends AbstractContentDetails
+    with PLayerJSIframe, AsyncMediaItems {
+  UAFilmsContentDetails({
+    required super.id,
+    required super.supplier,
+    required super.title,
+    required super.originalTitle,
+    required super.image,
+    required super.description,
+    required super.additionalInfo,
+    required super.similar,
+    required this.iframe,
+  });
+
+  @override
+  final String iframe;
+
+  factory UAFilmsContentDetails.fromJson(Map<String, dynamic> json) =>
+      _$UAFilmsContentDetailsFromJson(json);
 }

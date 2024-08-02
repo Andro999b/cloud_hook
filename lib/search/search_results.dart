@@ -49,6 +49,7 @@ class SearchResults extends HookWidget {
 
         return ContentInfoCard(
           contentInfo: item,
+          showSupplier: false,
         );
       },
       itemCount: value.length,

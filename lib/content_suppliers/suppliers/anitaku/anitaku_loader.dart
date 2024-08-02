@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:cloud_hook/content_suppliers/extrators/jwplayer/jwplayer.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/doodstream.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/mp4upload.dart';
+import 'package:cloud_hook/content_suppliers/extrators/source/streamwish.dart';
 import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
@@ -25,7 +25,7 @@ class AnitakuMediaItemLoader implements ContentMediaItemLoader {
       "id": animeId,
     });
 
-    final scrapper = Scrapper(uri: uri.toString());
+    final scrapper = Scrapper(uri: uri);
     final episodes = await scrapper.scrap(
       Iterate(
         itemScope: "li",
@@ -61,7 +61,7 @@ class AnitakuSourceLoader implements ContentMediaItemSourceLoader {
   FutureOr<List<ContentMediaItemSource>> call() async {
     final uri = Uri.https(Anitaku.host, episodeUrl.trim());
 
-    final scrapper = Scrapper(uri: uri.toString());
+    final scrapper = Scrapper(uri: uri);
     final servers = await scrapper.scrap(
       Scope(
         scope: "div.anime_muti_link > ul",
@@ -103,7 +103,7 @@ class AnitakuSourceLoader implements ContentMediaItemSourceLoader {
           url: video,
           referer: referer,
         ),
-      "streamwish" => JWPlayerSingleFileSourceLoader(
+      "streamwish" || "vidhide" => StreamwishSourceLoader(
           url: video,
           referer: referer,
           descriptionPrefix: name,

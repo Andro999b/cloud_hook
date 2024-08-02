@@ -9,33 +9,8 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'uakinoclub.g.dart';
 
-@JsonSerializable(createToJson: false)
-// ignore: must_be_immutable
-class UAKinoContentDetails extends AbstractContentDetails {
-  UAKinoContentDetails({
-    required super.id,
-    required super.supplier,
-    required super.title,
-    required super.originalTitle,
-    required super.image,
-    required super.description,
-    required super.additionalInfo,
-    required super.similar,
-  });
-
-  factory UAKinoContentDetails.fromJson(Map<String, dynamic> json) => _$UAKinoContentDetailsFromJson(json);
-
-  // ignore: prefer_final_fields
-  Iterable<ContentMediaItem> _mediaItems = const [];
-
-  @override
-  Iterable<ContentMediaItem> get mediaItems => _mediaItems;
-
-  @override
-  MediaType get mediaType => MediaType.video;
-}
-
-class UAKinoClubSupplier extends ContentSupplier with PageableChannelsLoader, DLEChannelsLoader {
+class UAKinoClubSupplier extends ContentSupplier
+    with PageableChannelsLoader, DLEChannelsLoader {
   @override
   final host = "uakino.me";
 
@@ -51,7 +26,8 @@ class UAKinoClubSupplier extends ContentSupplier with PageableChannelsLoader, DL
       };
 
   @override
-  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> get supportedLanguages =>
+      const {ContentLanguage.ukrainian};
 
   @override
   late final contentInfoSelector = Iterate(
@@ -68,10 +44,10 @@ class UAKinoClubSupplier extends ContentSupplier with PageableChannelsLoader, DL
   );
 
   @override
-  Future<List<ContentSearchResult>> search(String query, Set<ContentType> type) async {
-    final uri = Uri.https(host, "/index.php");
+  Future<List<ContentSearchResult>> search(
+      String query, Set<ContentType> type) async {
     final scrapper = Scrapper(
-      uri: uri.toString(),
+      uri: Uri.https(host, "/index.php"),
       method: "post",
       headers: const {"Content-Type": "application/x-www-form-urlencoded"},
       form: {
@@ -86,14 +62,15 @@ class UAKinoClubSupplier extends ContentSupplier with PageableChannelsLoader, DL
 
     return results
         .map(ContentSearchResult.fromJson)
-        .whereNot((e) => e.id.startsWith("news") || e.id.startsWith("franchise"))
+        .whereNot(
+            (e) => e.id.startsWith("news") || e.id.startsWith("franchise"))
         .toList();
   }
 
   @override
   Future<ContentDetails?> detailsById(String id) async {
-    var detailsUrl = Uri.https(host, "/$id.html").toString();
-    final scrapper = Scrapper(uri: detailsUrl);
+    final uri = Uri.https(host, "/$id.html");
+    final scrapper = Scrapper(uri: uri);
 
     final result = await scrapper.scrap(Scope(
       scope: "#dle-content",
@@ -109,7 +86,10 @@ class UAKinoClubSupplier extends ContentSupplier with PageableChannelsLoader, DL
             Iterate(
               itemScope: ".film-info > *",
               item: Concat.selectors(
-                [TextSelector.forScope(".fi-label"), TextSelector.forScope(".fi-desc")],
+                [
+                  TextSelector.forScope(".fi-label"),
+                  TextSelector.forScope(".fi-desc")
+                ],
                 separator: " ",
               ),
             ),
@@ -159,11 +139,14 @@ class UAKinoClubSupplier extends ContentSupplier with PageableChannelsLoader, DL
         "xfield": "playlist",
         "time": DateTime.now().millisecondsSinceEpoch.toString(),
       }),
-      detailsUrl,
+      uri.toString(),
     ).call();
 
     return details;
   }
+
+  @override
+  late final channelInfoSelector = contentInfoSelector;
 
   @override
   final Map<String, String> channelsPath = {
@@ -174,4 +157,31 @@ class UAKinoClubSupplier extends ContentSupplier with PageableChannelsLoader, DL
     "Мультфільми": "/cartoon/page/",
     "Мультсеріали": "/cartoon/cartoonseries/page/"
   };
+}
+
+@JsonSerializable(createToJson: false)
+// ignore: must_be_immutable
+class UAKinoContentDetails extends AbstractContentDetails {
+  UAKinoContentDetails({
+    required super.id,
+    required super.supplier,
+    required super.title,
+    required super.originalTitle,
+    required super.image,
+    required super.description,
+    required super.additionalInfo,
+    required super.similar,
+  });
+
+  factory UAKinoContentDetails.fromJson(Map<String, dynamic> json) =>
+      _$UAKinoContentDetailsFromJson(json);
+
+  // ignore: prefer_final_fields
+  Iterable<ContentMediaItem> _mediaItems = const [];
+
+  @override
+  Iterable<ContentMediaItem> get mediaItems => _mediaItems;
+
+  @override
+  MediaType get mediaType => MediaType.video;
 }

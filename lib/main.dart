@@ -15,13 +15,11 @@ import 'package:cloud_hook/search/search_screen.dart';
 import 'package:cloud_hook/settings/settings_screan.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/error_observer.dart';
-import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_kit/media_kit.dart';
-import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,6 +54,7 @@ class MainApp extends StatelessWidget {
         LogicalKeySet(LogicalKeyboardKey.select): const ActivateIntent(),
       },
       child: MaterialApp.router(
+        restorationScopeId: "cloud-hook",
         debugShowCheckedModeBanner: false,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
@@ -69,11 +68,8 @@ class MainApp extends StatelessWidget {
             // initialLocation: "/search",
             // initialLocation: "/collection",
             // initialLocation: "/settings",
-            // initialLocation: "/content/AniWave/death-note.z02",
-            // initialLocation: "/content/Anitaku/category%2Fisekai-suicide-squad",
             // initialLocation:
-            //     "/manga/MangaDex/61f03087-1070-4660-b7f0-d2717f84dc0e",
-            // initialLocation: "/video/TMDB/movie%2F54138",
+            //     "/content/UASerial/star-trek-the-next-generation%2Fseason-1",
             routes: [
               GoRoute(
                 path: NavigationRoute.home.path,
