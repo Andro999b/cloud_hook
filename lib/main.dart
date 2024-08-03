@@ -68,7 +68,7 @@ class MainApp extends StatelessWidget {
             // initialLocation: "/search",
             // initialLocation: "/collection",
             // initialLocation: "/settings",
-            initialLocation: "/content/Hianime/oban-star-racers-1535",
+            // initialLocation: "/content/Hianime/oban-star-racers-1535",
             routes: [
               GoRoute(
                 path: NavigationRoute.home.path,
