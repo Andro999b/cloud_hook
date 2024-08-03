@@ -172,7 +172,6 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          prerelease: true
           files: |
             android-outputs/*
             linux-x64.tar.gz

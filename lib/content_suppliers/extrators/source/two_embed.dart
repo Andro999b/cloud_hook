@@ -4,10 +4,11 @@ import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:dio/dio.dart';
+import 'package:js_unpack/js_unpack.dart';
 
 class TwoEmbedSourceLoader implements ContentMediaItemSourceLoader {
   static final _fileRegExp = RegExp("file:\\s?['\"](?<file>.+)['\"]");
-  final playerBaseUrl = "https://uqloads.xyz/e";
+  final playerHost = "uqloads.xyz";
   final baseUrl = "https://www.2embed.cc";
   final String imdb;
 
@@ -32,9 +33,7 @@ class TwoEmbedSourceLoader implements ContentMediaItemSourceLoader {
       url = "$baseUrl/embedtv/$imdb&s=$season&e=$episode";
     }
 
-    final scrapper = Scrapper(uri: Uri.parse(url));
-
-    final iframe = await scrapper
+    final iframe = await Scrapper(uri: Uri.parse(url))
         .scrap(Attribute.forScope("iframe#iframesrc", "data-src"));
 
     if (iframe == null) {
@@ -51,15 +50,25 @@ class TwoEmbedSourceLoader implements ContentMediaItemSourceLoader {
       return [];
     }
 
-    // jwplayer
-    final playerRes = await dio.get(
-      "$playerBaseUrl/$id",
-      options: Options(
-        headers: {"Referer": ref},
-      ),
-    );
+    final packedScript = await Scrapper(
+          uri: Uri.https(playerHost, "/e/$id"),
+          headers: {
+            "Referer": ref,
+          },
+        ).scrap(Filter(
+          Iterate(itemScope: "script", item: TextSelector()),
+          filter: (script) => script.startsWith("eval("),
+        )) ??
+        [];
 
-    final match = _fileRegExp.firstMatch(playerRes.data);
+    if (packedScript.isEmpty) {
+      logger.w("[2embed] packedScript not found in player");
+      return [];
+    }
+
+    final unpackedScript = JsUnpack(packedScript.first).unpack();
+
+    final match = _fileRegExp.firstMatch(unpackedScript);
     final file = match?.namedGroup("file");
 
     if (file == null) {
