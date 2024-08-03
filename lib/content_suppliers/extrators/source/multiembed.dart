@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_hook/content_suppliers/extrators/hunter_unpack.dart';
 import 'package:cloud_hook/content_suppliers/extrators/playerjs/playerjs.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
@@ -9,8 +10,8 @@ import 'package:dio/dio.dart';
 
 class MultiembedSourceLoader implements ContentMediaItemSourceLoader {
   static const baseUrl = "https://multiembed.mov";
-  static final _hunterRegExp =
-      RegExp(r'eval\(function\(h,u,n,t,e,r\).*?}\("(?<h>\w+)",(?<u>\d+),"(?<n>\w+)",(?<t>\d+),(?<e>\d+),(?<r>\d+)\)\)');
+  static final _hunterRegExp = RegExp(
+      r'eval\(function\(h,u,n,t,e,r\).*?}\("(?<h>\w+)",(?<u>\d+),"(?<n>\w+)",(?<t>\d+),(?<e>\d+),(?<r>\d+)\)\)');
 
   final int tmdb;
   final int? episode;
@@ -29,7 +30,8 @@ class MultiembedSourceLoader implements ContentMediaItemSourceLoader {
     if (episode == null) {
       url = "$baseUrl/directstream.php?video_id=$tmdb&tmdb=1";
     } else {
-      url = "$baseUrl/directstream.php?video_id=$tmdb&tmdb=1&s=$season&e=$episode";
+      url =
+          "$baseUrl/directstream.php?video_id=$tmdb&tmdb=1&s=$season&e=$episode";
     }
 
     final res = await dio.get(
@@ -58,7 +60,8 @@ class MultiembedSourceLoader implements ContentMediaItemSourceLoader {
       int.parse(match.namedGroup("r")!), // unused
     );
 
-    final file = playerJSFileRegExp.firstMatch(unpackedScript)?.namedGroup("file");
+    final file =
+        playerJSFileRegExp.firstMatch(unpackedScript)?.namedGroup("file");
 
     if (file == null) {
       logger.w("[multiembed] file not found");
@@ -74,5 +77,6 @@ class MultiembedSourceLoader implements ContentMediaItemSourceLoader {
   }
 
   @override
-  String toString() => "MultiembedSourceLoader(tmdb: $tmdb, episode: $episode, season: $season)";
+  String toString() =>
+      "MultiembedSourceLoader(tmdb: $tmdb, episode: $episode, season: $season)";
 }

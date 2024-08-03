@@ -1,10 +1,10 @@
 name: cloud_hook
 description: "Cloud Hooks"
 publish_to: 'none'
-version: 1.1.2
+version: 1.2.0
 
-isar_version: 3.1.7
-media_kit_version: 50c510d
+isar_version: &isar_version 3.1.7
+media_kit_version: &media_kit_version 50c510d
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -31,10 +31,10 @@ dependencies:
   # isar: ^3.1.0+1
   # isar_flutter_libs: ^3.1.0+1
   isar: 
-    version: &isar_version
+    version: *isar_version
     hosted: https://pub.isar-community.dev/
   isar_flutter_libs: # contains Isar Core
-    version: &isar_version
+    version: *isar_version
     hosted: https://pub.isar-community.dev/
   shared_preferences: ^2.2.2
   # media kit
@@ -72,17 +72,17 @@ dependency_overrides:
     git:
       url: https://github.com/media-kit/media-kit
       path: media_kit
-      ref: &media_kit_version
+      ref: *media_kit_version
   media_kit_video: 
     git:
       url: https://github.com/media-kit/media-kit
       path: media_kit_video
-      ref: &media_kit_version
+      ref: *media_kit_version
   media_kit_libs_video: 
     git:
       url: https://github.com/media-kit/media-kit
       path: libs/universal/media_kit_libs_video
-      ref: &media_kit_version
+      ref: *media_kit_version
   intl: 
 
 dev_dependencies:
@@ -92,7 +92,7 @@ dev_dependencies:
   build_runner: ^2.4.11
   # isar_generator: ^3.1.0+1
   isar_generator: 
-    version: &isar_version
+    version: *isar_version
     hosted: https://pub.isar-community.dev/
   custom_lint: ^0.6.4
   json_serializable: ^6.8.0

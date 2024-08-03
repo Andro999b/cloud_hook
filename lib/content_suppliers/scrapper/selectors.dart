@@ -168,6 +168,21 @@ class Attribute extends Selector<String?> {
   }
 }
 
+class ClassNames extends Selector<List<String>> {
+  @override
+  FutureOr<List<String>> select(dom.Element element) {
+    return element.classes.toList();
+  }
+
+  static Selector<List<String>> forScope(String scope) {
+    return ScopeWithDefault(
+      scope: scope,
+      item: ClassNames(),
+      defaultValue: const [],
+    );
+  }
+}
+
 typedef MergeFun<R, E> = R Function(List<E>);
 
 class Merge<R, E> extends Selector<R> {

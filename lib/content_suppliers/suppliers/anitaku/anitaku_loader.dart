@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_hook/content_suppliers/extrators/source/doodstream.dart';
+import 'package:cloud_hook/content_suppliers/extrators/source/gogostream.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/mp4upload.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/streamwish.dart';
 import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
@@ -102,6 +103,10 @@ class AnitakuSourceLoader implements ContentMediaItemSourceLoader {
       "doodstream" => DoodStreamSourceLoader(
           url: video,
           referer: referer,
+        ),
+      "vidcdn" => GogoStreamSourceLoader(
+          url: video,
+          descriptionPrefix: name,
         ),
       "streamwish" || "vidhide" => StreamwishSourceLoader(
           url: video,

@@ -14,17 +14,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'aniwave_loader.g.dart';
 
-@JsonSerializable(createToJson: false)
-class Episode {
-  final String id;
-  final String number;
-
-  Episode(this.id, this.number);
-
-  factory Episode.fromJson(Map<String, dynamic> json) =>
-      _$EpisodeFromJson(json);
-}
-
 class AniWaveMediaItemLoader implements ContentMediaItemLoader {
   final String host;
   final String mediaId;
@@ -79,17 +68,6 @@ class AniWaveMediaItemLoader implements ContentMediaItemLoader {
   }
 }
 
-@JsonSerializable(createToJson: false)
-class Server {
-  final String id;
-  final String title;
-  final String prefix;
-
-  Server(this.id, this.title, this.prefix);
-
-  factory Server.fromJson(Map<String, dynamic> json) => _$ServerFromJson(json);
-}
-
 class AniWaveSourceLoader implements ContentMediaItemSourceLoader {
   final String host;
   final String id;
@@ -125,14 +103,6 @@ class AniWaveSourceLoader implements ContentMediaItemSourceLoader {
       ".servers",
       Flatten([
         Iterate(
-          itemScope: "div[data-type='dub'] li",
-          item: SelectorsToMap({
-            "id": Attribute("data-link-id"),
-            "title": TextSelector(),
-            "prefix": Const("DUB")
-          }),
-        ),
-        Iterate(
           itemScope: "div[data-type='softsub'] li",
           item: SelectorsToMap({
             "id": Attribute("data-link-id"),
@@ -146,6 +116,14 @@ class AniWaveSourceLoader implements ContentMediaItemSourceLoader {
             "id": Attribute("data-link-id"),
             "title": TextSelector(),
             "prefix": Const("SUB")
+          }),
+        ),
+        Iterate(
+          itemScope: "div[data-type='dub'] li",
+          item: SelectorsToMap({
+            "id": Attribute("data-link-id"),
+            "title": TextSelector(),
+            "prefix": Const("DUB")
           }),
         ),
       ]),
@@ -195,4 +173,26 @@ class AniWaveServerSorceLoader
 
     return await aniwaveDecryptURL(encUrl);
   }
+}
+
+@JsonSerializable(createToJson: false)
+class Episode {
+  final String id;
+  final String number;
+
+  Episode(this.id, this.number);
+
+  factory Episode.fromJson(Map<String, dynamic> json) =>
+      _$EpisodeFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class Server {
+  final String id;
+  final String title;
+  final String prefix;
+
+  Server(this.id, this.title, this.prefix);
+
+  factory Server.fromJson(Map<String, dynamic> json) => _$ServerFromJson(json);
 }

@@ -16,6 +16,8 @@ const defaultHeaders = {
   "User-Agent": desktopUserAgent,
 };
 
+typedef RootElementSelector = dom.Element Function(dom.Document document);
+
 class Scrapper {
   final Uri uri;
   final String method;
@@ -38,7 +40,10 @@ class Scrapper {
     // this.encoding,
   });
 
-  FutureOr<R?> scrap<R>(Selector<R> selector) async {
+  FutureOr<R?> scrap<R>(
+    Selector<R> selector, {
+    RootElementSelector? rootElementSelector,
+  }) async {
     if (_document == null) {
       _page = await _loadPage();
 
@@ -49,7 +54,11 @@ class Scrapper {
       _document = parser.parse(_page);
     }
 
-    return selector.select(_document!.body!);
+    return selector.select(
+      rootElementSelector != null
+          ? rootElementSelector.call(_document!)
+          : _document!.body!,
+    );
   }
 
   Future<String?> _loadPage() async {

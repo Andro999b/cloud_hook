@@ -24,7 +24,6 @@ class AnixSupplier extends ContentSupplier with PageableChannelsLoader {
   @override
   Set<ContentType> get supportedTypes => {ContentType.anime};
 
-  @override
   late final contentInfoSelector = Iterate(
     itemScope: "div.ani .piece > .inner",
     item: SelectorsToMap({

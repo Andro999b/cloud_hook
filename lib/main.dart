@@ -68,8 +68,7 @@ class MainApp extends StatelessWidget {
             // initialLocation: "/search",
             // initialLocation: "/collection",
             // initialLocation: "/settings",
-            // initialLocation:
-            //     "/content/UASerial/star-trek-the-next-generation%2Fseason-1",
+            initialLocation: "/content/Hianime/oban-star-racers-1535",
             routes: [
               GoRoute(
                 path: NavigationRoute.home.path,

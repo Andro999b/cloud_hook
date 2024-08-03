@@ -43,14 +43,6 @@ class AnixSourceLoader extends AniWaveSourceLoader {
       ".ani-server-inner",
       Flatten([
         Iterate(
-          itemScope: "div[data-type='dub'] .server",
-          item: SelectorsToMap({
-            "id": Attribute("data-link-id"),
-            "title": TextSelector(),
-            "prefix": Const("DUB")
-          }),
-        ),
-        Iterate(
           itemScope: "div[data-type='softsub'] .server",
           item: SelectorsToMap({
             "id": Attribute("data-link-id"),
@@ -64,6 +56,14 @@ class AnixSourceLoader extends AniWaveSourceLoader {
             "id": Attribute("data-link-id"),
             "title": TextSelector(),
             "prefix": Const("SUB")
+          }),
+        ),
+        Iterate(
+          itemScope: "div[data-type='dub'] .server",
+          item: SelectorsToMap({
+            "id": Attribute("data-link-id"),
+            "title": TextSelector(),
+            "prefix": Const("DUB")
           }),
         ),
       ]),

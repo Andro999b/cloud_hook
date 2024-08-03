@@ -15,29 +15,36 @@ part 'jwplayer.g.dart';
 @JsonSerializable(createToJson: false)
 class Track {
   final String file;
-  final String? label;
   final String kind;
+  final String? label;
 
-  const Track({required this.file, required this.label, required this.kind});
+  const Track({
+    required this.file,
+    required this.kind,
+    this.label,
+  });
 
   factory Track.fromJson(Map<String, dynamic> json) => _$TrackFromJson(json);
 }
 
 @immutable
 @JsonSerializable(createToJson: false)
-class Sources {
+class Source {
   final String file;
+  final String? label;
 
-  const Sources({required this.file});
+  const Source({
+    required this.file,
+    this.label,
+  });
 
-  factory Sources.fromJson(Map<String, dynamic> json) =>
-      _$SourcesFromJson(json);
+  factory Source.fromJson(Map<String, dynamic> json) => _$SourceFromJson(json);
 }
 
 @immutable
 @JsonSerializable(createToJson: false)
 class JWPlayerConfig {
-  final List<Sources> sources;
+  final List<Source> sources;
   final List<Track> tracks;
 
   const JWPlayerConfig({required this.sources, required this.tracks});
@@ -51,7 +58,7 @@ class JWPlayer {
 
   static List<ContentMediaItemSource> fromJson(
     Map<String, dynamic> json, {
-    String descriptionPrefix = "JWPlayer",
+    String? descriptionPrefix,
     Map<String, String>? headers,
   }) {
     final config = JWPlayerConfig.fromJson(json);
@@ -64,13 +71,14 @@ class JWPlayer {
 
   static List<ContentMediaItemSource> fromConfig(
     JWPlayerConfig config, {
-    String despriptionPrefix = "JWPlayer",
+    String? despriptionPrefix,
     Map<String, String>? headers,
   }) {
     return [
-      ...config.sources.map(
-        (e) => SimpleContentMediaItemSource(
-          description: despriptionPrefix,
+      ...config.sources.mapIndexed(
+        (idx, e) => SimpleContentMediaItemSource(
+          description:
+              "${despriptionPrefix ?? ""} ${idx + 1}. ${e.label ?? ""}",
           link: parseUri(e.file),
           headers: headers,
         ),
@@ -80,7 +88,8 @@ class JWPlayer {
           .mapIndexed(
             (idx, e) => SimpleContentMediaItemSource(
               kind: FileKind.subtitle,
-              description: "[$despriptionPrefix] ${idx + 1}. ${e.label}",
+              description:
+                  "${despriptionPrefix ?? ""} ${idx + 1}. ${e.label ?? ""}",
               link: parseUri(e.file),
               headers: headers,
             ),
