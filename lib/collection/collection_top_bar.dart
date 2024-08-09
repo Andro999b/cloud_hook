@@ -2,10 +2,8 @@ import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/auth/auth_icon.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_provider.dart';
-import 'package:cloud_hook/collection/collection_screen.dart';
 import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
-import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/visual.dart';
 import 'package:cloud_hook/widgets/filter_dialog_section.dart';
@@ -41,8 +39,11 @@ class CollectionTopBar extends HookConsumerWidget {
             child: Center(
               child: BackButtonListener(
                 onBackButtonPressed: () async {
-                  searchBarFocusNode.unfocus();
-                  return true;
+                  if (searchBarFocusNode.hasFocus) {
+                    searchBarFocusNode.unfocus();
+                    return true;
+                  }
+                  return false;
                 },
                 child: SearchBar(
                   controller: controller,

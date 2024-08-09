@@ -65,7 +65,7 @@ class MainApp extends StatelessWidget {
         routerConfig: GoRouter(
           navigatorKey: rootNavigatorKey,
           // initialLocation: "/search",
-          initialLocation: "/collection",
+          // initialLocation: "/collection",
           // initialLocation: "/settings",
           // initialLocation: "/content/Hianime/oban-star-racers-1535",
           // initialLocation:

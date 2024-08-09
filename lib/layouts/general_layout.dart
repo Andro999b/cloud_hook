@@ -21,30 +21,24 @@ class GeneralLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BackButtonListener(
-      onBackButtonPressed: () async {
-        return false;
-      },
-      child: AppTheme(
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth < mobileWidth) {
-                return BottomNavigationLayout(
-                  selectedIndex: selectedIndex,
-                  floatingActionButton: floatingActionButton,
-                  child: child,
-                );
-              } else {
-                return SideNavigationLayout(
-                  selectedIndex: selectedIndex,
-                  showBackButton:
-                      AndroidTVDetector.isTV ? false : showBackButton,
-                  child: child,
-                );
-              }
-            },
-          ),
+    return AppTheme(
+      child: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < mobileWidth) {
+              return BottomNavigationLayout(
+                selectedIndex: selectedIndex,
+                floatingActionButton: floatingActionButton,
+                child: child,
+              );
+            } else {
+              return SideNavigationLayout(
+                selectedIndex: selectedIndex,
+                showBackButton: AndroidTVDetector.isTV ? false : showBackButton,
+                child: child,
+              );
+            }
+          },
         ),
       ),
     );

@@ -78,8 +78,11 @@ class SearchTopBar extends HookConsumerWidget {
       builder: (context, controller) {
         return BackButtonListener(
           onBackButtonPressed: () async {
-            searchBarFocusNode.unfocus();
-            return true;
+            if (searchBarFocusNode.hasFocus) {
+              searchBarFocusNode.unfocus();
+              return true;
+            }
+            return false;
           },
           child: SearchBar(
             padding: const WidgetStatePropertyAll<EdgeInsets>(
