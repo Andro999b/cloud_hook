@@ -1,4 +1,3 @@
-import 'package:cloud_hook/content_suppliers/extrators/source/multiembed.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/two_embed.dart';
 import 'package:test/test.dart';
 

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_repository.dart';
+import 'package:cloud_hook/content_suppliers/model.dart';
 
 class CollectionService {
   final CollectionRepository repository;
@@ -30,7 +31,30 @@ class CollectionService {
   FutureOr<Iterable<MediaCollectionItem>> search({
     String? query,
     Set<MediaCollectionItemStatus>? status,
-  }) {
-    return repository.search(query: query, status: status);
+    Set<MediaType>? mediaTypes,
+    Set<String>? suppliersNames,
+  }) async {
+    Iterable<MediaCollectionItem> collectionItems =
+        await repository.search(query: query);
+
+    if (status != null) {
+      collectionItems = collectionItems.where(
+        (i) => status.contains(i.status),
+      );
+    }
+
+    if (mediaTypes != null) {
+      collectionItems = collectionItems.where(
+        (i) => mediaTypes.contains(i.mediaType),
+      );
+    }
+
+    if (suppliersNames != null) {
+      collectionItems = collectionItems.where(
+        (i) => suppliersNames.contains(i.supplier),
+      );
+    }
+
+    return collectionItems;
   }
 }

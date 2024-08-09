@@ -1,7 +1,6 @@
-import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
+import 'package:cloud_hook/content/manga/manga_reader_settings_dialog.dart';
 import 'package:cloud_hook/content/manga/widgets.dart';
-import 'package:cloud_hook/content/widgets.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
@@ -86,8 +85,21 @@ class MangaReaderControlTopBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    return Material(
-      color: theme.colorScheme.surface.withOpacity(0.7),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [
+            0.1,
+            1.0,
+          ],
+          colors: [
+            Colors.black45,
+            Colors.transparent,
+          ],
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.only(
           top: 16.0,
@@ -102,15 +114,18 @@ class MangaReaderControlTopBar extends ConsumerWidget {
                 context.go(
                     "/content/${contentDetails.supplier}/${Uri.encodeComponent(contentDetails.id)}");
               },
+              color: Colors.white,
             ),
             const SizedBox(width: 8),
           ],
           Text(
             contentDetails.title,
-            style: theme.textTheme.titleMedium,
+            style: theme.textTheme.titleMedium!.copyWith(
+              color: Colors.white,
+            ),
           ),
           const Spacer(),
-          _renderVolumesBotton(context, ref),
+          _renderVolumesBotton(context, ref)
         ]),
       ),
     );
@@ -121,37 +136,58 @@ class MangaReaderControlTopBar extends ConsumerWidget {
       contentDetails: contentDetails,
       mediaItems: mediaItems,
       onSelect: (item) {
-        final provider = collectionItemProvider(contentDetails);
-        ref.read(provider.notifier).setCurrentItem(item.number);
+        ref
+            .read(collectionItemProvider(contentDetails).notifier)
+            .setCurrentItem(item.number);
         context.pop();
       },
       autofocus: true,
+      color: Colors.white,
     );
   }
 }
 
-class MangaReaderControlBottomBar extends MediaCollectionItemConsumerWidger {
+class MangaReaderControlBottomBar extends ConsumerWidget {
   final List<ContentMediaItem> mediaItems;
+  final ContentDetails contentDetails;
 
   const MangaReaderControlBottomBar({
     super.key,
-    required super.contentDetails,
+    required this.contentDetails,
     required this.mediaItems,
   });
 
   @override
-  Widget render(
+  Widget build(
     BuildContext context,
     WidgetRef ref,
-    MediaCollectionItem collectionItem,
   ) {
     final theme = Theme.of(context);
-    final pos = collectionItem.currentMediaItemPosition;
+    final pos = ref
+        .watch(collectionItemCurrentMediaItemPositionProvider(contentDetails))
+        .valueOrNull;
+
+    if (pos == null) {
+      return const SizedBox.shrink();
+    }
 
     final curPage = pos.position + 1;
     final pageNumbers = pos.length;
-    return Material(
-      color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [
+            0.1,
+            1.0,
+          ],
+          colors: [
+            Colors.transparent,
+            Colors.black54,
+          ],
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -163,7 +199,9 @@ class MangaReaderControlBottomBar extends MediaCollectionItemConsumerWidger {
               children: [
                 Text(
                   "$curPage / $pageNumbers",
-                  style: theme.textTheme.bodyMedium,
+                  style: theme.textTheme.bodyMedium!.copyWith(
+                    color: Colors.white,
+                  ),
                 ),
                 const Spacer(),
                 IconButton(
@@ -177,7 +215,8 @@ class MangaReaderControlBottomBar extends MediaCollectionItemConsumerWidger {
                     );
                   },
                   icon: const Icon(Icons.settings),
-                )
+                  color: Colors.white,
+                ),
               ],
             ),
           ),

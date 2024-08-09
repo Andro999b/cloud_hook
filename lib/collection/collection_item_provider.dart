@@ -128,12 +128,21 @@ Future<int> collectionItemCurrentItem(
 }
 
 @riverpod
-Future<String?> collectionItemCurrentSource(
-  CollectionItemCurrentSourceRef ref,
+Future<String?> collectionItemCurrentSourceName(
+  CollectionItemCurrentSourceNameRef ref,
   ContentDetails contentDetails,
 ) async {
   return ref.watch(collectionItemProvider(contentDetails)
       .selectAsync((value) => value.currentSourceName));
+}
+
+@riverpod
+Future<String?> collectionItemCurrentSubtitleName(
+  CollectionItemCurrentSubtitleNameRef ref,
+  ContentDetails contentDetails,
+) async {
+  return ref.watch(collectionItemProvider(contentDetails)
+      .selectAsync((value) => value.currentSubtitleName));
 }
 
 @riverpod
@@ -143,4 +152,13 @@ Future<int> collectionItemCurrentPosition(
 ) async {
   return ref.watch(collectionItemProvider(contentDetails)
       .selectAsync((value) => value.currentPosition));
+}
+
+@riverpod
+Future<MediaItemPosition> collectionItemCurrentMediaItemPosition(
+  CollectionItemCurrentMediaItemPositionRef ref,
+  ContentDetails contentDetails,
+) async {
+  return ref.watch(collectionItemProvider(contentDetails)
+      .selectAsync((value) => value.currentMediaItemPosition));
 }

@@ -43,7 +43,7 @@ Future<MangaMediaItemSource?> currentMangaChapter(
   final sources = await ref
       .watch(currentMangaChaptersProvider(contentDetails, mediaItems).future);
   final currentSource = await ref
-      .watch(collectionItemCurrentSourceProvider(contentDetails).future);
+      .watch(collectionItemCurrentSourceNameProvider(contentDetails).future);
 
   return currentSource == null
       ? sources.firstOrNull

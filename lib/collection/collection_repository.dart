@@ -126,10 +126,7 @@ abstract class CollectionRepository {
   Stream<void> get changesStream;
   FutureOr<MediaCollectionItem?> getCollectionItem(String supplier, String id);
   FutureOr<int> save(MediaCollectionItem collectionItem);
-  FutureOr<Iterable<MediaCollectionItem>> search({
-    String? query,
-    Set<MediaCollectionItemStatus>? status,
-  });
+  FutureOr<Iterable<MediaCollectionItem>> search({String? query});
   FutureOr<void> delete(String supplier, String id);
 }
 
@@ -168,10 +165,8 @@ class IsarCollectionRepository extends CollectionRepository {
   @override
   FutureOr<Iterable<MediaCollectionItem>> search({
     String? query,
-    Set<MediaCollectionItemStatus>? status,
   }) async {
     final words = query != null ? Isar.splitWords(query) : const [];
-    final statusList = status != null ? status.toList() : const [];
 
     final result = await collection
         .where()
@@ -185,19 +180,6 @@ class IsarCollectionRepository extends CollectionRepository {
             }
 
             return ftsQ;
-          },
-        )
-        .filter()
-        .optional(
-          statusList.isNotEmpty,
-          (q) {
-            var statusQ = q.statusEqualTo(statusList[0]);
-
-            for (var i = 1; i < statusList.length; i++) {
-              statusQ = statusQ.or().statusEqualTo(statusList[i]);
-            }
-
-            return statusQ;
           },
         )
         .sortByPriorityDesc()
@@ -242,8 +224,10 @@ class FirebaseRepository extends CollectionRepository {
   FutureOr<Iterable<MediaCollectionItem>> search({
     String? query,
     Set<MediaCollectionItemStatus>? status,
+    Set<MediaType>? mediaType,
+    Set<String>? suppliersName,
   }) {
-    return downstream.search(query: query, status: status);
+    return downstream.search(query: query);
   }
 
   @override

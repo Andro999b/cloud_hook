@@ -1,9 +1,12 @@
 import 'package:cloud_hook/app_preferences.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
+import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/search/search_model.dart';
 import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
+import 'package:cloud_hook/utils/collections.dart';
 import 'package:cloud_hook/utils/text.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search_provider.g.dart';
@@ -22,11 +25,17 @@ class Search extends _$Search {
 
     state = SearchState.loading(query);
 
-    final contentSuppliers = ref.read(selectedSupplierProvider);
-    final contentTypes = ref.read(selectedContentProvider);
+    final enabledSuppliers = ref.read(enabledSuppliersProvider);
+    final searchSettings = ref.read(searchSettingsProvider);
+    final contentSuppliers = enabledSuppliers.intersection(
+      searchSettings.searchSuppliersNames,
+    );
 
-    final stream =
-        ContentSuppliers.instance.search(query, contentSuppliers, contentTypes);
+    final stream = ContentSuppliers.instance.search(
+      query,
+      contentSuppliers,
+      searchSettings.types,
+    );
 
     final subscription = stream.listen((event) {
       state = state.copyWith(results: event);
@@ -39,46 +48,78 @@ class Search extends _$Search {
   }
 }
 
-@Riverpod(keepAlive: true)
-class SelectedSupplier extends _$SelectedSupplier {
+@immutable
+class SearchSettingsModel extends Equatable {
+  final Set<ContentLanguage> languages;
+  final Set<ContentType> types;
+  final Set<String> suppliersNames;
+
+  const SearchSettingsModel({
+    required this.languages,
+    required this.types,
+    required this.suppliersNames,
+  });
+
+  Set<String> get avaliableSuppliers =>
+      ContentSuppliers.instance.suppliersName.where((supplierName) {
+        final supplier = ContentSuppliers.instance.getSupplier(supplierName)!;
+        return languages.intersection(supplier.supportedLanguages).isNotEmpty &&
+            types.intersection(supplier.supportedTypes).isNotEmpty;
+      }).toSet();
+
+  Set<String> get searchSuppliersNames =>
+      suppliersNames.intersection(avaliableSuppliers);
+
   @override
-  Set<String> build() {
-    final enabledSuppliers = ref.watch(enabledSuppliersProvider);
-    var selectedContentSuppliers =
-        AppPreferences.selectedContentSuppliers ?? enabledSuppliers;
+  List<Object?> get props => [languages, types, suppliersNames];
 
-    return selectedContentSuppliers.intersection(enabledSuppliers);
-  }
-
-  void select(String supplier) async {
-    state = Set.from(state)..add(supplier);
-    AppPreferences.selectedContentSuppliers = state;
-  }
-
-  void unselect(String supplier) async {
-    state = Set.from(state)..remove(supplier);
-    AppPreferences.selectedContentSuppliers = state;
+  SearchSettingsModel copyWith({
+    Set<ContentLanguage>? languages,
+    Set<ContentType>? types,
+    Set<String>? suppliersNames,
+  }) {
+    return SearchSettingsModel(
+      languages: languages ?? this.languages,
+      types: types ?? this.types,
+      suppliersNames: suppliersNames ?? this.suppliersNames,
+    );
   }
 }
 
-@Riverpod(keepAlive: true)
-class SelectedContent extends _$SelectedContent {
+@riverpod
+class SearchSettings extends _$SearchSettings {
   @override
-  Set<ContentType> build() {
-    var selectedContentTypes = AppPreferences.selectedContentType;
-
-    selectedContentTypes ??= ContentType.values.toSet();
-
-    return Set.unmodifiable(selectedContentTypes);
+  SearchSettingsModel build() {
+    return SearchSettingsModel(
+        languages: AppPreferences.selectedContentLanguage ??
+            ContentLanguage.values.toSet(),
+        types: AppPreferences.selectedContentType ?? ContentType.values.toSet(),
+        suppliersNames: AppPreferences.collectionContentSuppliers ??
+            ContentSuppliers.instance.suppliersName);
   }
 
-  void select(ContentType type) async {
-    state = Set.from(state)..add(type);
-    AppPreferences.selectedContentType = state;
+  void toggleLanguage(ContentLanguage lang) {
+    final newLanuages = state.languages.toggle(lang);
+    state = state.copyWith(languages: newLanuages);
+    AppPreferences.selectedContentLanguage = newLanuages;
   }
 
-  void unselect(ContentType type) async {
-    state = Set.from(state)..remove(type);
-    AppPreferences.selectedContentType = state;
+  void toggleType(ContentType type) {
+    final newTypes = state.types.toggle(type);
+    state = state.copyWith(types: newTypes);
+    AppPreferences.selectedContentType = newTypes;
+  }
+
+  void toggleSupplierName(String supplierName) {
+    final newSupplierNames = state.suppliersNames.toggle(supplierName);
+    state = state.copyWith(suppliersNames: newSupplierNames);
+    AppPreferences.collectionContentSuppliers = newSupplierNames;
+  }
+
+  void toggleAllSuppliers(bool select) {
+    final newSupplierNames =
+        select ? ContentSuppliers.instance.suppliersName : <String>{};
+    state = state.copyWith(suppliersNames: newSupplierNames);
+    AppPreferences.collectionContentSuppliers = newSupplierNames;
   }
 }

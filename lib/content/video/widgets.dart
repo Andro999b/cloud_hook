@@ -6,7 +6,6 @@ import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/media_items_list.dart';
 import 'package:cloud_hook/content/video/video_content_view.dart';
-import 'package:cloud_hook/content/widgets.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/utils/visual.dart';
@@ -44,25 +43,33 @@ class ExitButton extends StatelessWidget {
 
 // Title
 
-class MediaTitle extends MediaCollectionItemConsumerWidger {
+class MediaTitle extends ConsumerWidget {
   final int playlistSize;
+  final ContentDetails contentDetails;
 
   const MediaTitle({
     super.key,
     required this.playlistSize,
-    required super.contentDetails,
+    required this.contentDetails,
   });
 
   @override
-  Widget render(
+  Widget build(
     BuildContext context,
     WidgetRef ref,
-    MediaCollectionItem collectionItem,
   ) {
+    final currentItem = ref
+        .watch(collectionItemCurrentItemProvider(contentDetails))
+        .valueOrNull;
+
+    if (currentItem == null) {
+      return const SizedBox.shrink();
+    }
+
     var title = contentDetails.title;
 
     if (playlistSize > 1) {
-      title += " - ${collectionItem.currentItem + 1} / $playlistSize";
+      title += " - ${currentItem + 1} / $playlistSize";
     }
 
     return Expanded(
@@ -82,21 +89,28 @@ class MediaTitle extends MediaCollectionItemConsumerWidger {
 
 // Playlist and source selection
 
-class PlayerPlaylistButton extends MediaCollectionItemConsumerWidger {
+class PlayerPlaylistButton extends ConsumerWidget {
   final PlaylistController playlistController;
+  final ContentDetails contentDetails;
 
   const PlayerPlaylistButton({
     super.key,
     required this.playlistController,
-    required super.contentDetails,
+    required this.contentDetails,
   });
 
   @override
-  Widget render(
+  Widget build(
     BuildContext context,
     WidgetRef ref,
-    MediaCollectionItem collectionItem,
   ) {
+    final collectionItem =
+        ref.watch(collectionItemProvider(contentDetails)).valueOrNull;
+
+    if (collectionItem == null) {
+      return const SizedBox.shrink();
+    }
+
     return IconButton(
       onPressed: () {
         Navigator.of(context).push(MediaItemsListRoute(
@@ -144,21 +158,34 @@ class SourceSelector extends StatelessWidget {
   }
 }
 
-class _SourceSelectDialog extends MediaCollectionItemConsumerWidger {
+class _SourceSelectDialog extends ConsumerWidget {
   final List<ContentMediaItem> mediaItems;
+  final ContentDetails contentDetails;
 
   const _SourceSelectDialog({
     required this.mediaItems,
-    required super.contentDetails,
+    required this.contentDetails,
   });
 
   @override
-  render(BuildContext context, WidgetRef ref, MediaCollectionItem data) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sourcesDataAsync =
+        ref.watch(collectionItemProvider(contentDetails).selectAsync((item) => (
+              item.currentItem,
+              item.currentSourceName,
+              item.currentSubtitleName,
+            )));
+
     return AppTheme(
       child: Dialog(
         clipBehavior: Clip.antiAlias,
         child: FutureBuilder(
-          future: Future.value(mediaItems[data.currentItem].sources),
+          future: sourcesDataAsync.then((rec) async {
+            final (currentItem, currentSource, currentSubtitle) = rec;
+            final sources = await mediaItems[currentItem].sources;
+
+            return (sources, currentSource, currentSubtitle);
+          }),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const SizedBox(
@@ -168,15 +195,17 @@ class _SourceSelectDialog extends MediaCollectionItemConsumerWidger {
               );
             }
 
-            final videos =
-                snapshot.data?.where((e) => e.kind == FileKind.video) ?? [];
-            final subtitles =
-                snapshot.data?.where((e) => e.kind == FileKind.subtitle) ?? [];
+            final (sources, currentSource, currentSubtitle) = snapshot.data!;
+
+            final videos = sources.where((e) => e.kind == FileKind.video);
+            final subtitles = sources.where((e) => e.kind == FileKind.subtitle);
 
             if (videos.isEmpty) {
               return Container(
-                width: 250,
-                constraints: const BoxConstraints.tightFor(height: 60),
+                constraints: const BoxConstraints.tightFor(
+                  height: 60,
+                  width: 60,
+                ),
                 child: Center(
                   child: Text(AppLocalizations.of(context)!.videoNoSources),
                 ),
@@ -188,24 +217,28 @@ class _SourceSelectDialog extends MediaCollectionItemConsumerWidger {
                 if (constraints.maxWidth < mobileWidth) {
                   return SingleChildScrollView(
                     child: Column(children: [
-                      _renderVideoSources(context, ref, videos, data),
+                      _renderVideoSources(context, ref, videos, currentSource),
                       if (subtitles.isNotEmpty)
-                        _renderSubtitlesSources(context, ref, subtitles, data),
+                        _renderSubtitlesSources(
+                            context, ref, subtitles, currentSubtitle),
                     ]),
                   );
                 } else {
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SingleChildScrollView(
-                          child:
-                              _renderVideoSources(context, ref, videos, data)),
-                      if (subtitles.isNotEmpty)
+                  return FocusScope(
+                    autofocus: true,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                         SingleChildScrollView(
-                          child: _renderSubtitlesSources(
-                              context, ref, subtitles, data),
-                        ),
-                    ],
+                            child: _renderVideoSources(
+                                context, ref, videos, currentSource)),
+                        if (subtitles.isNotEmpty)
+                          SingleChildScrollView(
+                            child: _renderSubtitlesSources(
+                                context, ref, subtitles, currentSubtitle),
+                          ),
+                      ],
+                    ),
                   );
                 }
               },
@@ -220,7 +253,7 @@ class _SourceSelectDialog extends MediaCollectionItemConsumerWidger {
     BuildContext context,
     WidgetRef ref,
     Iterable<ContentMediaItemSource> sources,
-    MediaCollectionItem data,
+    String? currentSourceName,
   ) {
     return SizedBox(
       width: 320,
@@ -229,18 +262,23 @@ class _SourceSelectDialog extends MediaCollectionItemConsumerWidger {
         mainAxisSize: MainAxisSize.min,
         children: sources
             .map(
-              (e) => MenuItemButton(
-                leadingIcon: const Icon(Icons.music_note),
-                trailingIcon: data.currentSourceName == e.description
+              (e) => ListTile(
+                visualDensity: VisualDensity.compact,
+                leading: const Icon(Icons.music_note),
+                trailing: currentSourceName == e.description
                     ? const Icon(Icons.check)
                     : null,
-                onPressed: () {
+                onTap: () {
                   context.pop();
                   final notifier =
                       ref.read(collectionItemProvider(contentDetails).notifier);
                   notifier.setCurrentSource(e.description);
                 },
-                child: Text(e.description),
+                title: Text(
+                  e.description,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
               ),
             )
             .toList(),
@@ -252,7 +290,7 @@ class _SourceSelectDialog extends MediaCollectionItemConsumerWidger {
     BuildContext context,
     WidgetRef ref,
     Iterable<ContentMediaItemSource> sources,
-    MediaCollectionItem data,
+    String? currentSubtitleName,
   ) {
     return SizedBox(
       width: 320,
@@ -260,32 +298,37 @@ class _SourceSelectDialog extends MediaCollectionItemConsumerWidger {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          MenuItemButton(
-            leadingIcon: const Icon(Icons.subtitles),
-            trailingIcon: data.currentSubtitleName == null
-                ? const Icon(Icons.check)
-                : null,
-            onPressed: () {
+          ListTile(
+            visualDensity: VisualDensity.compact,
+            leading: const Icon(Icons.subtitles),
+            trailing:
+                currentSubtitleName == null ? const Icon(Icons.check) : null,
+            onTap: () {
               final notifier =
                   ref.read(collectionItemProvider(contentDetails).notifier);
               notifier.setCurrentSubtitle(null);
               context.pop();
             },
-            child: Text(AppLocalizations.of(context)!.videoSubtitlesOff),
+            title: Text(AppLocalizations.of(context)!.videoSubtitlesOff),
           ),
           ...sources.map(
-            (e) => MenuItemButton(
-              leadingIcon: const Icon(Icons.subtitles),
-              trailingIcon: data.currentSubtitleName == e.description
+            (e) => ListTile(
+              visualDensity: VisualDensity.compact,
+              leading: const Icon(Icons.subtitles),
+              trailing: currentSubtitleName == e.description
                   ? const Icon(Icons.check)
                   : null,
-              onPressed: () {
+              onTap: () {
                 final notifier =
                     ref.read(collectionItemProvider(contentDetails).notifier);
                 notifier.setCurrentSubtitle(e.description);
                 context.pop();
               },
-              child: Text(e.description),
+              title: Text(
+                e.description,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
             ),
           )
         ],
@@ -296,27 +339,35 @@ class _SourceSelectDialog extends MediaCollectionItemConsumerWidger {
 
 // Prev and Next navigation buttons
 
-class SkipPrevButton extends MediaCollectionItemConsumerWidger {
+class SkipPrevButton extends ConsumerWidget {
   final double? iconSize;
+  final ContentDetails contentDetails;
 
   const SkipPrevButton({
     super.key,
-    required super.contentDetails,
+    required this.contentDetails,
     this.iconSize,
   });
 
   @override
-  Widget render(
+  Widget build(
     BuildContext context,
     WidgetRef ref,
-    MediaCollectionItem collectionItem,
   ) {
+    final currentItem = ref
+        .watch(collectionItemCurrentItemProvider(contentDetails))
+        .valueOrNull;
+
+    if (currentItem == null) {
+      return const SizedBox.shrink();
+    }
+
     return IconButton(
-      onPressed: collectionItem.currentItem > 0
+      onPressed: currentItem > 0
           ? () {
               ref
                   .read(collectionItemProvider(contentDetails).notifier)
-                  .setCurrentItem(collectionItem.currentItem - 1);
+                  .setCurrentItem(currentItem - 1);
             }
           : null,
       icon: const Icon(Icons.skip_previous),
@@ -328,31 +379,39 @@ class SkipPrevButton extends MediaCollectionItemConsumerWidger {
   }
 }
 
-class SkipNextButton extends MediaCollectionItemConsumerWidger {
+class SkipNextButton extends ConsumerWidget {
   final List<ContentMediaItem> mediaItems;
+  final ContentDetails contentDetails;
   final double? iconSize;
   final FocusNode? focusNode;
 
   const SkipNextButton({
     super.key,
     required this.mediaItems,
-    required super.contentDetails,
+    required this.contentDetails,
     this.iconSize,
     this.focusNode,
   });
 
   @override
-  Widget render(
+  Widget build(
     BuildContext context,
     WidgetRef ref,
-    MediaCollectionItem collectionItem,
   ) {
+    final currentItem = ref
+        .watch(collectionItemCurrentItemProvider(contentDetails))
+        .valueOrNull;
+
+    if (currentItem == null) {
+      return const SizedBox.shrink();
+    }
+
     return IconButton(
-      onPressed: collectionItem.currentItem < mediaItems.length - 1
+      onPressed: currentItem < mediaItems.length - 1
           ? () {
               ref
                   .read(collectionItemProvider(contentDetails).notifier)
-                  .setCurrentItem(collectionItem.currentItem + 1);
+                  .setCurrentItem(currentItem + 1);
             }
           : null,
       padding: EdgeInsets.zero,

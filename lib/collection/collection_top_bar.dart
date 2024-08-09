@@ -1,9 +1,14 @@
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/auth/auth_icon.dart';
+import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_provider.dart';
 import 'package:cloud_hook/collection/collection_screen.dart';
+import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
+import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:cloud_hook/widgets/filter_dialog_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,42 +21,45 @@ class CollectionTopBar extends HookConsumerWidget {
     final controller = useTextEditingController(
       text: ref.read(collectionFilterQueryProvider),
     );
-    final focusNode = useFocusNode();
 
     return Column(
       children: [
-        _renderSearhBar(context, ref, controller, focusNode),
+        _renderSearhBar(context, ref, controller),
       ],
     );
   }
 
   Widget _renderSearhBar(
-    BuildContext context,
-    WidgetRef ref,
-    TextEditingController controller,
-    FocusNode focusNode,
-  ) {
+      BuildContext context, WidgetRef ref, TextEditingController controller) {
+    final searchBarFocusNode = useFocusNode();
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
           Expanded(
             child: Center(
-              child: SearchBar(
-                controller: controller,
-                padding: const WidgetStatePropertyAll<EdgeInsets>(
-                  EdgeInsets.only(left: 16.0, right: 8.0),
-                ),
-                focusNode: focusNode,
-                leading: const Icon(Icons.search),
-                trailing: AndroidTVDetector.isTV
-                    ? null
-                    : [_renderFilterSwitcher(context)],
-                onSubmitted: (value) {
-                  ref.read(collectionFilterQueryProvider.notifier).state =
-                      value;
-                  focusNode.requestFocus();
+              child: BackButtonListener(
+                onBackButtonPressed: () async {
+                  searchBarFocusNode.unfocus();
+                  return true;
                 },
+                child: SearchBar(
+                  controller: controller,
+                  padding: const WidgetStatePropertyAll<EdgeInsets>(
+                    EdgeInsets.only(left: 16.0, right: 8.0),
+                  ),
+                  focusNode: searchBarFocusNode,
+                  leading: const Icon(Icons.search),
+                  trailing: AndroidTVDetector.isTV
+                      ? null
+                      : [_renderFilterSwitcher(context)],
+                  onSubmitted: (value) {
+                    ref.read(collectionFilterQueryProvider.notifier).state =
+                        value;
+                    searchBarFocusNode.requestFocus();
+                  },
+                ),
               ),
             ),
           ),
@@ -85,6 +93,11 @@ class _StatusFilterDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final collectionFilter = ref.watch(collectionFilterProvider);
+    final suppliersNames = ContentSuppliers.instance.suppliersName.toList();
+    final allStatus = MediaCollectionItemStatus.values
+        .where((s) => s != MediaCollectionItemStatus.none)
+        .toList();
 
     return Dialog(
       insetPadding: EdgeInsets.only(left: isMobile(context) ? 0 : 80.0),
@@ -95,46 +108,77 @@ class _StatusFilterDialog extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppLocalizations.of(context)!.status,
-              style: theme.textTheme.headlineSmall,
-            ),
-            const _StatusFilter(),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StatusFilter extends ConsumerWidget {
-  const _StatusFilter();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(collectionItemStatusFilterProvider);
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        children: [
-          ...groupsOrder.map(
-            (status) => FilterChip(
-              selected: selected.contains(status),
-              label: Text(statusLabel(context, status)),
-              onSelected: (value) {
-                final notifier =
-                    ref.read(collectionItemStatusFilterProvider.notifier);
-                if (value) {
-                  notifier.select(status);
-                } else {
-                  notifier.unselect(status);
-                }
+            FilterDialogSection(
+              label: Text(
+                AppLocalizations.of(context)!.mediaType,
+                style: theme.textTheme.headlineSmall,
+              ),
+              itemsCount: MediaType.values.length,
+              itemBuilder: (context, index) {
+                final item = MediaType.values[index];
+                return FilterChip(
+                  selected: collectionFilter.mediaTypes.contains(item),
+                  label: Text(mediaTypeLabel(context, item)),
+                  onSelected: (value) {
+                    ref
+                        .read(collectionFilterProvider.notifier)
+                        .toggleMediaType(item);
+                  },
+                );
               },
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            FilterDialogSection(
+              label: Text(
+                AppLocalizations.of(context)!.status,
+                style: theme.textTheme.headlineSmall,
+              ),
+              itemsCount: allStatus.length,
+              itemBuilder: (context, index) {
+                final item = allStatus[index];
+                return FilterChip(
+                  selected: collectionFilter.status.contains(item),
+                  label: Text(statusLabel(context, item)),
+                  onSelected: (value) {
+                    ref
+                        .read(collectionFilterProvider.notifier)
+                        .toggleStatus(item);
+                  },
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+            FilterDialogSection(
+              label: Text(
+                AppLocalizations.of(context)!.suppliers,
+                style: theme.textTheme.headlineSmall,
+              ),
+              itemsCount: suppliersNames.length,
+              itemBuilder: (context, index) {
+                final item = suppliersNames[index];
+                return FilterChip(
+                  label: Text(item),
+                  selected: collectionFilter.suppliersNames.contains(item),
+                  onSelected: (value) {
+                    ref
+                        .read(collectionFilterProvider.notifier)
+                        .toggleSupplierName(item);
+                  },
+                );
+              },
+              onSelectAll: () {
+                ref
+                    .read(collectionFilterProvider.notifier)
+                    .toggleAllSuppliers(true);
+              },
+              onUnselectAll: () {
+                ref
+                    .read(collectionFilterProvider.notifier)
+                    .toggleAllSuppliers(false);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

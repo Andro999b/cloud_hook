@@ -1,5 +1,4 @@
 import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/search/search_provider.dart';
 import 'package:cloud_hook/search/search_top_bar/search_suggestion_model.dart';
@@ -7,6 +6,7 @@ import 'package:cloud_hook/search/search_top_bar/search_suggestion_provider.dart
 import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:cloud_hook/widgets/filter_dialog_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -61,6 +61,8 @@ class SearchTopBar extends HookConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) {
+    final searchBarFocusNode = useFocusNode();
+
     return SearchAnchor(
       isFullScreen: isMobile(context),
       searchController: searchController,
@@ -74,24 +76,32 @@ class SearchTopBar extends HookConsumerWidget {
         }
       },
       builder: (context, controller) {
-        return SearchBar(
-          padding: const WidgetStatePropertyAll<EdgeInsets>(
-            EdgeInsets.only(left: 16.0, right: 8.0),
+        return BackButtonListener(
+          onBackButtonPressed: () async {
+            searchBarFocusNode.unfocus();
+            return true;
+          },
+          child: SearchBar(
+            padding: const WidgetStatePropertyAll<EdgeInsets>(
+              EdgeInsets.only(left: 16.0, right: 8.0),
+            ),
+            focusNode: searchBarFocusNode,
+            autoFocus: true,
+            leading: const Icon(Icons.search),
+            controller: controller,
+            onTap: () {
+              controller.openView();
+            },
+            onChanged: (value) {
+              controller.openView();
+            },
+            onSubmitted: (value) {
+              _search(ref, value);
+            },
+            trailing: AndroidTVDetector.isTV
+                ? null
+                : [_renderFilterSwitcher(context)],
           ),
-          autoFocus: true,
-          leading: const Icon(Icons.search),
-          controller: controller,
-          onTap: () {
-            controller.openView();
-          },
-          onChanged: (value) {
-            controller.openView();
-          },
-          onSubmitted: (value) {
-            _search(ref, value);
-          },
-          trailing:
-              AndroidTVDetector.isTV ? null : [_renderFilterSwitcher(context)],
         );
       },
       viewBuilder: (suggestions) => _TopSearchSuggestions(
@@ -121,6 +131,8 @@ class _FilterSelectorsDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final enabledSuppliers = ref.watch(enabledSuppliersProvider).toList();
+    final searchSettings = ref.watch(searchSettingsProvider);
 
     return Dialog(
       insetPadding: EdgeInsets.only(left: isMobile(context) ? 0 : 80.0),
@@ -131,109 +143,78 @@ class _FilterSelectorsDialog extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              AppLocalizations.of(context)!.contentType,
-              style: theme.textTheme.headlineSmall,
+            FilterDialogSection(
+              label: Text(
+                AppLocalizations.of(context)!.language,
+                style: theme.textTheme.headlineSmall,
+              ),
+              itemsCount: ContentLanguage.values.length,
+              itemBuilder: (context, index) {
+                final item = ContentLanguage.values[index];
+                return FilterChip(
+                  selected: searchSettings.languages.contains(item),
+                  label: Text(item.code),
+                  onSelected: (value) {
+                    ref
+                        .read(searchSettingsProvider.notifier)
+                        .toggleLanguage(item);
+                  },
+                );
+              },
             ),
-            const _ContentTypeSelector(),
-            Text(
-              AppLocalizations.of(context)!.suppliers,
-              style: theme.textTheme.headlineSmall,
+            const SizedBox(height: 8),
+            FilterDialogSection(
+              label: Text(
+                AppLocalizations.of(context)!.contentType,
+                style: theme.textTheme.headlineSmall,
+              ),
+              itemsCount: ContentType.values.length,
+              itemBuilder: (context, index) {
+                final item = ContentType.values[index];
+                return FilterChip(
+                  selected: searchSettings.types.contains(item),
+                  label: Text(contentTypeLabel(context, item)),
+                  onSelected: (value) {
+                    ref.read(searchSettingsProvider.notifier).toggleType(item);
+                  },
+                );
+              },
             ),
-            const _SuppliersSelector(),
+            const SizedBox(height: 8),
+            FilterDialogSection(
+              label: Text(
+                AppLocalizations.of(context)!.suppliers,
+                style: theme.textTheme.headlineSmall,
+              ),
+              itemsCount: enabledSuppliers.length,
+              itemBuilder: (context, index) {
+                final item = enabledSuppliers[index];
+                return FilterChip(
+                  label: Text(item),
+                  selected: searchSettings.searchSuppliersNames.contains(item),
+                  onSelected: searchSettings.avaliableSuppliers.contains(item)
+                      ? (value) {
+                          ref
+                              .read(searchSettingsProvider.notifier)
+                              .toggleSupplierName(item);
+                        }
+                      : null,
+                );
+              },
+              onSelectAll: () {
+                ref
+                    .read(searchSettingsProvider.notifier)
+                    .toggleAllSuppliers(true);
+              },
+              onUnselectAll: () {
+                ref
+                    .read(searchSettingsProvider.notifier)
+                    .toggleAllSuppliers(false);
+              },
+            ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _ContentTypeSelector extends ConsumerWidget {
-  const _ContentTypeSelector();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selectedContentType = ref.watch(selectedContentProvider);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Wrap(
-        alignment: WrapAlignment.start,
-        spacing: 6,
-        runSpacing: 6,
-        children: [
-          ...ContentType.values.map(
-            (type) => FilterChip(
-              selected: selectedContentType.contains(type),
-              label: Text(contentTypeLable(context, type)),
-              onSelected: (value) {
-                var notifier = ref.read(selectedContentProvider.notifier);
-                if (value) {
-                  notifier.select(type);
-                } else {
-                  notifier.unselect(type);
-                }
-              },
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class _SuppliersSelector extends ConsumerWidget {
-  const _SuppliersSelector();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selectedSuppliers = ref.watch(selectedSupplierProvider);
-    final enabledSuppliers = ref.watch(enabledSuppliersProvider);
-    final selectedContentType = ref.watch(selectedContentProvider);
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: Wrap(
-        alignment: WrapAlignment.start,
-        spacing: 6,
-        runSpacing: 6,
-        children: [
-          ...enabledSuppliers.map(
-            (name) => _renderOption(
-              selectedSuppliers,
-              selectedContentType,
-              name,
-              ref,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _renderOption(
-    Set<String> selectedSuppliers,
-    Set<ContentType> selectedContentType,
-    String name,
-    WidgetRef ref,
-  ) {
-    final supplier = ContentSuppliers.instance.getSupplier(name)!;
-    final enabled =
-        supplier.supportedTypes.intersection(selectedContentType).isNotEmpty;
-
-    return FilterChip(
-      selected: selectedSuppliers.contains(name),
-      label: Text(name),
-      onSelected: enabled
-          ? (value) {
-              final notifier = ref.read(selectedSupplierProvider.notifier);
-              if (value) {
-                notifier.select(name);
-              } else {
-                notifier.unselect(name);
-              }
-            }
-          : null,
     );
   }
 }

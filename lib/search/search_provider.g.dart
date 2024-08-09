@@ -6,7 +6,7 @@ part of 'search_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$searchHash() => r'0e98517654ab14c85d32eaf948333062d830f6ae';
+String _$searchHash() => r'b1e6488d184259496a10ffb2194f15b87f5ffbe0';
 
 /// See also [Search].
 @ProviderFor(Search)
@@ -20,37 +20,21 @@ final searchProvider = NotifierProvider<Search, SearchState>.internal(
 );
 
 typedef _$Search = Notifier<SearchState>;
-String _$selectedSupplierHash() => r'056bf9940e4675cfb5797e1cca7577478ba29fc9';
+String _$searchSettingsHash() => r'4488db88d6b0f5a84c368a3cb4bedd8bf4d9fdb5';
 
-/// See also [SelectedSupplier].
-@ProviderFor(SelectedSupplier)
-final selectedSupplierProvider =
-    NotifierProvider<SelectedSupplier, Set<String>>.internal(
-  SelectedSupplier.new,
-  name: r'selectedSupplierProvider',
+/// See also [SearchSettings].
+@ProviderFor(SearchSettings)
+final searchSettingsProvider =
+    AutoDisposeNotifierProvider<SearchSettings, SearchSettingsModel>.internal(
+  SearchSettings.new,
+  name: r'searchSettingsProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$selectedSupplierHash,
+      : _$searchSettingsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SelectedSupplier = Notifier<Set<String>>;
-String _$selectedContentHash() => r'f9e4fac1d7a920bc6824606019e632ef7c4b9fb8';
-
-/// See also [SelectedContent].
-@ProviderFor(SelectedContent)
-final selectedContentProvider =
-    NotifierProvider<SelectedContent, Set<ContentType>>.internal(
-  SelectedContent.new,
-  name: r'selectedContentProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$selectedContentHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$SelectedContent = Notifier<Set<ContentType>>;
+typedef _$SearchSettings = AutoDisposeNotifier<SearchSettingsModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

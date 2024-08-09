@@ -15,9 +15,9 @@ enum ContentType {
 }
 
 enum ContentLanguage {
-  english("en"),
-  ukrainian("uk"),
-  multi("mulri");
+  english("EN"),
+  ukrainian("UK"),
+  multi("Multi");
 
   final String code;
 

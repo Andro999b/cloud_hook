@@ -28,7 +28,6 @@ class AniWaveMediaItemLoader implements ContentMediaItemLoader {
       "https://$host/ajax/episode/list/$mediaId?vrf=$vrf",
       options: Options(headers: {
         ...defaultHeaders,
-        "Host": host,
         "Referer": "https://$host",
       }),
     );
@@ -80,10 +79,7 @@ class AniWaveSourceLoader implements ContentMediaItemSourceLoader {
 
     final serversRes = await dio.get(
       "https://$host/ajax/server/list/$id?vrf=$vrf",
-      options: Options(headers: {
-        ...defaultHeaders,
-        "Host": host,
-      }),
+      options: Options(headers: {...defaultHeaders}),
     );
 
     final servers = await scrapServers(serversRes.data["result"]);
@@ -158,10 +154,7 @@ class AniWaveServerSorceLoader
 
     final serverRes = await dio.get(
       "https://$host/ajax/server/$id?vrf=$vrf",
-      options: Options(headers: {
-        ...defaultHeaders,
-        "Host": host,
-      }),
+      options: Options(headers: {...defaultHeaders}),
     );
 
     final String? encUrl = serverRes.data["result"]?["url"];

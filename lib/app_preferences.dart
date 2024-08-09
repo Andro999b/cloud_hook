@@ -12,13 +12,19 @@ class AppPreferences {
     instance = await SharedPreferences.getInstance();
   }
 
-  static Set<String>? get selectedContentSuppliers =>
-      instance.getStringList("selected_content_suppliers")?.toSet();
+  static Set<ContentLanguage>? get selectedContentLanguage => instance
+      .getStringList("selected_content_language")
+      ?.map(
+        (value) =>
+            ContentLanguage.values.firstWhere((lang) => lang.name == value),
+      )
+      .nonNulls
+      .toSet();
 
-  static set selectedContentSuppliers(Set<String>? value) =>
+  static set selectedContentLanguage(Set<ContentLanguage>? value) =>
       instance.setStringList(
-        "selected_content_suppliers",
-        value?.toList() ?? List.empty(),
+        "selected_content_language",
+        value?.map((lang) => lang.name).toList() ?? List.empty(),
       );
 
   static Set<ContentType>? get selectedContentType => instance
@@ -33,6 +39,15 @@ class AppPreferences {
       instance.setStringList(
         "selected_content_type",
         value?.map((type) => type.name).toList() ?? List.empty(),
+      );
+
+  static Set<String>? get selectedContentSuppliers =>
+      instance.getStringList("selected_content_suppliers")?.toSet();
+
+  static set selectedContentSuppliers(Set<String>? value) =>
+      instance.setStringList(
+        "selected_content_suppliers",
+        value?.toList() ?? List.empty(),
       );
 
   static set themeBrightness(Brightness? brightness) => brightness != null
@@ -54,22 +69,46 @@ class AppPreferences {
     return colorValue != null ? Color(colorValue) : defaultColor;
   }
 
-  static Set<MediaCollectionItemStatus>? get selectedCollectionItemStatus =>
-      instance
-          .getStringList("collection_item_status")
-          ?.map(
-            (value) => MediaCollectionItemStatus.values
-                .firstWhere((type) => type.name == value),
-          )
-          .nonNulls
-          .toSet();
+  static Set<MediaType>? get collectionMediaType => instance
+      .getStringList("collection_media_type")
+      ?.map(
+        (value) => MediaType.values.firstWhere((type) => type.name == value),
+      )
+      .nonNulls
+      .toSet();
 
-  static set selectedCollectionItemStatus(
+  static set collectionMediaType(
+    Set<MediaType>? value,
+  ) =>
+      instance.setStringList(
+        "collection_media_type",
+        value?.map((type) => type.name).toList() ?? List.empty(),
+      );
+
+  static Set<MediaCollectionItemStatus>? get collectionItemStatus => instance
+      .getStringList("collection_item_status")
+      ?.map(
+        (value) => MediaCollectionItemStatus.values
+            .firstWhere((type) => type.name == value),
+      )
+      .nonNulls
+      .toSet();
+
+  static set collectionItemStatus(
     Set<MediaCollectionItemStatus>? value,
   ) =>
       instance.setStringList(
         "collection_item_status",
         value?.map((type) => type.name).toList() ?? List.empty(),
+      );
+
+  static Set<String>? get collectionContentSuppliers =>
+      instance.getStringList("collection_content_suppliers")?.toSet();
+
+  static set collectionContentSuppliers(Set<String>? value) =>
+      instance.setStringList(
+        "collection_content_suppliers",
+        value?.toList() ?? List.empty(),
       );
 
   static int get lastSyncTimestamp =>

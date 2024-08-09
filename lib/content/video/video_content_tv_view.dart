@@ -257,7 +257,7 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
             1.0,
           ],
           colors: [
-            Colors.black26,
+            Colors.black45,
             Colors.transparent,
           ],
         ),

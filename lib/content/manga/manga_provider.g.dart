@@ -182,7 +182,7 @@ class _CurrentMangaChaptersProviderElement
 }
 
 String _$currentMangaChapterHash() =>
-    r'dda894c0edb3f9e0ae03245c10e9b00dbf62e06a';
+    r'a24b093f0b0e4fc197a9bd121251de0bc170693b';
 
 /// See also [currentMangaChapter].
 @ProviderFor(currentMangaChapter)

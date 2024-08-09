@@ -21,7 +21,7 @@ final collectionServiceProvider = Provider<CollectionService>.internal(
 );
 
 typedef CollectionServiceRef = ProviderRef<CollectionService>;
-String _$collectionHash() => r'38b550ea11947f30d00dbf40fbebd5c21faf7222';
+String _$collectionHash() => r'ac1e7e9d35f6867fb1c5bd8e4216b17b5746e6c7';
 
 /// See also [collection].
 @ProviderFor(collection)
@@ -71,22 +71,21 @@ final collectionChangesProvider =
 );
 
 typedef _$CollectionChanges = StreamNotifier<void>;
-String _$collectionItemStatusFilterHash() =>
-    r'5653bc5b9b99f94eb3c02dd8c60a3bb7e828de1e';
+String _$collectionFilterHash() => r'86ed2bcd5ec64aa27cb99f5358b2ce0596eb8776';
 
-/// See also [CollectionItemStatusFilter].
-@ProviderFor(CollectionItemStatusFilter)
-final collectionItemStatusFilterProvider = NotifierProvider<
-    CollectionItemStatusFilter, Set<MediaCollectionItemStatus>>.internal(
-  CollectionItemStatusFilter.new,
-  name: r'collectionItemStatusFilterProvider',
+/// See also [CollectionFilter].
+@ProviderFor(CollectionFilter)
+final collectionFilterProvider = AutoDisposeNotifierProvider<CollectionFilter,
+    CollectionFilterModel>.internal(
+  CollectionFilter.new,
+  name: r'collectionFilterProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$collectionItemStatusFilterHash,
+      : _$collectionFilterHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$CollectionItemStatusFilter = Notifier<Set<MediaCollectionItemStatus>>;
+typedef _$CollectionFilter = AutoDisposeNotifier<CollectionFilterModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

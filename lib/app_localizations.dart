@@ -18,6 +18,16 @@ String priorityLabel(
   };
 }
 
+String mediaTypeLabel(
+  BuildContext context,
+  MediaType mediaType,
+) {
+  return switch (mediaType) {
+    MediaType.video => AppLocalizations.of(context)!.mediaTypeVideo,
+    MediaType.manga => AppLocalizations.of(context)!.mediaTypeManga,
+  };
+}
+
 String statusLabel(
   BuildContext context,
   MediaCollectionItemStatus status,
@@ -52,7 +62,7 @@ String statusMenuItemLabel(
   };
 }
 
-String contentTypeLable(BuildContext context, ContentType type) {
+String contentTypeLabel(BuildContext context, ContentType type) {
   return switch (type) {
     ContentType.anime => AppLocalizations.of(context)!.contentTypeAnime,
     ContentType.cartoon => AppLocalizations.of(context)!.contentTypeCartoon,
@@ -62,7 +72,7 @@ String contentTypeLable(BuildContext context, ContentType type) {
   };
 }
 
-String mangaReaderImageModeLable(
+String mangaReaderImageModeLabel(
     BuildContext context, MangaReaderImageMode mode) {
   return switch (mode) {
     MangaReaderImageMode.original =>

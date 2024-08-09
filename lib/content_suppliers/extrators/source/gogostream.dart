@@ -68,7 +68,6 @@ class GogoStreamSourceLoader implements ContentMediaItemSourceLoader {
 
     final id = serverUri.queryParameters['id']!;
     final encryptedId = encrypt(id, iv, secretKey);
-    final token = serverUri.queryParameters['token'];
 
     final linksRes = await dio.get(
       "https://${serverUri.authority}/encrypt-ajax.php?"

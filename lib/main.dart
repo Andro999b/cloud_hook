@@ -54,7 +54,6 @@ class MainApp extends StatelessWidget {
         LogicalKeySet(LogicalKeyboardKey.select): const ActivateIntent(),
       },
       child: MaterialApp.router(
-        restorationScopeId: "cloud-hook",
         debugShowCheckedModeBanner: false,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
@@ -64,64 +63,67 @@ class MainApp extends StatelessWidget {
           PointerDeviceKind.trackpad
         }),
         routerConfig: GoRouter(
-            navigatorKey: rootNavigatorKey,
-            // initialLocation: "/search",
-            // initialLocation: "/collection",
-            // initialLocation: "/settings",
-            // initialLocation: "/content/Hianime/oban-star-racers-1535",
-            routes: [
-              GoRoute(
-                path: NavigationRoute.home.path,
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: HomeScrean(),
+          navigatorKey: rootNavigatorKey,
+          // initialLocation: "/search",
+          initialLocation: "/collection",
+          // initialLocation: "/settings",
+          // initialLocation: "/content/Hianime/oban-star-racers-1535",
+          // initialLocation:
+          //     "/manga/MangaDex/ef3a66a4-010f-4930-b6d4-0ff28b0ceed5",
+          routes: [
+            GoRoute(
+              path: NavigationRoute.home.path,
+              pageBuilder: (context, state) => const NoTransitionPage(
+                child: HomeScrean(),
+              ),
+            ),
+            GoRoute(
+              path: NavigationRoute.search.path,
+              pageBuilder: (context, state) => const NoTransitionPage(
+                child: SearchScreen(),
+              ),
+            ),
+            GoRoute(
+              path: NavigationRoute.collection.path,
+              pageBuilder: (context, state) => const NoTransitionPage(
+                child: CollectionScreen(),
+              ),
+            ),
+            GoRoute(
+              path: NavigationRoute.settings.path,
+              pageBuilder: (context, state) => const NoTransitionPage(
+                child: SettingsScrean(),
+              ),
+            ),
+            GoRoute(
+              path: "/content/:supplier/:id",
+              pageBuilder: (context, state) => NoTransitionPage(
+                child: ContentDetailsScreen(
+                  supplier: state.pathParameters["supplier"]!,
+                  id: state.pathParameters["id"]!,
                 ),
               ),
-              GoRoute(
-                path: NavigationRoute.search.path,
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: SearchScreen(),
+            ),
+            GoRoute(
+              path: "/video/:supplier/:id",
+              pageBuilder: (context, state) => NoTransitionPage(
+                child: VideoContentScreen(
+                  supplier: state.pathParameters["supplier"]!,
+                  id: state.pathParameters["id"]!,
                 ),
               ),
-              GoRoute(
-                path: NavigationRoute.collection.path,
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: CollectionScreen(),
+            ),
+            GoRoute(
+              path: "/manga/:supplier/:id",
+              pageBuilder: (context, state) => NoTransitionPage(
+                child: MangaContentScrean(
+                  supplier: state.pathParameters["supplier"]!,
+                  id: state.pathParameters["id"]!,
                 ),
               ),
-              GoRoute(
-                path: NavigationRoute.settings.path,
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: SettingsScrean(),
-                ),
-              ),
-              GoRoute(
-                path: "/content/:supplier/:id",
-                pageBuilder: (context, state) => NoTransitionPage(
-                  child: ContentDetailsScreen(
-                    supplier: state.pathParameters["supplier"]!,
-                    id: state.pathParameters["id"]!,
-                  ),
-                ),
-              ),
-              GoRoute(
-                path: "/video/:supplier/:id",
-                pageBuilder: (context, state) => NoTransitionPage(
-                  child: VideoContentScreen(
-                    supplier: state.pathParameters["supplier"]!,
-                    id: state.pathParameters["id"]!,
-                  ),
-                ),
-              ),
-              GoRoute(
-                path: "/manga/:supplier/:id",
-                pageBuilder: (context, state) => NoTransitionPage(
-                  child: MangaContentScrean(
-                    supplier: state.pathParameters["supplier"]!,
-                    id: state.pathParameters["id"]!,
-                  ),
-                ),
-              )
-            ]),
+            )
+          ],
+        ),
       ),
     );
   }

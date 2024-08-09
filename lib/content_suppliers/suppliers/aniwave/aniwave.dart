@@ -26,7 +26,7 @@ class AniWaveSupplier extends ContentSupplier {
   Future<List<ContentInfo>> search(String query, Set<ContentType> type) async {
     final uri = Uri.https(host, "filter", {"keyword": query});
 
-    final scrapper = Scrapper(uri: uri, headers: {"Host": host});
+    final scrapper = Scrapper(uri: uri);
     final results = await scrapper.scrap(
           Scope(
             scope: "#list-items",
@@ -51,7 +51,7 @@ class AniWaveSupplier extends ContentSupplier {
   Future<ContentDetails?> detailsById(String id) async {
     final uri = Uri.https(host, "/watch/$id");
 
-    final scrapper = Scrapper(uri: uri, headers: {"Host": host});
+    final scrapper = Scrapper(uri: uri);
     final results = await scrapper.scrap(
       Scope(
         scope: "#body",
@@ -122,10 +122,7 @@ class AniWaveSupplier extends ContentSupplier {
 
     final res = await dio.getUri(
       uri,
-      options: Options(headers: {
-        ...defaultHeaders,
-        "Host": host,
-      }),
+      options: Options(headers: {...defaultHeaders}),
     );
 
     final results = await Scrapper.scrapFragment(
