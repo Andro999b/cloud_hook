@@ -6,7 +6,6 @@ import 'package:cloud_hook/content_suppliers/extrators/source/multi_api_keys.dar
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
-import 'package:simple_rc4/simple_rc4.dart';
 
 class VidPlaySourceLoader implements ContentMediaItemSourceLoader {
   final String url;
@@ -22,11 +21,13 @@ class VidPlaySourceLoader implements ContentMediaItemSourceLoader {
     final uri = parseUri(url);
 
     final host = uri.authority;
-    final keys = await _fetchKeys();
+    final keys = await MultiApiKeys.fetch();
 
     final id = _extractId(url);
-    final endcodedId = _encode(_extractId(url), keys[0]);
-    final h = _encode(id, keys[1]);
+    final endcodedId = _encode(_extractId(url), keys.vidplay!);
+
+    final hKey = keys.vidplay!.firstWhere((op) => op.method == "h");
+    final h = runRC4EncryptOp(id, hKey.keys![0]);
 
     final mediaInfoUri = Uri.https(host, "/mediainfo/$endcodedId", {
       ...uri.queryParameters,
@@ -40,7 +41,7 @@ class VidPlaySourceLoader implements ContentMediaItemSourceLoader {
       return [];
     }
 
-    final decodedResult = _decode(mediaInfoRes.data["result"], keys[2]);
+    final decodedResult = _decode(mediaInfoRes.data["result"], keys.vidplay!);
     final mediaInfo = json.decode(decodedResult) as Map<String, dynamic>;
 
     return JWPlayer.fromJson(
@@ -49,29 +50,24 @@ class VidPlaySourceLoader implements ContentMediaItemSourceLoader {
     );
   }
 
-  Future<List<String>> _fetchKeys() async {
-    final apiKeys = await MultiApiKeys.fetch();
+  String _encode(String data, List<KeyOps> ops) {
+    String out = data;
 
-    return apiKeys.vidplay ?? [];
-    //   "https://raw.githubusercontent.com/Ciarands/vidsrc-keys/main/keys.json",
-    //   "https://raw.githubusercontent.com/Inside4ndroid/vidkey-js/main/keys.json",
+    for (var op in ops) {
+      out = op.encrypt(out);
+    }
+
+    return out;
   }
 
-  String _encode(String data, String key) {
-    final cipher = RC4(key);
+  String _decode(String data, List<KeyOps> ops) {
+    String out = data;
 
-    var encoded = utf8.encode(data).toList();
-    encoded = cipher.encodeBytes(encoded);
+    for (var op in ops.reversed) {
+      out = op.decrypt(out);
+    }
 
-    return base64Url.encode(encoded);
-  }
-
-  String _decode(String data, String key) {
-    final cipher = RC4(key);
-
-    final decoded = cipher.decodeBytes(base64.decode(data));
-
-    return Uri.decodeComponent(decoded);
+    return Uri.decodeComponent(out);
   }
 
   String _extractId(String url) {

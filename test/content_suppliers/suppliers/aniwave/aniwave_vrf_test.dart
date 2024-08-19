@@ -3,14 +3,13 @@ import 'package:test/test.dart';
 
 void main() {
   test("Should generate correct vrf", () async {
-    final vrf = await aniwaveVRF("14161");
-    expect(vrf, equals("u--S"));
+    final vrf = await aniwaveEncryptVRF("17027");
+    expect(vrf, equals("cE9mRHFqLVdvNXN3MmFSTQ=="));
   });
 
   test("Should decrypt url", () async {
     final url = await aniwaveDecryptURL(
-        "biRg7iG4vs8U2hI5GelW2e3k6NsU8vwNI0eR2Ib2EWXDt8XDI5fJUZbKTOOrScMfpGcSsQq9hgm-J2xEuSzUx9PxCs6EnIwt5Xs-DA==");
-    expect(url,
-        equals("https://vid2a41.site/e/GQP475713P93?t=4xjRAPEkBVUKyQ%3D%3D"));
+        "cEpfZnhqbnptSUZNei1JQ0R2THlyaEJuckdYeU1zQUk5Z2NCX1ViRE84eG92OUZlZFBVbHppb3VMX21Gc0wtRDl4YkhKUTZ1ME5iSHVuejRoaDdndC1Ddnl0NmRLNldDb25oa2FKZGJyWGJyS0NYeldpUVJvZz09");
+    expect(url, equals("https://megaf.cc/e/07ynm7?t=4xjSDfUjAFQOyg=="));
   });
 }

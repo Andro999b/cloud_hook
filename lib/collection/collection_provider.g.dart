@@ -71,7 +71,7 @@ final collectionChangesProvider =
 );
 
 typedef _$CollectionChanges = StreamNotifier<void>;
-String _$collectionFilterHash() => r'86ed2bcd5ec64aa27cb99f5358b2ce0596eb8776';
+String _$collectionFilterHash() => r'bc8cf7307bfca96d2b8e0c351da1460ad703e6a0';
 
 /// See also [CollectionFilter].
 @ProviderFor(CollectionFilter)
