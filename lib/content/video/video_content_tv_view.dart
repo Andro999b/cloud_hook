@@ -15,13 +15,13 @@ import 'package:media_kit_video/media_kit_video_controls/src/controls/methods/vi
 class VideoContentTVView extends StatelessWidget {
   final Player player;
   final VideoController videoController;
-  final PlaylistController playlistController;
+  final PlayerController playerController;
 
   const VideoContentTVView({
     super.key,
     required this.player,
     required this.videoController,
-    required this.playlistController,
+    required this.playerController,
   });
 
   @override
@@ -35,7 +35,7 @@ class VideoContentTVView extends StatelessWidget {
   Widget _renderControls(BuildContext context, VideoState state) {
     return AndroidTVControls(
       player: player,
-      playlistController: playlistController,
+      playerController: playerController,
     );
   }
 }
@@ -46,11 +46,11 @@ class AndroidTVControls extends StatefulWidget {
   const AndroidTVControls({
     super.key,
     required this.player,
-    required this.playlistController,
+    required this.playerController,
   });
 
   final Player player;
-  final PlaylistController playlistController;
+  final PlayerController playerController;
 
   @override
   State<AndroidTVControls> createState() => _AndroidTVControlsState();
@@ -203,8 +203,8 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
                           ),
                           _AndroidTVBottomBar(
                             contentDetails:
-                                widget.playlistController.contentDetails,
-                            playlistController: widget.playlistController,
+                                widget.playerController.contentDetails,
+                            playerController: widget.playerController,
                             playPauseFocusNode: playPauseFocusNode,
                           )
                         ],
@@ -267,10 +267,11 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
         children: [
           const SizedBox(width: 8),
           MediaTitle(
-            contentDetails: widget.playlistController.contentDetails,
-            playlistSize: widget.playlistController.mediaItems.length,
+            contentDetails: widget.playerController.contentDetails,
+            playlistSize: widget.playerController.mediaItems.length,
           ),
           const Spacer(),
+          PlayerErrorPopup(playerController: widget.playerController),
         ],
       ),
     );
@@ -320,12 +321,12 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
 class _AndroidTVBottomBar extends ConsumerWidget {
   const _AndroidTVBottomBar({
     required this.contentDetails,
-    required this.playlistController,
+    required this.playerController,
     required this.playPauseFocusNode,
   });
 
   final ContentDetails contentDetails;
-  final PlaylistController playlistController;
+  final PlayerController playerController;
   final FocusNode playPauseFocusNode;
 
   @override
@@ -333,7 +334,7 @@ class _AndroidTVBottomBar extends ConsumerWidget {
     final currentProgress = ref.watch(collectionItemProvider(contentDetails));
 
     final isLastItem = currentProgress.valueOrNull?.currentItem !=
-        playlistController.mediaItems.length - 1;
+        playerController.mediaItems.length - 1;
 
     return Container(
       decoration: const BoxDecoration(
@@ -362,17 +363,17 @@ class _AndroidTVBottomBar extends ConsumerWidget {
             ),
             SkipNextButton(
               contentDetails: contentDetails,
-              mediaItems: playlistController.mediaItems,
+              mediaItems: playerController.mediaItems,
               focusNode: isLastItem ? playPauseFocusNode : null,
             ),
             const Spacer(),
             SourceSelector(
-              mediaItems: playlistController.mediaItems,
+              mediaItems: playerController.mediaItems,
               contentDetails: contentDetails,
             ),
-            if (playlistController.mediaItems.length > 1)
+            if (playerController.mediaItems.length > 1)
               PlayerPlaylistButton(
-                playlistController: playlistController,
+                playerController: playerController,
                 contentDetails: contentDetails,
               )
           ],

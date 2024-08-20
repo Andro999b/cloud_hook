@@ -7,13 +7,13 @@ import 'package:media_kit_video/media_kit_video.dart';
 class VideoContentMobileView extends StatefulWidget {
   final Player player;
   final VideoController videoController;
-  final PlaylistController playlistController;
+  final PlayerController playerController;
 
   const VideoContentMobileView({
     super.key,
     required this.player,
     required this.videoController,
-    required this.playlistController,
+    required this.playerController,
   });
 
   @override
@@ -53,28 +53,29 @@ class _VideoContentMobileViewState extends State<VideoContentMobileView> {
         const ExitButton(),
         const SizedBox(width: 8),
         MediaTitle(
-          playlistSize: widget.playlistController.mediaItems.length,
-          contentDetails: widget.playlistController.contentDetails,
+          playlistSize: widget.playerController.mediaItems.length,
+          contentDetails: widget.playerController.contentDetails,
         ),
         const Spacer(),
-        if (widget.playlistController.mediaItems.length > 1)
+        PlayerErrorPopup(playerController: widget.playerController),
+        if (widget.playerController.mediaItems.length > 1)
           PlayerPlaylistButton(
-            playlistController: widget.playlistController,
-            contentDetails: widget.playlistController.contentDetails,
+            playerController: widget.playerController,
+            contentDetails: widget.playerController.contentDetails,
           )
       ],
       primaryButtonBar: [
         const Spacer(flex: 2),
         SkipPrevButton(
-          contentDetails: widget.playlistController.contentDetails,
+          contentDetails: widget.playerController.contentDetails,
           iconSize: 36.0,
         ),
         const Spacer(),
         const MaterialPlayOrPauseButton(iconSize: 48.0),
         const Spacer(),
         SkipNextButton(
-          contentDetails: widget.playlistController.contentDetails,
-          mediaItems: widget.playlistController.mediaItems,
+          contentDetails: widget.playerController.contentDetails,
+          mediaItems: widget.playerController.mediaItems,
           iconSize: 36.0,
         ),
         const Spacer(flex: 2),
@@ -83,8 +84,8 @@ class _VideoContentMobileViewState extends State<VideoContentMobileView> {
         const MaterialPositionIndicator(),
         const Spacer(),
         SourceSelector(
-          mediaItems: widget.playlistController.mediaItems,
-          contentDetails: widget.playlistController.contentDetails,
+          mediaItems: widget.playerController.mediaItems,
+          contentDetails: widget.playerController.contentDetails,
         ),
         const MaterialFullscreenButton(),
       ],

@@ -29,17 +29,18 @@ extension PlayerExt on Player {
   }
 }
 
-class PlaylistController {
+class PlayerController {
   final Player player;
   final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
+  final ValueNotifier<List<String>> errors = ValueNotifier([]);
 
   List<ContentMediaItemSource>? currentSources;
 
   final WidgetRef _ref;
 
-  PlaylistController({
+  PlayerController({
     required this.player,
     required this.contentDetails,
     required this.mediaItems,
@@ -85,6 +86,7 @@ class PlaylistController {
       );
 
       isLoading.value = false;
+      errors.value = [];
       await player.open(media);
 
       currentSources = sources;
@@ -153,6 +155,10 @@ class PlaylistController {
   bool _isValidItemIdx(int itemIdx) {
     return itemIdx < mediaItems.length && itemIdx >= 0;
   }
+
+  void addError(String error) {
+    errors.value = [...errors.value, error];
+  }
 }
 
 class VideoContentView extends ConsumerStatefulWidget {
@@ -172,7 +178,7 @@ class VideoContentView extends ConsumerStatefulWidget {
 class _VideoContentViewState extends ConsumerState<VideoContentView> {
   final player = Player();
   late final VideoController videoController;
-  late final PlaylistController playlistController;
+  late final PlayerController playerController;
   late ProviderSubscription subscription;
 
   @override
@@ -193,7 +199,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
           )
         : VideoController(player);
 
-    playlistController = PlaylistController(
+    playerController = PlayerController(
       contentDetails: widget.contentDetails,
       player: player,
       mediaItems: widget.mediaItems,
@@ -217,7 +223,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
             await _playMediaItems(nextValue);
           } else if (previousValue?.currentSubtitleName !=
               nextValue.currentSubtitleName) {
-            await playlistController.setSubtitle(nextValue.currentSubtitleName);
+            await playerController.setSubtitle(nextValue.currentSubtitleName);
           }
         }
       },
@@ -227,7 +233,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
     // track video end
     player.stream.completed.listen((event) {
       if (event) {
-        playlistController.nextItem();
+        playerController.nextItem();
       }
     });
 
@@ -245,16 +251,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
     player.stream.volume.listen((event) => AppPreferences.volume = event);
 
     player.stream.error.listen((event) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "${AppLocalizations.of(context)!.videoSourceFailed}: $event",
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+      playerController.addError(event);
       logger.e("[player]: $event");
     });
 
@@ -268,15 +265,18 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
 
   Future<void> _playMediaItems(MediaCollectionItem nextValue) async {
     try {
-      await playlistController.play(nextValue);
+      await playerController.play(nextValue);
     } catch (_) {
       // show error snackbar
       if (mounted) {
+        final error = AppLocalizations.of(context)!.videoSourceFailed;
+        playerController.addError(error);
+
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
           ..showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)!.videoSourceFailed),
+              content: Text(error),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -321,7 +321,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
         children: [
           view,
           ValueListenableBuilder(
-            valueListenable: playlistController.isLoading,
+            valueListenable: playerController.isLoading,
             builder: (context, value, child) {
               return value
                   ? const Center(
@@ -339,7 +339,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
     return VideoContentTVView(
       player: player,
       videoController: videoController,
-      playlistController: playlistController,
+      playerController: playerController,
     );
   }
 
@@ -347,7 +347,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
     return VideoContentMobileView(
       player: player,
       videoController: videoController,
-      playlistController: playlistController,
+      playerController: playerController,
     );
   }
 
@@ -355,7 +355,7 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
     return VideoContentDesktopView(
       player: player,
       videoController: videoController,
-      playlistController: playlistController,
+      playerController: playerController,
     );
   }
 

@@ -10,13 +10,13 @@ import 'package:window_manager/window_manager.dart';
 class VideoContentDesktopView extends StatefulWidget {
   final Player player;
   final VideoController videoController;
-  final PlaylistController playlistController;
+  final PlayerController playerController;
 
   const VideoContentDesktopView({
     super.key,
     required this.player,
     required this.videoController,
-    required this.playlistController,
+    required this.playerController,
   });
 
   @override
@@ -36,13 +36,13 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
     const SingleActivator(LogicalKeyboardKey.mediaPlayPause): () =>
         widget.player.playOrPause(),
     const SingleActivator(LogicalKeyboardKey.mediaTrackNext):
-        widget.playlistController.nextItem,
+        widget.playerController.nextItem,
     const SingleActivator(LogicalKeyboardKey.bracketLeft):
-        widget.playlistController.prevItem,
+        widget.playerController.prevItem,
     const SingleActivator(LogicalKeyboardKey.mediaTrackPrevious):
-        widget.playlistController.nextItem,
+        widget.playerController.nextItem,
     const SingleActivator(LogicalKeyboardKey.bracketRight):
-        widget.playlistController.nextItem,
+        widget.playerController.nextItem,
     const SingleActivator(LogicalKeyboardKey.space): () =>
         widget.player.playOrPause(),
     const SingleActivator(LogicalKeyboardKey.keyJ): () {
@@ -102,7 +102,7 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
 
   MaterialDesktopVideoControlsThemeData _createThemeData(bool fullscrean) {
     const marging = EdgeInsets.symmetric(horizontal: 20.0);
-    final playlistController = widget.playlistController;
+    final playerController = widget.playerController;
 
     return MaterialDesktopVideoControlsThemeData(
       buttonBarButtonColor: Colors.white,
@@ -112,21 +112,22 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
         const ExitButton(),
         const SizedBox(width: 8),
         MediaTitle(
-          playlistSize: playlistController.mediaItems.length,
-          contentDetails: playlistController.contentDetails,
+          playlistSize: playerController.mediaItems.length,
+          contentDetails: playerController.contentDetails,
         ),
-        if (playlistController.mediaItems.length > 1)
+        PlayerErrorPopup(playerController: playerController),
+        if (playerController.mediaItems.length > 1)
           PlayerPlaylistButton(
-            playlistController: playlistController,
-            contentDetails: playlistController.contentDetails,
+            playerController: playerController,
+            contentDetails: playerController.contentDetails,
           )
       ],
       bottomButtonBar: [
-        SkipPrevButton(contentDetails: playlistController.contentDetails),
+        SkipPrevButton(contentDetails: playerController.contentDetails),
         const PlayOrPauseButton(),
         SkipNextButton(
-          contentDetails: playlistController.contentDetails,
-          mediaItems: playlistController.mediaItems,
+          contentDetails: playerController.contentDetails,
+          mediaItems: playerController.mediaItems,
         ),
         const MaterialDesktopVolumeButton(),
         const MaterialDesktopPositionIndicator(),
@@ -137,8 +138,8 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
             icon: const Icon(Symbols.pip),
           ),
         SourceSelector(
-          mediaItems: playlistController.mediaItems,
-          contentDetails: playlistController.contentDetails,
+          mediaItems: playerController.mediaItems,
+          contentDetails: playerController.contentDetails,
         ),
         const MaterialDesktopFullscreenButton(),
       ],

@@ -9,6 +9,7 @@ import 'package:cloud_hook/content/video/video_content_view.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -90,12 +91,12 @@ class MediaTitle extends ConsumerWidget {
 // Playlist and source selection
 
 class PlayerPlaylistButton extends ConsumerWidget {
-  final PlaylistController playlistController;
+  final PlayerController playerController;
   final ContentDetails contentDetails;
 
   const PlayerPlaylistButton({
     super.key,
-    required this.playlistController,
+    required this.playerController,
     required this.contentDetails,
   });
 
@@ -115,9 +116,9 @@ class PlayerPlaylistButton extends ConsumerWidget {
       onPressed: () {
         Navigator.of(context).push(MediaItemsListRoute(
           title: AppLocalizations.of(context)!.episodesList,
-          mediaItems: playlistController.mediaItems,
+          mediaItems: playerController.mediaItems,
           contentProgress: collectionItem,
-          onSelect: (item) => playlistController.selectItem(item.number),
+          onSelect: (item) => playerController.selectItem(item.number),
         ));
       },
       icon: const Icon(Icons.list),
@@ -578,6 +579,55 @@ class VideoItemsListItem extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class PlayerErrorPopup extends StatelessWidget {
+  final PlayerController playerController;
+
+  const PlayerErrorPopup({
+    super.key,
+    required this.playerController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: playerController.errors,
+      builder: (context, value, child) {
+        if (value.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return MenuAnchor(
+          builder: (context, controller, child) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: IconButton(
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+                icon: const Icon(
+                  Icons.warning_rounded,
+                  color: Colors.white,
+                ),
+              ),
+            );
+          },
+          menuChildren: [
+            ...value.reversed.take(10).map(
+                  (error) => ListTile(
+                    title: Text(error),
+                  ),
+                )
+          ],
+        );
+      },
     );
   }
 }
