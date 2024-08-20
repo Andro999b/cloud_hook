@@ -11,10 +11,17 @@ part 'multi_api_keys.g.dart';
 class ApiKeys {
   final List<String>? chillx;
   final List<KeyOps>? vidplay;
+  final List<KeyOps>? vidsrcto;
   final List<KeyOps>? aniwave;
   final List<KeyOps>? cinezone;
 
-  ApiKeys({this.chillx, this.vidplay, this.aniwave, this.cinezone});
+  ApiKeys({
+    this.chillx,
+    this.vidplay,
+    this.vidsrcto,
+    this.aniwave,
+    this.cinezone,
+  });
 
   factory ApiKeys.fromJson(Map<String, dynamic> json) =>
       _$ApiKeysFromJson(json);

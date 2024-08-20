@@ -12,6 +12,9 @@ ApiKeys _$ApiKeysFromJson(Map<String, dynamic> json) => ApiKeys(
       vidplay: (json['vidplay'] as List<dynamic>?)
           ?.map((e) => KeyOps.fromJson(e as Map<String, dynamic>))
           .toList(),
+      vidsrcto: (json['vidsrcto'] as List<dynamic>?)
+          ?.map((e) => KeyOps.fromJson(e as Map<String, dynamic>))
+          .toList(),
       aniwave: (json['aniwave'] as List<dynamic>?)
           ?.map((e) => KeyOps.fromJson(e as Map<String, dynamic>))
           .toList(),

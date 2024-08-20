@@ -1,19 +1,18 @@
 import 'package:cloud_hook/content_suppliers/extrators/source/filemoon.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/mp4upload.dart';
+import 'package:cloud_hook/content_suppliers/extrators/source/multi_api_keys.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/vidplay.dart';
-import 'package:cloud_hook/content_suppliers/extrators/source/vidsrcto_api_keys.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:dio/dio.dart';
-import 'package:simple_rc4/simple_rc4.dart';
 
 class VidSrcToSourceLoader
     with VidSrcToServerMixin
     implements ContentMediaItemSourceLoader {
-  final host = "vidsrc.to";
+  final host = "vidsrc2.to";
   final String imdb;
   final int? episode;
   final int? season;
@@ -35,7 +34,7 @@ class VidSrcToSourceLoader
       url = "$baseUrl/embed/tv/$imdb/$season/$episode";
     }
 
-    final keys = await VidsrcToApiKeys.fetch();
+    final keys = await MultiApiKeys.fetch();
 
     final mediaId = await Scrapper(
       uri: Uri.parse(url),
@@ -48,7 +47,8 @@ class VidSrcToSourceLoader
     }
 
     final sourcesRes = await dio.get(
-      "$baseUrl/ajax/embed/episode/$mediaId/sources?token=${_encryptToken(mediaId, keys)}",
+      "$baseUrl/ajax/embed/episode/$mediaId/sources?token="
+      "${_encrypt(mediaId, keys.vidsrcto!)}",
       options: Options(
         headers: {...defaultHeaders},
       ),
@@ -74,10 +74,11 @@ class VidSrcToSourceLoader
 
   @override
   Future<String?> loadSource(String id) async {
-    final keys = await VidsrcToApiKeys.fetch();
+    final keys = await MultiApiKeys.fetch();
 
     final sourceRes = await dio.get(
-        "$baseUrl/ajax/embed/source/$id?token=${_encryptToken(id, keys)}",
+        "$baseUrl/ajax/embed/source/$id?token="
+        "${_encrypt(id, keys.vidsrcto!)}",
         options: Options(
           headers: {
             ...defaultHeaders,
@@ -91,8 +92,7 @@ class VidSrcToSourceLoader
       return null;
     }
 
-    final rc4 = RC4(keys.decrypt[0]);
-    return Uri.decodeComponent(rc4.decodeString(encUrl));
+    return _decode(encUrl, keys.vidsrcto!);
   }
 
   @override
@@ -100,12 +100,24 @@ class VidSrcToSourceLoader
     return "VidSrcToSourceLoader(imdb: $imdb, episode: $episode, season: $season)";
   }
 
-  String _encryptToken(String id, ApiKeys keys) {
-    final chipher = RC4(keys.encrypt[0]);
+  String _encrypt(String data, List<KeyOps> ops) {
+    String out = data;
 
-    final encoded = chipher.encodeString(id);
+    for (var op in ops) {
+      out = op.encrypt(out);
+    }
 
-    return encoded.replaceAll("/", "_");
+    return out;
+  }
+
+  String _decode(String data, List<KeyOps> ops) {
+    String out = data;
+
+    for (var op in ops.reversed) {
+      out = op.decrypt(out);
+    }
+
+    return Uri.decodeComponent(out);
   }
 }
 
@@ -117,11 +129,14 @@ mixin VidSrcToServerMixin {
       [String? descriptionPrefix]) async {
     try {
       return switch (serverName.toLowerCase()) {
+        "server 1" ||
         "vidplay" ||
         "vidstream" ||
         "megaf" ||
-        "f2cloud" =>
+        "f2cloud" ||
+        "server 1" =>
           await _extractVidplay(serverId, descriptionPrefix),
+        "server 2" ||
         "filemoon" ||
         "moonf" =>
           await _extractFilemoon(serverId, referer, descriptionPrefix),
