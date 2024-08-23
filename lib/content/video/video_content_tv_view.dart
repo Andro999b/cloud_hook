@@ -271,7 +271,6 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
             playlistSize: widget.playerController.mediaItems.length,
           ),
           const Spacer(),
-          PlayerErrorPopup(playerController: widget.playerController),
         ],
       ),
     );
@@ -367,6 +366,7 @@ class _AndroidTVBottomBar extends ConsumerWidget {
               focusNode: isLastItem ? playPauseFocusNode : null,
             ),
             const Spacer(),
+            PlayerErrorPopup(playerController: playerController),
             SourceSelector(
               mediaItems: playerController.mediaItems,
               contentDetails: contentDetails,
