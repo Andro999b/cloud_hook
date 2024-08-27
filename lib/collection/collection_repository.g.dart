@@ -137,7 +137,7 @@ const IsarMediaCollectionItemSchema = CollectionSchema(
   getId: _isarMediaCollectionItemGetId,
   getLinks: _isarMediaCollectionItemGetLinks,
   attach: _isarMediaCollectionItemAttach,
-  version: '3.1.7',
+  version: '3.1.8',
 );
 
 int _isarMediaCollectionItemEstimateSize(

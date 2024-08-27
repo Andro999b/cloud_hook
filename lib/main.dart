@@ -15,6 +15,7 @@ import 'package:cloud_hook/search/search_screen.dart';
 import 'package:cloud_hook/settings/settings_screan.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/error_observer.dart';
+import 'package:cloud_hook/utils/visual.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,7 +25,10 @@ import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
+
+  if (isDesktopDevice()) {
+    await windowManager.ensureInitialized();
+  }
 
   // init media kit
   MediaKit.ensureInitialized();
