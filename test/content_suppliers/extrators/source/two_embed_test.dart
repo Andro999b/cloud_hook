@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   test('two embed should return sources', () async {
-    final sources = await TwoEmbedSourceLoader(imdb: "tt0088247").call();
+    final sources = await TwoEmbedSourceLoader(imdb: "tt10676048").call();
     expect(sources, isNotEmpty);
   });
 }

@@ -3,7 +3,6 @@ import 'dart:isolate';
 import 'package:cloud_hook/content_suppliers/suppliers/animeua/animeua.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/anitaku/anitaku.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/anitube/anitube.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/aniwave/aniwave.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/eneyida/eneyida.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/hianime/hianime.dart';
 import 'package:cloud_hook/content_suppliers/suppliers/mangadex/mangadex.dart';
@@ -24,7 +23,6 @@ class ContentSuppliers {
     TmdbSupplier(),
     Anitaku(),
     HianimeSupplier(),
-    AniWaveSupplier(),
     MangaDexSupllier(),
     EneyidaSupplier(),
     UASerialSupplier(),

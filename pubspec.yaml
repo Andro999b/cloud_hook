@@ -1,10 +1,10 @@
 name: cloud_hook
 description: "Cloud Hooks"
 publish_to: 'none'
-version: 1.3.5
+version: 1.3.6
 
 isar_version: &isar_version 3.1.8
-media_kit_version: &media_kit_version 50c510d
+media_kit_version: &media_kit_version e41e50c
 
 environment:
   sdk: ">=3.0.0 <4.0.0"

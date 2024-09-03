@@ -49,12 +49,14 @@ class TwoEmbedSourceLoader implements ContentMediaItemSourceLoader {
       return [];
     }
 
-    final packedScript = await Scrapper(
-          uri: Uri.https(playerHost, "/e/$id"),
-          headers: {
-            "Referer": ref,
-          },
-        ).scrap(Filter(
+    final scrapper = Scrapper(
+      uri: Uri.https(playerHost, "/e/$id"),
+      headers: {
+        "Referer": ref,
+      },
+    );
+
+    final packedScript = await scrapper.scrap(Filter(
           Iterate(itemScope: "script", item: TextSelector()),
           filter: (script) => script.startsWith("eval("),
         )) ??

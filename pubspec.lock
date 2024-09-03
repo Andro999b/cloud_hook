@@ -774,11 +774,11 @@ packages:
     dependency: "direct main"
     description:
       path: media_kit
-      ref: "50c510d"
-      resolved-ref: "50c510d018cc5286eb6730f3ea165290f19dc5f6"
+      ref: e41e50c
+      resolved-ref: e41e50c8cfb370e69612b205dcfd9f3ca80690f5
       url: "https://github.com/media-kit/media-kit"
     source: git
-    version: "1.1.10+1"
+    version: "1.1.11"
   media_kit_libs_android_video:
     dependency: transitive
     description:
@@ -815,37 +815,37 @@ packages:
     dependency: "direct main"
     description:
       path: "libs/universal/media_kit_libs_video"
-      ref: "50c510d"
-      resolved-ref: "50c510d018cc5286eb6730f3ea165290f19dc5f6"
+      ref: e41e50c
+      resolved-ref: e41e50c8cfb370e69612b205dcfd9f3ca80690f5
       url: "https://github.com/media-kit/media-kit"
     source: git
-    version: "1.0.4"
+    version: "1.0.5"
   media_kit_libs_windows_video:
     dependency: transitive
     description:
       name: media_kit_libs_windows_video
-      sha256: "7bace5f35d9afcc7f9b5cdadb7541d2191a66bb3fc71bfa11c1395b3360f6122"
+      sha256: "32654572167825c42c55466f5d08eee23ea11061c84aa91b09d0e0f69bdd0887"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.9"
+    version: "1.0.10"
   media_kit_native_event_loop:
     dependency: "direct overridden"
     description:
       path: media_kit_native_event_loop
-      ref: "50c510d"
-      resolved-ref: "50c510d018cc5286eb6730f3ea165290f19dc5f6"
+      ref: e41e50c
+      resolved-ref: e41e50c8cfb370e69612b205dcfd9f3ca80690f5
       url: "https://github.com/media-kit/media-kit"
     source: git
-    version: "1.0.8"
+    version: "1.0.9"
   media_kit_video:
     dependency: "direct main"
     description:
       path: media_kit_video
-      ref: "50c510d"
-      resolved-ref: "50c510d018cc5286eb6730f3ea165290f19dc5f6"
+      ref: e41e50c
+      resolved-ref: e41e50c8cfb370e69612b205dcfd9f3ca80690f5
       url: "https://github.com/media-kit/media-kit"
     source: git
-    version: "1.2.4"
+    version: "1.2.5"
   meta:
     dependency: transitive
     description:

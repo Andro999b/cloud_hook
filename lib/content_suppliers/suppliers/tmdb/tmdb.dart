@@ -120,7 +120,6 @@ class TmdbSupplier extends ContentSupplier {
         MoviesapiSourceLoader(tmdb: tmdb, season: season, episode: episode),
         MultiembedSourceLoader(tmdb: tmdb, season: season, episode: episode),
         if (imdb != null) ...[
-          VidSrcToSourceLoader(imdb: imdb, season: season, episode: episode),
           TwoEmbedSourceLoader(imdb: imdb, season: season, episode: episode),
         ]
       ]),
