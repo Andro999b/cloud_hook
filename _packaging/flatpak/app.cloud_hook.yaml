@@ -1,0 +1,145 @@
+id: app.cloud_hook.CloudHook
+runtime: org.gnome.Platform
+runtime-version: '46'
+sdk: org.gnome.Sdk
+command: cloud_hook
+finish-args:
+- "--share=ipc"
+- "--socket=fallback-x11"
+- "--socket=wayland"
+- "--socket=pulseaudio"
+- "--share=network"
+- "--device=all"
+modules:
+- name: libmpv
+  cleanup:
+  - "/include"
+  - "/lib/pkgconfig"
+  buildsystem: meson
+  config-opts:
+  - "-Dbuild-date=false"
+  - "-Dlibmpv=true"
+  - "-Dmanpage-build=disabled"
+  - "-Dvulkan=enabled"
+  - "-Dvulkan-interop=enabled"
+  sources:
+  - type: archive
+    url: https://github.com/mpv-player/mpv/archive/v0.38.0.tar.gz
+    sha256: 86d9ef40b6058732f67b46d0bbda24a074fae860b3eaae05bab3145041303066
+  modules:
+  - name: libplacebo
+    buildsystem: meson
+    cleanup:
+    - "/include"
+    - "/lib/pkgconfig"
+    config-opts:
+    - "-Dvulkan=enabled"
+    - "-Dshaderc=enabled"
+    sources:
+    - type: git
+      url: https://github.com/haasn/libplacebo.git
+      tag: v6.338.2
+    modules:
+      - name: shaderc
+        buildsystem: cmake-ninja
+        builddir: true
+        config-opts:
+        - "-DSHADERC_SKIP_COPYRIGHT_CHECK=ON"
+        - "-DSHADERC_SKIP_EXAMPLES=ON"
+        - "-DSHADERC_SKIP_TESTS=ON"
+        - "-DSPIRV_SKIP_EXECUTABLES=ON"
+        -  "-DENABLE_GLSLANG_BINARIES=OFF"
+        cleanup:
+        - "/bin"
+        - "/include"
+        - "/lib/cmake"
+        - "/lib/pkgconfig"
+        sources:
+        - type: git
+          url: https://github.com/google/shaderc.git
+          commit: 40bced4e1e205ecf44630d2dfa357655b6dabd04
+        - type: git
+          url: https://github.com/KhronosGroup/SPIRV-Tools.git
+          commit: 04896c462d9f3f504c99a4698605b6524af813c1
+          dest: third_party/spirv-tools
+        - type: git
+          url: https://github.com/KhronosGroup/SPIRV-Headers.git
+          commit: 4f7b471f1a66b6d06462cd4ba57628cc0cd087d7
+          dest: third_party/spirv-headers
+        - type: git
+          url: https://github.com/KhronosGroup/glslang.git
+          tag: 14.2.0
+          dest: third_party/glslang
+  - name: libass
+    cleanup:
+    - "/include"
+    - "/lib/*.la"
+    - "/lib/pkgconfig"
+    config-opts:
+    - "--disable-static"
+    sources:
+    - type: archive
+      url: https://github.com/libass/libass/releases/download/0.17.1/libass-0.17.1.tar.gz
+      sha256: d653be97198a0543c69111122173c41a99e0b91426f9e17f06a858982c2fb03d
+    modules:
+    - name: fribidi
+      cleanup:
+      - "/bin"
+      - "/include"
+      - "/lib/pkgconfig"
+      - "/lib/*.la"
+      - "/share/man"
+      buildsystem: meson
+      config-opts:
+      - "--buildtype=release"
+      - "-Ddocs=false"
+      sources:
+      - type: git
+        url: https://github.com/fribidi/fribidi.git
+        tag: v1.0.12
+        commit: 6428d8469e536bcbb6e12c7b79ba6659371c435a
+  - name: ffmpeg
+    cleanup:
+    - "/include"
+    - "/lib/pkgconfig"
+    - "/share/ffmpeg/examples"
+    config-opts:
+    - "--enable-shared"
+    - "--disable-static"
+    - "--disable-debug"
+    - "--enable-gnutls"
+    - "--disable-encoders"
+    - "--disable-muxers"
+    - "--disable-doc"
+    build-options:
+      arch:
+        x86_64:
+          config-opts:
+          - "--enable-nvdec"
+    sources:
+    - type: archive
+      url: https://ffmpeg.org/releases/ffmpeg-6.1.tar.xz
+      sha256: 488c76e57dd9b3bee901f71d5c95eaf1db4a5a31fe46a28654e837144207c270
+    modules:
+    - name: ffnvcodec
+      only-arches:
+      - x86_64
+      buildsystem: simple
+      build-commands:
+      - make
+      - make install PREFIX=${FLATPAK_DEST}
+      sources:
+      - type: archive
+        url: https://github.com/FFmpeg/nv-codec-headers/releases/download/n12.1.14.0/nv-codec-headers-12.1.14.0.tar.gz
+        sha256: 62b30ab37e4e9be0d0c5b37b8fee4b094e38e570984d56e1135a6b6c2c164c9f
+- name: cloud_hook
+  buildsystem: simple
+  only-arches:
+    - x86_64
+  build-commands:
+  - "./build-flatpak.sh"
+  sources:
+  - type: dir
+    path: ../../build/linux/x64/release
+  - type: file
+    path: build-flatpak.sh

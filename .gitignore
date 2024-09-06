@@ -49,3 +49,5 @@ secrets.json
 
 # FVM Version Cache
 .fvm/
+
+.flatpak-builder

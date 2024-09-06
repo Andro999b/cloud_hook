@@ -9,6 +9,7 @@ import 'package:cloud_hook/content/video/video_content_view.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -225,7 +226,6 @@ class _SourceSelectDialog extends ConsumerWidget {
                   );
                 } else {
                   return FocusScope(
-                    autofocus: true,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -261,8 +261,8 @@ class _SourceSelectDialog extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: sources
-            .map(
-              (e) => ListTile(
+            .mapIndexed(
+              (idx, e) => ListTile(
                 visualDensity: VisualDensity.compact,
                 leading: const Icon(Icons.music_note),
                 trailing: currentSourceName == e.description
@@ -279,6 +279,7 @@ class _SourceSelectDialog extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                 ),
+                autofocus: idx == 0,
               ),
             )
             .toList(),
@@ -611,14 +612,17 @@ class PlayerErrorPopup extends StatelessWidget {
               },
               icon: const Icon(
                 Icons.warning_rounded,
-                color: Colors.white,
               ),
+              color: Colors.white,
+              focusColor: Colors.white.withOpacity(0.4),
+              disabledColor: Colors.white.withOpacity(0.7),
             );
           },
           menuChildren: [
-            ...value.reversed.take(10).map(
-                  (error) => ListTile(
+            ...value.reversed.take(10).mapIndexed(
+                  (idx, error) => ListTile(
                     title: Text(error),
+                    autofocus: idx == 0,
                   ),
                 )
           ],

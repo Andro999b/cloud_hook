@@ -334,31 +334,32 @@ class _CurrentMangaChapterProviderElement
       (origin as CurrentMangaChapterProvider).mediaItems;
 }
 
-String _$currentMangaPageHash() => r'279df0ba0a7b2fdb8f78639b42b85873843d2f4f';
+String _$currentMangaChapterPageNumHash() =>
+    r'2c03860bfaa7d25310ea7e7c515bd5d2b392c828';
 
-/// See also [currentMangaPage].
-@ProviderFor(currentMangaPage)
-const currentMangaPageProvider = CurrentMangaPageFamily();
+/// See also [currentMangaChapterPageNum].
+@ProviderFor(currentMangaChapterPageNum)
+const currentMangaChapterPageNumProvider = CurrentMangaChapterPageNumFamily();
 
-/// See also [currentMangaPage].
-class CurrentMangaPageFamily extends Family<AsyncValue<MangaChapterPages?>> {
-  /// See also [currentMangaPage].
-  const CurrentMangaPageFamily();
+/// See also [currentMangaChapterPageNum].
+class CurrentMangaChapterPageNumFamily extends Family<AsyncValue<int>> {
+  /// See also [currentMangaChapterPageNum].
+  const CurrentMangaChapterPageNumFamily();
 
-  /// See also [currentMangaPage].
-  CurrentMangaPageProvider call(
+  /// See also [currentMangaChapterPageNum].
+  CurrentMangaChapterPageNumProvider call(
     ContentDetails contentDetails,
     List<ContentMediaItem> mediaItems,
   ) {
-    return CurrentMangaPageProvider(
+    return CurrentMangaChapterPageNumProvider(
       contentDetails,
       mediaItems,
     );
   }
 
   @override
-  CurrentMangaPageProvider getProviderOverride(
-    covariant CurrentMangaPageProvider provider,
+  CurrentMangaChapterPageNumProvider getProviderOverride(
+    covariant CurrentMangaChapterPageNumProvider provider,
   ) {
     return call(
       provider.contentDetails,
@@ -378,36 +379,36 @@ class CurrentMangaPageFamily extends Family<AsyncValue<MangaChapterPages?>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'currentMangaPageProvider';
+  String? get name => r'currentMangaChapterPageNumProvider';
 }
 
-/// See also [currentMangaPage].
-class CurrentMangaPageProvider
-    extends AutoDisposeFutureProvider<MangaChapterPages?> {
-  /// See also [currentMangaPage].
-  CurrentMangaPageProvider(
+/// See also [currentMangaChapterPageNum].
+class CurrentMangaChapterPageNumProvider
+    extends AutoDisposeFutureProvider<int> {
+  /// See also [currentMangaChapterPageNum].
+  CurrentMangaChapterPageNumProvider(
     ContentDetails contentDetails,
     List<ContentMediaItem> mediaItems,
   ) : this._internal(
-          (ref) => currentMangaPage(
-            ref as CurrentMangaPageRef,
+          (ref) => currentMangaChapterPageNum(
+            ref as CurrentMangaChapterPageNumRef,
             contentDetails,
             mediaItems,
           ),
-          from: currentMangaPageProvider,
-          name: r'currentMangaPageProvider',
+          from: currentMangaChapterPageNumProvider,
+          name: r'currentMangaChapterPageNumProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$currentMangaPageHash,
-          dependencies: CurrentMangaPageFamily._dependencies,
+                  : _$currentMangaChapterPageNumHash,
+          dependencies: CurrentMangaChapterPageNumFamily._dependencies,
           allTransitiveDependencies:
-              CurrentMangaPageFamily._allTransitiveDependencies,
+              CurrentMangaChapterPageNumFamily._allTransitiveDependencies,
           contentDetails: contentDetails,
           mediaItems: mediaItems,
         );
 
-  CurrentMangaPageProvider._internal(
+  CurrentMangaChapterPageNumProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -423,12 +424,12 @@ class CurrentMangaPageProvider
 
   @override
   Override overrideWith(
-    FutureOr<MangaChapterPages?> Function(CurrentMangaPageRef provider) create,
+    FutureOr<int> Function(CurrentMangaChapterPageNumRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: CurrentMangaPageProvider._internal(
-        (ref) => create(ref as CurrentMangaPageRef),
+      override: CurrentMangaChapterPageNumProvider._internal(
+        (ref) => create(ref as CurrentMangaChapterPageNumRef),
         from: from,
         name: null,
         dependencies: null,
@@ -441,13 +442,13 @@ class CurrentMangaPageProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<MangaChapterPages?> createElement() {
-    return _CurrentMangaPageProviderElement(this);
+  AutoDisposeFutureProviderElement<int> createElement() {
+    return _CurrentMangaChapterPageNumProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is CurrentMangaPageProvider &&
+    return other is CurrentMangaChapterPageNumProvider &&
         other.contentDetails == contentDetails &&
         other.mediaItems == mediaItems;
   }
@@ -462,7 +463,7 @@ class CurrentMangaPageProvider
   }
 }
 
-mixin CurrentMangaPageRef on AutoDisposeFutureProviderRef<MangaChapterPages?> {
+mixin CurrentMangaChapterPageNumRef on AutoDisposeFutureProviderRef<int> {
   /// The parameter `contentDetails` of this provider.
   ContentDetails get contentDetails;
 
@@ -470,17 +471,172 @@ mixin CurrentMangaPageRef on AutoDisposeFutureProviderRef<MangaChapterPages?> {
   List<ContentMediaItem> get mediaItems;
 }
 
-class _CurrentMangaPageProviderElement
-    extends AutoDisposeFutureProviderElement<MangaChapterPages?>
-    with CurrentMangaPageRef {
-  _CurrentMangaPageProviderElement(super.provider);
+class _CurrentMangaChapterPageNumProviderElement
+    extends AutoDisposeFutureProviderElement<int>
+    with CurrentMangaChapterPageNumRef {
+  _CurrentMangaChapterPageNumProviderElement(super.provider);
 
   @override
   ContentDetails get contentDetails =>
-      (origin as CurrentMangaPageProvider).contentDetails;
+      (origin as CurrentMangaChapterPageNumProvider).contentDetails;
   @override
   List<ContentMediaItem> get mediaItems =>
-      (origin as CurrentMangaPageProvider).mediaItems;
+      (origin as CurrentMangaChapterPageNumProvider).mediaItems;
+}
+
+String _$currentMangaChapterPagesHash() =>
+    r'f45a81b381df562bfb2696aa92e2cc42d4f02b47';
+
+/// See also [currentMangaChapterPages].
+@ProviderFor(currentMangaChapterPages)
+const currentMangaChapterPagesProvider = CurrentMangaChapterPagesFamily();
+
+/// See also [currentMangaChapterPages].
+class CurrentMangaChapterPagesFamily
+    extends Family<AsyncValue<List<ImageProvider<Object>>?>> {
+  /// See also [currentMangaChapterPages].
+  const CurrentMangaChapterPagesFamily();
+
+  /// See also [currentMangaChapterPages].
+  CurrentMangaChapterPagesProvider call(
+    ContentDetails contentDetails,
+    List<ContentMediaItem> mediaItems,
+  ) {
+    return CurrentMangaChapterPagesProvider(
+      contentDetails,
+      mediaItems,
+    );
+  }
+
+  @override
+  CurrentMangaChapterPagesProvider getProviderOverride(
+    covariant CurrentMangaChapterPagesProvider provider,
+  ) {
+    return call(
+      provider.contentDetails,
+      provider.mediaItems,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'currentMangaChapterPagesProvider';
+}
+
+/// See also [currentMangaChapterPages].
+class CurrentMangaChapterPagesProvider
+    extends AutoDisposeFutureProvider<List<ImageProvider<Object>>?> {
+  /// See also [currentMangaChapterPages].
+  CurrentMangaChapterPagesProvider(
+    ContentDetails contentDetails,
+    List<ContentMediaItem> mediaItems,
+  ) : this._internal(
+          (ref) => currentMangaChapterPages(
+            ref as CurrentMangaChapterPagesRef,
+            contentDetails,
+            mediaItems,
+          ),
+          from: currentMangaChapterPagesProvider,
+          name: r'currentMangaChapterPagesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$currentMangaChapterPagesHash,
+          dependencies: CurrentMangaChapterPagesFamily._dependencies,
+          allTransitiveDependencies:
+              CurrentMangaChapterPagesFamily._allTransitiveDependencies,
+          contentDetails: contentDetails,
+          mediaItems: mediaItems,
+        );
+
+  CurrentMangaChapterPagesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.contentDetails,
+    required this.mediaItems,
+  }) : super.internal();
+
+  final ContentDetails contentDetails;
+  final List<ContentMediaItem> mediaItems;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<ImageProvider<Object>>?> Function(
+            CurrentMangaChapterPagesRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: CurrentMangaChapterPagesProvider._internal(
+        (ref) => create(ref as CurrentMangaChapterPagesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        contentDetails: contentDetails,
+        mediaItems: mediaItems,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<ImageProvider<Object>>?>
+      createElement() {
+    return _CurrentMangaChapterPagesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CurrentMangaChapterPagesProvider &&
+        other.contentDetails == contentDetails &&
+        other.mediaItems == mediaItems;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, contentDetails.hashCode);
+    hash = _SystemHash.combine(hash, mediaItems.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin CurrentMangaChapterPagesRef
+    on AutoDisposeFutureProviderRef<List<ImageProvider<Object>>?> {
+  /// The parameter `contentDetails` of this provider.
+  ContentDetails get contentDetails;
+
+  /// The parameter `mediaItems` of this provider.
+  List<ContentMediaItem> get mediaItems;
+}
+
+class _CurrentMangaChapterPagesProviderElement
+    extends AutoDisposeFutureProviderElement<List<ImageProvider<Object>>?>
+    with CurrentMangaChapterPagesRef {
+  _CurrentMangaChapterPagesProviderElement(super.provider);
+
+  @override
+  ContentDetails get contentDetails =>
+      (origin as CurrentMangaChapterPagesProvider).contentDetails;
+  @override
+  List<ContentMediaItem> get mediaItems =>
+      (origin as CurrentMangaChapterPagesProvider).mediaItems;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
