@@ -155,18 +155,18 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
     if (!pipMode) {
       // Exit PiP Mode
       await windowManager.setTitleBarStyle(TitleBarStyle.normal);
-      await Future.delayed(const Duration(milliseconds: 100));
+      // await Future.delayed(const Duration(milliseconds: 100));
       await windowManager.setSize(const Size(1280, 720));
       await windowManager.setAlwaysOnTop(false);
-      await Future.delayed(const Duration(milliseconds: 100));
+      // await Future.delayed(const Duration(milliseconds: 100));
       await windowManager.setAlignment(Alignment.center);
     } else {
       // Enter PiP Mode
       await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
-      await Future.delayed(const Duration(milliseconds: 100));
+      // await Future.delayed(const Duration(milliseconds: 100));
       await windowManager.setSize(const Size(576, 324));
       await windowManager.setAlwaysOnTop(true);
-      await Future.delayed(const Duration(milliseconds: 100));
+      // await Future.delayed(const Duration(milliseconds: 100));
       await windowManager.setAlignment(Alignment.bottomRight);
     }
   }
