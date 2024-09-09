@@ -9,6 +9,7 @@ import 'package:cloud_hook/content/video/video_content_view.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -228,6 +229,7 @@ class _SourceSelectDialog extends ConsumerWidget {
                     autofocus: true,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SingleChildScrollView(
                             child: _renderVideoSources(
@@ -258,11 +260,12 @@ class _SourceSelectDialog extends ConsumerWidget {
     return SizedBox(
       width: 320,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: sources
-            .map(
-              (e) => ListTile(
+            .mapIndexed(
+              (idx, e) => ListTile(
+                autofocus: idx == 0,
                 visualDensity: VisualDensity.compact,
                 leading: const Icon(Icons.music_note),
                 trailing: currentSourceName == e.description
@@ -295,7 +298,7 @@ class _SourceSelectDialog extends ConsumerWidget {
     return SizedBox(
       width: 320,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
@@ -609,15 +612,16 @@ class PlayerErrorPopup extends StatelessWidget {
                   controller.open();
                 }
               },
-              icon: const Icon(
-                Icons.warning_rounded,
-                color: Colors.white,
-              ),
+              icon: const Icon(Icons.warning_rounded),
+              color: Colors.white,
+              focusColor: Colors.white.withOpacity(0.4),
+              disabledColor: Colors.white.withOpacity(0.7),
             );
           },
           menuChildren: [
-            ...value.reversed.take(10).map(
-                  (error) => ListTile(
+            ...value.reversed.take(10).mapIndexed(
+                  (idx, error) => ListTile(
+                    autofocus: idx == 0,
                     title: Text(error),
                   ),
                 )

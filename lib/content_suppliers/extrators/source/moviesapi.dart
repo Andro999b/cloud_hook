@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:cloud_hook/content_suppliers/extrators/cryptojs.dart';
 import 'package:cloud_hook/content_suppliers/extrators/jwplayer/jwplayer.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/multi_api_keys.dart';
+import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/scrapper.dart';
 import 'package:cloud_hook/content_suppliers/scrapper/selectors.dart';
@@ -95,16 +96,16 @@ class MoviesapiSourceLoader implements ContentMediaItemSourceLoader {
 
     final cryptoParams = _CryptoJSParams.fromJson(json.decode(aesJsonStr));
 
-    final apiKeys = await MultiApiKeys.fetch();
+    final apiKeys = await MultiApiKeys.keys.fetch();
 
     if (apiKeys.chillx?.isEmpty ?? true) {
       logger.w("[moviesapi] chillx key not found");
       return [];
     }
 
-    final script = json.decode(cryptoJSDecrypt(
-      apiKeys.chillx!.first,
-      cryptoParams.s,
+    final script = json.decode(cryptoJSDecrypt64(
+      utf8.encode(apiKeys.chillx!.first),
+      hexToBytes(cryptoParams.s),
       cryptoParams.ct,
     ));
 
