@@ -51,8 +51,31 @@ Future<MangaMediaItemSource?> currentMangaChapter(
 }
 
 @riverpod
-Future<MangaChapterPages?> currentMangaPage(
-  CurrentMangaPageRef ref,
+Future<int> currentMangaChapterPageNum(
+  CurrentMangaChapterPageNumRef ref,
+  ContentDetails contentDetails,
+  List<ContentMediaItem> mediaItems,
+) async {
+  int currentPage = await ref
+      .watch(collectionItemCurrentPositionProvider(contentDetails).future);
+
+  final currentSource = await ref
+      .watch(currentMangaChapterProvider(contentDetails, mediaItems).future);
+
+  if (currentSource == null) {
+    return 0;
+  }
+
+  if (currentPage > currentSource.pageNambers) {
+    currentPage = 0;
+  }
+
+  return currentPage;
+}
+
+@riverpod
+Future<List<ImageProvider<Object>>?> currentMangaChapterPages(
+  CurrentMangaChapterPagesRef ref,
   ContentDetails contentDetails,
   List<ContentMediaItem> mediaItems,
 ) async {
