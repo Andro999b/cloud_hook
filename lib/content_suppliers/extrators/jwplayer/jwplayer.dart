@@ -120,10 +120,10 @@ class JWPlayerSingleFileSourceLoader implements ContentMediaItemSourceLoader {
       ),
     );
 
-    return lookuFile(res.data, descriptionPrefix: descriptionPrefix);
+    return lookupFile(res.data, descriptionPrefix: descriptionPrefix);
   }
 
-  static List<ContentMediaItemSource> lookuFile(
+  static List<ContentMediaItemSource> lookupFile(
     String script, {
     String? descriptionPrefix,
   }) {

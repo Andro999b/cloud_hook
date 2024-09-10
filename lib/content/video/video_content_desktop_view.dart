@@ -96,6 +96,7 @@ class _VideoContentDesktopViewState extends State<VideoContentDesktopView> {
                 onPipExit: _switchToPipMode,
               )
             : MaterialDesktopVideoControls(state),
+        subtitleViewConfiguration: subtitleViewConfiguration,
       ),
     );
   }

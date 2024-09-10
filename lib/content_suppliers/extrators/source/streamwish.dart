@@ -37,7 +37,7 @@ class StreamwishSourceLoader implements ContentMediaItemSourceLoader {
 
     final unpackedScript = JsUnpack(packedScript).unpack();
 
-    return JWPlayerSingleFileSourceLoader.lookuFile(
+    return JWPlayerSingleFileSourceLoader.lookupFile(
       unpackedScript,
       descriptionPrefix: descriptionPrefix,
     );

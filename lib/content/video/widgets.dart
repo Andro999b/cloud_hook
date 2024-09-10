@@ -10,6 +10,7 @@ import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/utils/visual.dart';
 import 'package:collection/collection.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -228,6 +229,7 @@ class _SourceSelectDialog extends ConsumerWidget {
                   return FocusScope(
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SingleChildScrollView(
                             child: _renderVideoSources(
@@ -258,7 +260,7 @@ class _SourceSelectDialog extends ConsumerWidget {
     return SizedBox(
       width: 320,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: sources
             .mapIndexed(
@@ -296,7 +298,7 @@ class _SourceSelectDialog extends ConsumerWidget {
     return SizedBox(
       width: 320,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(

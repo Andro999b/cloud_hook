@@ -29,6 +29,7 @@ class VideoContentTVView extends StatelessWidget {
     return Video(
       controller: videoController,
       controls: (state) => _renderControls(context, state),
+      subtitleViewConfiguration: subtitleViewConfiguration,
     );
   }
 
