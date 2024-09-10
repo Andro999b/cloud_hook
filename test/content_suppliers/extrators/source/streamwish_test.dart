@@ -13,8 +13,8 @@ void main() async {
 
   test('streamwish should return sources 2', () async {
     final sources = await StreamwishSourceLoader(
-      url: "https://alions.pro/v/d3yenleunv5f",
-      referer: "https://anitaku.pe/oban-star-racers-episode-20",
+      url: "https://alions.pro/v/fyztke025wn8",
+      referer: "https://anitaku.pe/yami-shibai-13-episode-9",
     ).call();
     expect(sources, isNotEmpty);
   });

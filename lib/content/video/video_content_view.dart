@@ -19,6 +19,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
+const subtitleViewConfiguration = SubtitleViewConfiguration(
+  style: TextStyle(
+      height: 1.4,
+      fontSize: 48.0,
+      color: Color(0xffffffff),
+      fontWeight: FontWeight.normal,
+      backgroundColor: Color(0xaa000000)),
+);
+
 extension PlayerExt on Player {
   void safeSeek(Duration position) {
     if (position <= Duration.zero) {

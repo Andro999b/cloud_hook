@@ -1,17 +1,12 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:pointycastle/digests/md5.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 
-String cryptoJSDecrypt(String password, String salt, String encrypted) {
-  final (key, iv) = deriveKeyAndIV(
-    utf8.encode(password),
-    hexToBytes(salt),
-  );
+String cryptoJSDecrypt64(Uint8List password, Uint8List salt, String encrypted) {
+  final (key, iv) = deriveKeyAndIV(password, salt);
 
   final encrypter = encrypt.Encrypter(encrypt.AES(
     encrypt.Key(key),
@@ -20,6 +15,19 @@ String cryptoJSDecrypt(String password, String salt, String encrypted) {
   ));
 
   return encrypter.decrypt64(encrypted, iv: encrypt.IV(iv));
+}
+
+String cryptoJSDecrypt(
+    Uint8List password, Uint8List salt, Uint8List encrypted) {
+  final (key, iv) = deriveKeyAndIV(password, salt);
+
+  final encrypter = encrypt.Encrypter(encrypt.AES(
+    encrypt.Key(key),
+    mode: encrypt.AESMode.cbc,
+    padding: "PKCS7",
+  ));
+
+  return encrypter.decrypt(encrypt.Encrypted(encrypted), iv: encrypt.IV(iv));
 }
 
 (Uint8List, Uint8List) deriveKeyAndIV(

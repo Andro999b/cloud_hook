@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
 import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -10,17 +11,9 @@ part 'multi_api_keys.g.dart';
 @JsonSerializable(createToJson: false)
 class ApiKeys {
   final List<String>? chillx;
-  final List<KeyOps>? vidplay;
-  final List<KeyOps>? vidsrcto;
-  final List<KeyOps>? aniwave;
-  final List<KeyOps>? cinezone;
 
   ApiKeys({
     this.chillx,
-    this.vidplay,
-    this.vidsrcto,
-    this.aniwave,
-    this.cinezone,
   });
 
   factory ApiKeys.fromJson(Map<String, dynamic> json) =>
@@ -63,24 +56,12 @@ class KeyOps {
 }
 
 class MultiApiKeys {
-  static const url = "https://rowdy-avocado.github.io/multi-keys/";
-
-  static const refreshInterval = Duration(seconds: 3600);
-  static DateTime? _lastRefresh;
-  static ApiKeys? _lastKeys;
+  static CachedKey<ApiKeys> keys = CachedKey(
+    url: "https://rowdy-avocado.github.io/multi-keys/",
+    parse: (data) => ApiKeys.fromJson(json.decode(data)),
+  );
 
   MultiApiKeys._();
-
-  static Future<ApiKeys> fetch() async {
-    if (_lastRefresh == null ||
-        DateTime.now().difference(_lastRefresh!) > refreshInterval) {
-      final res = await dio.get(url);
-      _lastKeys = ApiKeys.fromJson(json.decode(res.data));
-      _lastRefresh = DateTime.now();
-    }
-
-    return _lastKeys!;
-  }
 }
 
 String runExchangeOp(String input, String k1, String k2) {
