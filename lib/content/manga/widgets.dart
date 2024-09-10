@@ -1,8 +1,10 @@
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
+import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/content/media_items_list.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:cloud_hook/settings/settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -122,6 +124,77 @@ class MangaItemsListItem extends StatelessWidget {
           trailing: selected ? const Icon(Icons.menu_book) : null,
         ),
       ],
+    );
+  }
+}
+
+class MangaPageImage extends StatelessWidget {
+  const MangaPageImage({
+    super.key,
+    required this.image,
+    required this.imageMode,
+    required this.constraints,
+  });
+
+  final ImageProvider<Object> image;
+  final MangaReaderImageMode imageMode;
+  final BoxConstraints constraints;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    return Image(
+      image: image,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+
+        return SizedBox(
+          height: size.height,
+          width: size.width,
+          child: Center(
+            child: Text(
+              AppLocalizations.of(context)!.mangaPageLoading,
+            ),
+          ),
+        );
+      },
+      fit: switch (imageMode) {
+        MangaReaderImageMode.fitHeight => BoxFit.fitHeight,
+        MangaReaderImageMode.fitWidth => BoxFit.fitWidth,
+        _ => BoxFit.contain
+      },
+      width: switch (imageMode) {
+        MangaReaderImageMode.fitWidth ||
+        MangaReaderImageMode.fit =>
+          constraints.maxWidth,
+        _ => null
+      },
+      height: switch (imageMode) {
+        MangaReaderImageMode.fitHeight ||
+        MangaReaderImageMode.fit =>
+          constraints.maxHeight,
+        _ => null
+      },
+    );
+  }
+}
+
+class MangaBackground extends ConsumerWidget {
+  const MangaBackground({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final size = MediaQuery.sizeOf(context);
+
+    final currentBackground = ref.watch(mangaReaderBackgroundSettingsProvider);
+
+    return Container(
+      width: size.width,
+      height: size.height,
+      color: switch (currentBackground) {
+        MangaReaderBackground.light => Colors.white,
+        MangaReaderBackground.dark => Colors.black,
+      },
     );
   }
 }

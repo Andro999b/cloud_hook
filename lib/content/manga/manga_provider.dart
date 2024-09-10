@@ -95,8 +95,5 @@ Future<List<ImageProvider<Object>>?> currentMangaChapterPages(
 
   final pages = await currentSource.allPages();
 
-  return MangaChapterPages(
-    currentPage: currentPage,
-    pages: pages,
-  );
+  return pages;
 }

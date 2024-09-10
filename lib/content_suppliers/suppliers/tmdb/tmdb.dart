@@ -4,7 +4,6 @@ import 'package:cloud_hook/app_secrets.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/moviesapi.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/multiembed.dart';
 import 'package:cloud_hook/content_suppliers/extrators/source/two_embed.dart';
-import 'package:cloud_hook/content_suppliers/extrators/source/vidsrcto.dart';
 import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:collection/collection.dart';

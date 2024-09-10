@@ -57,5 +57,8 @@
     "mangaImageReaderModeFit": "Розтягнути",
     "mangaImageReaderModeFitWidth": "Розтягнути по ширині",
     "mangaImageReaderModeFitHeight": "Розтягнути по висоті",
-    "mangaTranslation": "Переклад"
+    "mangaTranslation": "Переклад",
+    "mangaReaderBackground": "Фон",
+    "mangaReaderBackgroundLight": "Світлий",
+    "mangaReaderBackgroundDark": "Темний"
 }

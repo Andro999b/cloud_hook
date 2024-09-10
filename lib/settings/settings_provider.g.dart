@@ -56,5 +56,23 @@ final mangaReaderImageModeSettingsProvider = AutoDisposeNotifierProvider<
 
 typedef _$MangaReaderImageModeSettings
     = AutoDisposeNotifier<MangaReaderImageMode>;
+String _$mangaReaderBackgroundSettingsHash() =>
+    r'0f2404f6f1b9c8f0607f0f1faf4615eb9ae1c799';
+
+/// See also [MangaReaderBackgroundSettings].
+@ProviderFor(MangaReaderBackgroundSettings)
+final mangaReaderBackgroundSettingsProvider = AutoDisposeNotifierProvider<
+    MangaReaderBackgroundSettings, MangaReaderBackground>.internal(
+  MangaReaderBackgroundSettings.new,
+  name: r'mangaReaderBackgroundSettingsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$mangaReaderBackgroundSettingsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$MangaReaderBackgroundSettings
+    = AutoDisposeNotifier<MangaReaderBackground>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

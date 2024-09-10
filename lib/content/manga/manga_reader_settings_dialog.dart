@@ -21,7 +21,7 @@ class MangaReaderSettingsDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    final currentImageMode = ref.watch(mangaReaderImageModeSettingsProvider);
+    //
 
     return Dialog(
       child: Container(
@@ -33,6 +33,13 @@ class MangaReaderSettingsDialog extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 8),
+              Text(
+                AppLocalizations.of(context)!.mangaReaderBackground,
+                style: theme.textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8),
+              const MangaReaderBackgroundSelector(),
+              const SizedBox(height: 8),
               MangaTranslationSelector(
                 contentDetails: contentDetails,
                 mediaItems: mediaItems,
@@ -43,20 +50,67 @@ class MangaReaderSettingsDialog extends ConsumerWidget {
                 style: theme.textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: MangaReaderImageMode.values
-                    .map(
-                      (mode) => _renderImageMode(
-                          context, ref, currentImageMode, mode),
-                    )
-                    .toList(),
-              )
+              const MangaImageModeSelector()
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class MangaReaderBackgroundSelector extends ConsumerWidget {
+  const MangaReaderBackgroundSelector({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentBackground = ref.watch(mangaReaderBackgroundSettingsProvider);
+
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: MangaReaderBackground.values
+          .map(
+            (background) => _renderBackgroundSelect(
+                context, ref, currentBackground, background),
+          )
+          .toList(),
+    );
+  }
+
+  Widget _renderBackgroundSelect(
+    BuildContext context,
+    WidgetRef ref,
+    MangaReaderBackground current,
+    MangaReaderBackground background,
+  ) {
+    return ChoiceChip(
+      label: Text(mangaReaderBackgroundLabel(context, background)),
+      selected: current == background,
+      onSelected: (value) {
+        ref
+            .read(mangaReaderBackgroundSettingsProvider.notifier)
+            .select(background);
+      },
+    );
+  }
+}
+
+class MangaImageModeSelector extends ConsumerWidget {
+  const MangaImageModeSelector({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentImageMode = ref.watch(mangaReaderImageModeSettingsProvider);
+
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: MangaReaderImageMode.values
+          .map(
+            (mode) => _renderImageMode(context, ref, currentImageMode, mode),
+          )
+          .toList(),
     );
   }
 

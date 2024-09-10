@@ -4,3 +4,8 @@ enum MangaReaderImageMode {
   fitHeight,
   fitWidth,
 }
+
+enum MangaReaderBackground {
+  light,
+  dark,
+}

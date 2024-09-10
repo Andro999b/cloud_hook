@@ -43,3 +43,16 @@ class MangaReaderImageModeSettings extends _$MangaReaderImageModeSettings {
     state = mode;
   }
 }
+
+@riverpod
+class MangaReaderBackgroundSettings extends _$MangaReaderBackgroundSettings {
+  @override
+  MangaReaderBackground build() {
+    return AppPreferences.mangaReaderBackground;
+  }
+
+  void select(MangaReaderBackground background) {
+    AppPreferences.mangaReaderBackground = background;
+    state = background;
+  }
+}

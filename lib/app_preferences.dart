@@ -161,4 +161,16 @@ class AppPreferences {
           )
           .firstOrNull ??
       MangaReaderImageMode.original;
+
+  static set mangaReaderBackground(MangaReaderBackground background) =>
+      instance.setString("manga_reader_background", background.name);
+
+  static MangaReaderBackground get mangaReaderBackground =>
+      MangaReaderBackground.values
+          .where(
+            (type) =>
+                type.name == instance.getString("manga_reader_background"),
+          )
+          .firstOrNull ??
+      MangaReaderBackground.dark;
 }

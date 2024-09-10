@@ -3,15 +3,13 @@ import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/manga/manga_provider.dart';
 import 'package:cloud_hook/content/manga/manga_reader_controls.dart';
 import 'package:cloud_hook/content/manga/model.dart';
+import 'package:cloud_hook/content/manga/widgets.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/settings/settings_provider.dart';
-import 'package:cloud_hook/utils/visual.dart';
 import 'package:cloud_hook/widgets/display_error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'intents.dart';
 
@@ -39,7 +37,60 @@ class MangaReader extends HookConsumerWidget {
       },
     );
 
-    final scrollController = useScrollController();
+    return Stack(
+      children: [
+        const MangaBackground(),
+        MangaByPageReader(
+          contentDetails: contentDetails,
+          mediaItems: mediaItems,
+        ),
+      ],
+    );
+  }
+}
+
+class MangaByPageReader extends ConsumerWidget {
+  final ContentDetails contentDetails;
+  final List<ContentMediaItem> mediaItems;
+
+  const MangaByPageReader({
+    super.key,
+    required this.contentDetails,
+    required this.mediaItems,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pageProvider = currentMangaChapterPagesProvider(
+      contentDetails,
+      mediaItems,
+    );
+
+    return ref.watch(pageProvider).when(
+          data: (pages) => _renderReader(context, ref, pages ?? const []),
+          error: (error, stackTrace) => DisplayError(
+            error: error,
+            stackTrace: stackTrace,
+            onRefresh: () => ref.refresh(pageProvider.future),
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+        );
+  }
+
+  Widget _renderReader(
+    BuildContext context,
+    WidgetRef ref,
+    List<ImageProvider<Object>> pages,
+  ) {
+    if (pages.isEmpty == true) {
+      return Center(
+        child: Text(AppLocalizations.of(context)!.mangaUnableToLoadPage),
+      );
+    }
+
+    final scrollController = ScrollController();
+
+    final size = MediaQuery.of(context).size;
 
     return FocusableActionDetector(
       shortcuts: const {
@@ -48,6 +99,7 @@ class MangaReader extends HookConsumerWidget {
         SingleActivator(LogicalKeyboardKey.arrowUp): ScrollUpPageIntent(),
         SingleActivator(LogicalKeyboardKey.arrowDown): ScrollDownPageIntent(),
         SingleActivator(LogicalKeyboardKey.select): ShowUIIntent(),
+        SingleActivator(LogicalKeyboardKey.space): ShowUIIntent(),
         SingleActivator(LogicalKeyboardKey.enter): ShowUIIntent(),
         SingleActivator(LogicalKeyboardKey.digit1):
             SwitchReaderImageMode(MangaReaderImageMode.original),
@@ -84,17 +136,41 @@ class MangaReader extends HookConsumerWidget {
         ),
       },
       autofocus: true,
-      child: MangaChapterViewer(
-        contentDetails: contentDetails,
-        mediaItems: mediaItems,
-        scrollController: scrollController,
+      child: Builder(
+        builder: (context) {
+          return GestureDetector(
+            onTapUp: (details) {
+              final screenWidth = size.width;
+              if (details.globalPosition.dx < screenWidth / 3) {
+                Actions.invoke(context, const PrevPageIntent());
+              } else if (details.globalPosition.dx < (screenWidth / 3) * 2) {
+                Actions.invoke(context, const ShowUIIntent());
+              } else {
+                Actions.invoke(context, const NextPageIntent());
+              }
+            },
+            child: SizedBox(
+              width: size.width,
+              height: size.height,
+              child: _SinglePageView(
+                pages: pages,
+                pageNumProvider: currentMangaChapterPageNumProvider(
+                  contentDetails,
+                  mediaItems,
+                ),
+                scrollController: scrollController,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 
   void _movePage(int inc, WidgetRef ref) async {
-    final chapter = await ref
-        .read(currentMangaChapterProvider(contentDetails, mediaItems).future);
+    final chapter = await ref.read(
+      currentMangaChapterProvider(contentDetails, mediaItems).future,
+    );
 
     final provider = collectionItemProvider(contentDetails);
     final contentProgress = (await ref.read(provider.future));
@@ -128,79 +204,12 @@ class MangaReader extends HookConsumerWidget {
   }
 }
 
-class MangaChapterViewer extends ConsumerWidget {
-  final ContentDetails contentDetails;
-  final List<ContentMediaItem> mediaItems;
-  final ScrollController scrollController;
-
-  const MangaChapterViewer({
-    super.key,
-    required this.contentDetails,
-    required this.mediaItems,
-    required this.scrollController,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final pageProvider = currentMangaChapterPagesProvider(
-      contentDetails,
-      mediaItems,
-    );
-
-    return ref.watch(pageProvider).when(
-          data: (pages) => _renderReader(context, pages ?? const []),
-          error: (error, stackTrace) => DisplayError(
-            error: error,
-            stackTrace: stackTrace,
-            onRefresh: () => ref.refresh(pageProvider.future),
-          ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-        );
-  }
-
-  Widget _renderReader(
-      BuildContext context, List<ImageProvider<Object>> pages) {
-    if (pages.isEmpty == true) {
-      return Center(
-        child: Text(AppLocalizations.of(context)!.mangaUnableToLoadPage),
-      );
-    }
-
-    final size = MediaQuery.of(context).size;
-    final theme = Theme.of(context);
-
-    return GestureDetector(
-      onTapUp: (details) {
-        final screenWidth = MediaQuery.of(context).size.width;
-        if (details.globalPosition.dx < screenWidth / 3) {
-          Actions.invoke(context, const PrevPageIntent());
-        } else if (details.globalPosition.dx < (screenWidth / 3) * 2) {
-          Actions.invoke(context, const ShowUIIntent());
-        } else {
-          Actions.invoke(context, const NextPageIntent());
-        }
-      },
-      child: Container(
-        width: size.width,
-        height: size.height,
-        color: theme.colorScheme.surface,
-        child: _SinglePageViewer(
-          pages: pages,
-          pageNumProvider:
-              currentMangaChapterPageNumProvider(contentDetails, mediaItems),
-          scrollController: scrollController,
-        ),
-      ),
-    );
-  }
-}
-
-class _SinglePageViewer extends ConsumerWidget {
+class _SinglePageView extends ConsumerWidget {
   final List<ImageProvider<Object>> pages;
   final CurrentMangaChapterPageNumProvider pageNumProvider;
   final ScrollController scrollController;
 
-  const _SinglePageViewer({
+  const _SinglePageView({
     required this.pages,
     required this.pageNumProvider,
     required this.scrollController,
@@ -253,100 +262,6 @@ class _SinglePageViewer extends ConsumerWidget {
           ),
         );
       }),
-    );
-  }
-}
-
-class _ScrollPagesViewer extends ConsumerWidget {
-  final List<ImageProvider<Object>> pages;
-  final CurrentMangaChapterPageNumProvider pageNumProvider;
-  final ScrollController scrollController;
-
-  const _ScrollPagesViewer({
-    required this.pages,
-    required this.pageNumProvider,
-    required this.scrollController,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final imageMode = ref.watch(mangaReaderImageModeSettingsProvider);
-
-    return Center(
-      child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-        final scrollController = ItemScrollController();
-        final scrollListener = ItemPositionsListener.create();
-
-        return InteractiveViewer(
-          scaleEnabled: !isDesktopDevice(),
-          child: ScrollablePositionedList.builder(
-            itemCount: pages.length,
-            itemScrollController: scrollController,
-            itemBuilder: (context, index) {
-              final page = pages[index];
-
-              return MangaPageImage(
-                image: page,
-                imageMode: imageMode,
-                constraints: constraints,
-              );
-            },
-          ),
-        );
-      }),
-      // ),
-    );
-  }
-}
-
-class MangaPageImage extends StatelessWidget {
-  const MangaPageImage({
-    super.key,
-    required this.image,
-    required this.imageMode,
-    required this.constraints,
-  });
-
-  final ImageProvider<Object> image;
-  final MangaReaderImageMode imageMode;
-  final BoxConstraints constraints;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    return Image(
-      image: image,
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-
-        return SizedBox(
-          height: size.height,
-          width: size.width,
-          child: Center(
-            child: Text(
-              AppLocalizations.of(context)!.mangaPageLoading,
-            ),
-          ),
-        );
-      },
-      fit: switch (imageMode) {
-        MangaReaderImageMode.fitHeight => BoxFit.fitHeight,
-        MangaReaderImageMode.fitWidth => BoxFit.fitWidth,
-        _ => BoxFit.contain
-      },
-      width: switch (imageMode) {
-        MangaReaderImageMode.fitWidth ||
-        MangaReaderImageMode.fit =>
-          constraints.maxWidth,
-        _ => null
-      },
-      height: switch (imageMode) {
-        MangaReaderImageMode.fitHeight ||
-        MangaReaderImageMode.fit =>
-          constraints.maxHeight,
-        _ => null
-      },
     );
   }
 }

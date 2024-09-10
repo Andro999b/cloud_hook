@@ -1,5 +1,5 @@
 import 'package:cloud_hook/content/content_details_provider.dart';
-import 'package:cloud_hook/content/manga/manga_content_view.dart';
+import 'package:cloud_hook/content/manga/manga_reader.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/widgets/display_error.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +22,7 @@ class MangaContentScrean extends ConsumerWidget {
       child: AppTheme(
         child: Scaffold(
           body: result.when(
-            data: (data) => MangaContentView(
+            data: (data) => MangaReader(
               contentDetails: data.contentDetails,
               mediaItems: data.mediaItems,
             ),

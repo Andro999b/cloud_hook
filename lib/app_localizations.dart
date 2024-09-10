@@ -85,3 +85,13 @@ String mangaReaderImageModeLabel(
       AppLocalizations.of(context)!.mangaImageReaderModeFitWidth,
   };
 }
+
+String mangaReaderBackgroundLabel(
+    BuildContext context, MangaReaderBackground background) {
+  return switch (background) {
+    MangaReaderBackground.light =>
+      AppLocalizations.of(context)!.mangaReaderBackgroundLight,
+    MangaReaderBackground.dark =>
+      AppLocalizations.of(context)!.mangaReaderBackgroundDark,
+  };
+}
