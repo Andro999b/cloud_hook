@@ -150,17 +150,16 @@ class AppPreferences {
   static Set<String>? getSupplierChannels(String supplierName) =>
       instance.getStringList("suppliers.$supplierName.channels")?.toSet();
 
-  static set mangaReaderImageMode(MangaReaderImageMode mode) =>
-      instance.setString("manga_reader_image_mode", mode.name);
+  static set mangaReaderScale(MangaReaderScale scale) =>
+      instance.setString("manga_reader_scale", scale.name);
 
-  static MangaReaderImageMode get mangaReaderImageMode =>
-      MangaReaderImageMode.values
+  static MangaReaderScale get mangaReaderScale =>
+      MangaReaderScale.values
           .where(
-            (type) =>
-                type.name == instance.getString("manga_reader_image_mode"),
+            (type) => type.name == instance.getString("manga_reader_scale"),
           )
           .firstOrNull ??
-      MangaReaderImageMode.original;
+      MangaReaderScale.fit;
 
   static set mangaReaderBackground(MangaReaderBackground background) =>
       instance.setString("manga_reader_background", background.name);
@@ -173,4 +172,13 @@ class AppPreferences {
           )
           .firstOrNull ??
       MangaReaderBackground.dark;
+
+  static set mangaReaderMode(MangaReaderMode mode) =>
+      instance.setString("manga_reader_mode", mode.name);
+
+  static MangaReaderMode get mangaReaderMode =>
+      MangaReaderMode.values
+          .where((type) => type.name == instance.getString("manga_reader_mode"))
+          .firstOrNull ??
+      MangaReaderMode.vertical;
 }

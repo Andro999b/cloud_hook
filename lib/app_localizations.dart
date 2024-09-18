@@ -11,10 +11,11 @@ String priorityLabel(
   BuildContext context,
   int priority,
 ) {
+  final localization = AppLocalizations.of(context)!;
   return switch (priority) {
-    0 => AppLocalizations.of(context)!.priorityLow,
-    1 => AppLocalizations.of(context)!.priorityNormal,
-    _ => AppLocalizations.of(context)!.priorityHight
+    0 => localization.priorityLow,
+    1 => localization.priorityNormal,
+    _ => localization.priorityHight
   };
 }
 
@@ -22,9 +23,10 @@ String mediaTypeLabel(
   BuildContext context,
   MediaType mediaType,
 ) {
+  final localization = AppLocalizations.of(context)!;
   return switch (mediaType) {
-    MediaType.video => AppLocalizations.of(context)!.mediaTypeVideo,
-    MediaType.manga => AppLocalizations.of(context)!.mediaTypeManga,
+    MediaType.video => localization.mediaTypeVideo,
+    MediaType.manga => localization.mediaTypeManga,
   };
 }
 
@@ -32,16 +34,13 @@ String statusLabel(
   BuildContext context,
   MediaCollectionItemStatus status,
 ) {
+  final localization = AppLocalizations.of(context)!;
   return switch (status) {
-    MediaCollectionItemStatus.inProgress =>
-      AppLocalizations.of(context)!.statusLableWatchingNow,
-    MediaCollectionItemStatus.complete =>
-      AppLocalizations.of(context)!.statusLableComplete,
-    MediaCollectionItemStatus.latter =>
-      AppLocalizations.of(context)!.statusLableLatter,
-    MediaCollectionItemStatus.onHold =>
-      AppLocalizations.of(context)!.statusLableOnHold,
-    _ => AppLocalizations.of(context)!.addToCollection,
+    MediaCollectionItemStatus.inProgress => localization.statusLableWatchingNow,
+    MediaCollectionItemStatus.complete => localization.statusLableComplete,
+    MediaCollectionItemStatus.latter => localization.statusLableLatter,
+    MediaCollectionItemStatus.onHold => localization.statusLableOnHold,
+    _ => localization.addToCollection,
   };
 }
 
@@ -49,49 +48,53 @@ String statusMenuItemLabel(
   BuildContext context,
   MediaCollectionItemStatus status,
 ) {
+  final localization = AppLocalizations.of(context)!;
   return switch (status) {
-    MediaCollectionItemStatus.inProgress =>
-      AppLocalizations.of(context)!.statusLableWatchingNow,
-    MediaCollectionItemStatus.complete =>
-      AppLocalizations.of(context)!.statusLableComplete,
-    MediaCollectionItemStatus.latter =>
-      AppLocalizations.of(context)!.statusLableLatter,
-    MediaCollectionItemStatus.onHold =>
-      AppLocalizations.of(context)!.statusLablePutOnHold,
-    _ => AppLocalizations.of(context)!.removeFromCollection,
+    MediaCollectionItemStatus.inProgress => localization.statusLableWatchingNow,
+    MediaCollectionItemStatus.complete => localization.statusLableComplete,
+    MediaCollectionItemStatus.latter => localization.statusLableLatter,
+    MediaCollectionItemStatus.onHold => localization.statusLablePutOnHold,
+    _ => localization.removeFromCollection,
   };
 }
 
 String contentTypeLabel(BuildContext context, ContentType type) {
+  final localization = AppLocalizations.of(context)!;
   return switch (type) {
-    ContentType.anime => AppLocalizations.of(context)!.contentTypeAnime,
-    ContentType.cartoon => AppLocalizations.of(context)!.contentTypeCartoon,
-    ContentType.movie => AppLocalizations.of(context)!.contentTypeMovie,
-    ContentType.series => AppLocalizations.of(context)!.contentTypeSeries,
-    ContentType.manga => AppLocalizations.of(context)!.contentTypeManga,
+    ContentType.anime => localization.contentTypeAnime,
+    ContentType.cartoon => localization.contentTypeCartoon,
+    ContentType.movie => localization.contentTypeMovie,
+    ContentType.series => localization.contentTypeSeries,
+    ContentType.manga => localization.contentTypeManga,
   };
 }
 
-String mangaReaderImageModeLabel(
-    BuildContext context, MangaReaderImageMode mode) {
+String mangaReaderScaleLabel(BuildContext context, MangaReaderScale mode) {
+  final localization = AppLocalizations.of(context)!;
   return switch (mode) {
-    MangaReaderImageMode.original =>
-      AppLocalizations.of(context)!.mangaImageReaderModeOriginal,
-    MangaReaderImageMode.fit =>
-      AppLocalizations.of(context)!.mangaImageReaderModeFit,
-    MangaReaderImageMode.fitHeight =>
-      AppLocalizations.of(context)!.mangaImageReaderModeFitHeight,
-    MangaReaderImageMode.fitWidth =>
-      AppLocalizations.of(context)!.mangaImageReaderModeFitWidth,
+    MangaReaderScale.fit => localization.mangaReaderScaleFit,
+    MangaReaderScale.fitHeight => localization.mangaReaderScaleFitHeight,
+    MangaReaderScale.fitWidth => localization.mangaReaderScaleFitWidth,
   };
 }
 
 String mangaReaderBackgroundLabel(
     BuildContext context, MangaReaderBackground background) {
+  final localization = AppLocalizations.of(context)!;
   return switch (background) {
-    MangaReaderBackground.light =>
-      AppLocalizations.of(context)!.mangaReaderBackgroundLight,
-    MangaReaderBackground.dark =>
-      AppLocalizations.of(context)!.mangaReaderBackgroundDark,
+    MangaReaderBackground.light => localization.mangaReaderBackgroundLight,
+    MangaReaderBackground.dark => localization.mangaReaderBackgroundDark,
+  };
+}
+
+String mangaReaderModeLabel(BuildContext context, MangaReaderMode mode) {
+  final localization = AppLocalizations.of(context)!;
+  return switch (mode) {
+    MangaReaderMode.vertical => localization.mangaReaderModeVerical,
+    MangaReaderMode.leftToRight => localization.mangaReaderModeLeftToRight,
+    MangaReaderMode.rightToLeft => localization.mangaReaderModeRightToLeft,
+    MangaReaderMode.vericalScroll => localization.mangaReaderModeVericalScroll,
+    MangaReaderMode.hotizontalScroll =>
+      localization.mangaReaderModeHorizontalScroll,
   };
 }

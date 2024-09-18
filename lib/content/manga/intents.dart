@@ -9,6 +9,14 @@ class PrevPageIntent extends Intent {
   const PrevPageIntent();
 }
 
+class NextChapterIntent extends Intent {
+  const NextChapterIntent();
+}
+
+class PrevChapterIntent extends Intent {
+  const PrevChapterIntent();
+}
+
 class ScrollDownPageIntent extends Intent {
   const ScrollDownPageIntent();
 }
@@ -22,6 +30,6 @@ class ShowUIIntent extends Intent {
 }
 
 class SwitchReaderImageMode extends Intent {
-  final MangaReaderImageMode mode;
+  final MangaReaderScale mode;
   const SwitchReaderImageMode(this.mode);
 }

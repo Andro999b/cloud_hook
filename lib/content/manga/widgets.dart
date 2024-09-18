@@ -128,57 +128,6 @@ class MangaItemsListItem extends StatelessWidget {
   }
 }
 
-class MangaPageImage extends StatelessWidget {
-  const MangaPageImage({
-    super.key,
-    required this.image,
-    required this.imageMode,
-    required this.constraints,
-  });
-
-  final ImageProvider<Object> image;
-  final MangaReaderImageMode imageMode;
-  final BoxConstraints constraints;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    return Image(
-      image: image,
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-
-        return SizedBox(
-          height: size.height,
-          width: size.width,
-          child: Center(
-            child: Text(
-              AppLocalizations.of(context)!.mangaPageLoading,
-            ),
-          ),
-        );
-      },
-      fit: switch (imageMode) {
-        MangaReaderImageMode.fitHeight => BoxFit.fitHeight,
-        MangaReaderImageMode.fitWidth => BoxFit.fitWidth,
-        _ => BoxFit.contain
-      },
-      width: switch (imageMode) {
-        MangaReaderImageMode.fitWidth ||
-        MangaReaderImageMode.fit =>
-          constraints.maxWidth,
-        _ => null
-      },
-      height: switch (imageMode) {
-        MangaReaderImageMode.fitHeight ||
-        MangaReaderImageMode.fit =>
-          constraints.maxHeight,
-        _ => null
-      },
-    );
-  }
-}
-
 class MangaBackground extends ConsumerWidget {
   const MangaBackground({super.key});
 
@@ -196,5 +145,27 @@ class MangaBackground extends ConsumerWidget {
         MangaReaderBackground.dark => Colors.black,
       },
     );
+  }
+}
+
+class MangaChapterProgressIndicator extends ConsumerWidget {
+  final ContentDetails contentDetails;
+
+  const MangaChapterProgressIndicator({
+    super.key,
+    required this.contentDetails,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pos = ref
+        .watch(collectionItemCurrentMediaItemPositionProvider(contentDetails))
+        .valueOrNull;
+
+    if (pos == null || pos.length == 0) {
+      return const SizedBox.shrink();
+    }
+
+    return LinearProgressIndicator(value: pos.progress);
   }
 }

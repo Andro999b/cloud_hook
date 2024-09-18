@@ -485,7 +485,7 @@ class _CurrentMangaChapterPageNumProviderElement
 }
 
 String _$currentMangaChapterPagesHash() =>
-    r'447407b802291c15ae719b11bfb7f2042cf122ee';
+    r'b54862b16332fe619c65b1fc38a2faf87f873686';
 
 /// See also [currentMangaChapterPages].
 @ProviderFor(currentMangaChapterPages)

@@ -79,18 +79,11 @@ Future<List<ImageProvider<Object>>?> currentMangaChapterPages(
   ContentDetails contentDetails,
   List<ContentMediaItem> mediaItems,
 ) async {
-  int currentPage = await ref
-      .watch(collectionItemCurrentPositionProvider(contentDetails).future);
-
   final currentSource = await ref
       .watch(currentMangaChapterProvider(contentDetails, mediaItems).future);
 
   if (currentSource == null) {
     return null;
-  }
-
-  if (currentPage > currentSource.pageNambers) {
-    currentPage = 0;
   }
 
   final pages = await currentSource.allPages();

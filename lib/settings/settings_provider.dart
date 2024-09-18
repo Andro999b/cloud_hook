@@ -32,15 +32,15 @@ class ColorSettings extends _$ColorSettings {
 }
 
 @riverpod
-class MangaReaderImageModeSettings extends _$MangaReaderImageModeSettings {
+class MangaReaderScaleSettings extends _$MangaReaderScaleSettings {
   @override
-  MangaReaderImageMode build() {
-    return AppPreferences.mangaReaderImageMode;
+  MangaReaderScale build() {
+    return AppPreferences.mangaReaderScale;
   }
 
-  void select(MangaReaderImageMode mode) {
-    AppPreferences.mangaReaderImageMode = mode;
-    state = mode;
+  void select(MangaReaderScale scale) {
+    AppPreferences.mangaReaderScale = scale;
+    state = scale;
   }
 }
 
@@ -54,5 +54,18 @@ class MangaReaderBackgroundSettings extends _$MangaReaderBackgroundSettings {
   void select(MangaReaderBackground background) {
     AppPreferences.mangaReaderBackground = background;
     state = background;
+  }
+}
+
+@riverpod
+class MangaReaderModeSettings extends _$MangaReaderModeSettings {
+  @override
+  MangaReaderMode build() {
+    return AppPreferences.mangaReaderMode;
+  }
+
+  void select(MangaReaderMode mode) {
+    AppPreferences.mangaReaderMode = mode;
+    state = mode;
   }
 }

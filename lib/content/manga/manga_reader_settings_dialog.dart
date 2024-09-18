@@ -20,37 +20,27 @@ class MangaReaderSettingsDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-
-    //
+    final currentMode = ref.watch(mangaReaderModeSettingsProvider);
 
     return Dialog(
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 800),
+        constraints: const BoxConstraints(maxWidth: 600),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
         child: FocusScope(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const _MangaReaderBackgroundSelector(),
               const SizedBox(height: 8),
-              Text(
-                AppLocalizations.of(context)!.mangaReaderBackground,
-                style: theme.textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 8),
-              const MangaReaderBackgroundSelector(),
-              const SizedBox(height: 8),
-              MangaTranslationSelector(
+              _MangaTranslationSelector(
                 contentDetails: contentDetails,
                 mediaItems: mediaItems,
               ),
               const SizedBox(height: 8),
-              Text(
-                AppLocalizations.of(context)!.mangaImageReaderMode,
-                style: theme.textTheme.headlineSmall,
-              ),
+              const _MangaReaderModeSelector(),
               const SizedBox(height: 8),
-              const MangaImageModeSelector()
+              if (!currentMode.scroll) const _ImageScaleSelector()
             ],
           ),
         ),
@@ -59,83 +49,50 @@ class MangaReaderSettingsDialog extends ConsumerWidget {
   }
 }
 
-class MangaReaderBackgroundSelector extends ConsumerWidget {
-  const MangaReaderBackgroundSelector({super.key});
+class _MangaReaderBackgroundSelector extends ConsumerWidget {
+  const _MangaReaderBackgroundSelector();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final currentBackground = ref.watch(mangaReaderBackgroundSettingsProvider);
 
     return Wrap(
       spacing: 6,
       runSpacing: 6,
-      children: MangaReaderBackground.values
-          .map(
-            (background) => _renderBackgroundSelect(
-                context, ref, currentBackground, background),
-          )
-          .toList(),
-    );
-  }
-
-  Widget _renderBackgroundSelect(
-    BuildContext context,
-    WidgetRef ref,
-    MangaReaderBackground current,
-    MangaReaderBackground background,
-  ) {
-    return ChoiceChip(
-      label: Text(mangaReaderBackgroundLabel(context, background)),
-      selected: current == background,
-      onSelected: (value) {
-        ref
-            .read(mangaReaderBackgroundSettingsProvider.notifier)
-            .select(background);
-      },
-    );
-  }
-}
-
-class MangaImageModeSelector extends ConsumerWidget {
-  const MangaImageModeSelector({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentImageMode = ref.watch(mangaReaderImageModeSettingsProvider);
-
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      children: MangaReaderImageMode.values
-          .map(
-            (mode) => _renderImageMode(context, ref, currentImageMode, mode),
-          )
-          .toList(),
-    );
-  }
-
-  Widget _renderImageMode(
-    BuildContext context,
-    WidgetRef ref,
-    MangaReaderImageMode currentMode,
-    MangaReaderImageMode mode,
-  ) {
-    return ChoiceChip(
-      label: Text(mangaReaderImageModeLabel(context, mode)),
-      selected: currentMode == mode,
-      onSelected: (value) {
-        ref.read(mangaReaderImageModeSettingsProvider.notifier).select(mode);
-      },
+      crossAxisAlignment: WrapCrossAlignment.center,
+      alignment: WrapAlignment.spaceBetween,
+      children: [
+        Text(
+          AppLocalizations.of(context)!.mangaReaderBackground,
+          style: theme.textTheme.headlineSmall,
+        ),
+        DropdownMenu(
+          initialSelection: currentBackground,
+          onSelected: (value) {
+            ref
+                .read(mangaReaderBackgroundSettingsProvider.notifier)
+                .select(value!);
+          },
+          dropdownMenuEntries: MangaReaderBackground.values.map(
+            (value) {
+              return DropdownMenuEntry(
+                value: value,
+                label: mangaReaderBackgroundLabel(context, value),
+              );
+            },
+          ).toList(),
+        ),
+      ],
     );
   }
 }
 
-class MangaTranslationSelector extends ConsumerWidget {
+class _MangaTranslationSelector extends ConsumerWidget {
   final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
 
-  const MangaTranslationSelector({
-    super.key,
+  const _MangaTranslationSelector({
     required this.contentDetails,
     required this.mediaItems,
   });
@@ -163,33 +120,106 @@ class MangaTranslationSelector extends ConsumerWidget {
   ) {
     final theme = Theme.of(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      alignment: WrapAlignment.spaceBetween,
       children: [
         Text(
           AppLocalizations.of(context)!.mangaTranslation,
           style: theme.textTheme.headlineSmall,
         ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: sources
-              .map(
-                (s) => ChoiceChip(
-                  label: Text(s.description),
-                  selected: s.description == currentSource,
-                  onSelected: (value) {
-                    if (value) {
-                      ref
-                          .read(collectionItemProvider(contentDetails).notifier)
-                          .setCurrentSource(s.description);
-                    }
-                  },
-                ),
-              )
-              .toList(),
-        )
+        DropdownMenu(
+          initialSelection: currentSource,
+          onSelected: (value) {
+            ref
+                .read(collectionItemProvider(contentDetails).notifier)
+                .setCurrentSource(value);
+          },
+          dropdownMenuEntries: sources.map(
+            (value) {
+              return DropdownMenuEntry(
+                value: value.description,
+                label: value.description,
+              );
+            },
+          ).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _MangaReaderModeSelector extends ConsumerWidget {
+  const _MangaReaderModeSelector();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final currentMode = ref.watch(mangaReaderModeSettingsProvider);
+
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      alignment: WrapAlignment.spaceBetween,
+      children: [
+        Text(
+          AppLocalizations.of(context)!.mangaReaderMode,
+          style: theme.textTheme.headlineSmall,
+        ),
+        DropdownMenu(
+          initialSelection: currentMode,
+          onSelected: (value) {
+            ref.read(mangaReaderModeSettingsProvider.notifier).select(value!);
+          },
+          dropdownMenuEntries: MangaReaderMode.values.map(
+            (value) {
+              return DropdownMenuEntry(
+                value: value,
+                label: mangaReaderModeLabel(context, value),
+              );
+            },
+          ).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _ImageScaleSelector extends ConsumerWidget {
+  const _ImageScaleSelector();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final currentScale = ref.watch(mangaReaderScaleSettingsProvider);
+
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      alignment: WrapAlignment.spaceBetween,
+      children: [
+        Text(
+          AppLocalizations.of(context)!.mangaReaderScale,
+          style: theme.textTheme.headlineSmall,
+        ),
+        DropdownMenu(
+          initialSelection: currentScale,
+          onSelected: (value) {
+            ref.read(mangaReaderScaleSettingsProvider.notifier).select(value!);
+          },
+          dropdownMenuEntries: MangaReaderScale.values.map(
+            (value) {
+              return DropdownMenuEntry(
+                value: value,
+                label: mangaReaderScaleLabel(context, value),
+              );
+            },
+          ).toList(),
+        ),
       ],
     );
   }

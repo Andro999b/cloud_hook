@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cloud_hook/content_suppliers/extrators/utils.dart';
-import 'package:cloud_hook/content_suppliers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:simple_rc4/simple_rc4.dart';

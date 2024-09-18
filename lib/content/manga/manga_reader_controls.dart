@@ -219,8 +219,7 @@ class MangaReaderControlBottomBar extends ConsumerWidget {
                 ),
               ],
             ),
-          ),
-          if (pageNumbers > 0) LinearProgressIndicator(value: pos.progress)
+          )
         ],
       ),
     );
