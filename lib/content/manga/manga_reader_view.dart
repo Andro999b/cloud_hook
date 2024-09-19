@@ -7,49 +7,36 @@ import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/settings/settings_provider.dart';
 import 'package:cloud_hook/widgets/display_error.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class MangaReaderView extends ConsumerStatefulWidget {
+class MangaReaderView extends ConsumerWidget {
   final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
+  final CurrentMangaReaderChapterProvider _chapterProvider;
+  final CollectionItemProvider _collectionItemProvider;
 
-  const MangaReaderView({
+  MangaReaderView({
     super.key,
     required this.contentDetails,
     required this.mediaItems,
-  });
+  })  : _chapterProvider = currentMangaReaderChapterProvider(
+          contentDetails,
+          mediaItems,
+        ),
+        _collectionItemProvider = collectionItemProvider(contentDetails);
 
   @override
-  ConsumerState<MangaReaderView> createState() => _MangaReaderViewState();
-}
-
-class _MangaReaderViewState extends ConsumerState<MangaReaderView> {
-  final transformationController = TransformationController();
-  final scrollOffsetController = ScrollOffsetController();
-
-  @override
-  Widget build(BuildContext context) {
-    final pageProvider = currentMangaChapterPagesProvider(
-      widget.contentDetails,
-      widget.mediaItems,
-    );
-
+  Widget build(BuildContext context, WidgetRef ref) {
     final readerMode = ref.watch(mangaReaderModeSettingsProvider);
-
-    return ref.watch(pageProvider).when(
-          data: (pages) => _renderReader(
-            context,
-            ref,
-            readerMode,
-            pages ?? const [],
-          ),
+    return ref.watch(_chapterProvider).when(
+          data: (chapter) => _renderReader(context, ref, readerMode, chapter),
           error: (error, stackTrace) => DisplayError(
             error: error,
-            stackTrace: stackTrace,
-            onRefresh: () => ref.refresh(pageProvider.future),
+            onRefresh: () => ref.refresh(_chapterProvider.future),
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
         );
@@ -59,14 +46,61 @@ class _MangaReaderViewState extends ConsumerState<MangaReaderView> {
     BuildContext context,
     WidgetRef ref,
     MangaReaderMode readerMode,
-    List<ImageProvider<Object>> pages,
+    MangaReaderChapter? chapter,
   ) {
-    if (pages.isEmpty == true) {
-      return Center(
-        child: Text(AppLocalizations.of(context)!.mangaUnableToLoadPage),
+    if (chapter == null) {
+      return DisplayError(
+        error: AppLocalizations.of(context)!.mangaUnableToLoadPage,
+        onRefresh: () => ref.refresh(_chapterProvider),
       );
     }
 
+    return _MangaPagesReaderView(
+      chapter: chapter,
+      readerMode: readerMode,
+      contentDetails: contentDetails,
+      mediaItems: mediaItems,
+      chapterProvider: _chapterProvider,
+      collectionItemProvider: _collectionItemProvider,
+    );
+  }
+}
+
+class _MangaPagesReaderView extends ConsumerStatefulWidget {
+  final MangaReaderChapter chapter;
+  final MangaReaderMode readerMode;
+  final ContentDetails contentDetails;
+  final List<ContentMediaItem> mediaItems;
+  final CurrentMangaReaderChapterProvider chapterProvider;
+  final CollectionItemProvider collectionItemProvider;
+
+  const _MangaPagesReaderView({
+    required this.chapter,
+    required this.readerMode,
+    required this.contentDetails,
+    required this.mediaItems,
+    required this.chapterProvider,
+    required this.collectionItemProvider,
+  });
+
+  @override
+  ConsumerState<_MangaPagesReaderView> createState() =>
+      _MangaPagesReaderViewState();
+}
+
+class _MangaPagesReaderViewState extends ConsumerState<_MangaPagesReaderView> {
+  final transformationController = TransformationController();
+  final scrollOffsetController = ScrollOffsetController();
+  late final ValueNotifier<int> pageListenable;
+
+  @override
+  void initState() {
+    pageListenable = ValueNotifier(widget.chapter.initialPage);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return FocusableActionDetector(
       shortcuts: const {
         SingleActivator(LogicalKeyboardKey.arrowLeft): PrevPageIntent(),
@@ -85,12 +119,10 @@ class _MangaReaderViewState extends ConsumerState<MangaReaderView> {
       },
       actions: {
         PrevPageIntent: CallbackAction<PrevPageIntent>(
-          onInvoke: (_) =>
-              _movePage(readerMode == MangaReaderMode.rightToLeft ? 1 : -1),
+          onInvoke: (_) => _movePage(widget.readerMode, -1),
         ),
         NextPageIntent: CallbackAction<NextPageIntent>(
-          onInvoke: (_) =>
-              _movePage(readerMode == MangaReaderMode.rightToLeft ? -1 : 1),
+          onInvoke: (_) => _movePage(widget.readerMode, 1),
         ),
         ShowUIIntent: CallbackAction<ShowUIIntent>(
           onInvoke: (_) => Navigator.of(context).push(
@@ -104,67 +136,58 @@ class _MangaReaderViewState extends ConsumerState<MangaReaderView> {
           onInvoke: (intent) => _swithReaderImageMode(intent.mode),
         ),
         ScrollUpPageIntent: CallbackAction<ScrollUpPageIntent>(
-          onInvoke: (_) => _scrollTo(readerMode, 100),
+          onInvoke: (_) => _scrollTo(widget.readerMode, 100),
         ),
         ScrollDownPageIntent: CallbackAction<ScrollDownPageIntent>(
-          onInvoke: (_) => _scrollTo(readerMode, -100),
+          onInvoke: (_) => _scrollTo(widget.readerMode, -100),
         ),
       },
       autofocus: true,
       child: _ReaderGestureDetector(
+        readerMode: widget.readerMode,
         transformationController: transformationController,
-        child: _InitialPageLoader(
-          contentDetails: widget.contentDetails,
-          mediaItems: widget.mediaItems,
-          builder: (initialPage, pageNumProvider) => switch (readerMode) {
-            MangaReaderMode.hotizontalScroll ||
-            MangaReaderMode.vericalScroll =>
-              _ScrolledView(
-                pages: pages,
-                initialPage: initialPage,
+        child: widget.readerMode.scroll
+            ? _ScrolledView(
+                readerMode: widget.readerMode,
+                pages: widget.chapter.pages,
+                initialPage: widget.chapter.initialPage,
                 transformationController: transformationController,
                 scrollOffsetController: scrollOffsetController,
-                pageNumProvider: pageNumProvider,
-                collectionItemProvider:
-                    collectionItemProvider(widget.contentDetails),
-              ),
-            _ => _PagedView(
-                pages: pages,
-                initialPage: initialPage,
+                pageListinable: pageListenable,
+                collectionItemProvider: widget.collectionItemProvider,
+              )
+            : _PagedView(
+                readerMode: widget.readerMode,
+                pages: widget.chapter.pages,
+                initialPage: widget.chapter.initialPage,
                 transformationController: transformationController,
-                pageNumProvider: pageNumProvider,
+                pageListinable: pageListenable,
               ),
-          },
-        ),
       ),
     );
   }
 
-  void _movePage(int inc) async {
-    final chapter = await ref.read(
-      currentMangaChapterProvider(widget.contentDetails, widget.mediaItems)
-          .future,
-    );
+  void _movePage(MangaReaderMode readerMode, int inc) async {
+    inc = readerMode.rtl ? -inc : inc;
 
-    final provider = collectionItemProvider(widget.contentDetails);
-    final contentProgress = (await ref.read(provider.future));
+    final contentProgress =
+        (await ref.read(widget.collectionItemProvider.future));
     final pos = contentProgress.currentPosition;
 
-    if (chapter != null) {
-      final newPos = pos + inc;
-      final notifier = ref.read(provider.notifier);
+    final newPos = pos + inc;
+    final notifier = ref.read(widget.collectionItemProvider.notifier);
 
-      if (newPos < 0) {
-        if (contentProgress.currentItem > 0) {
-          notifier.setCurrentItem(contentProgress.currentItem - 1);
-        }
-      } else if (newPos >= chapter.pageNambers) {
-        if (contentProgress.currentItem < widget.mediaItems.length) {
-          notifier.setCurrentItem(contentProgress.currentItem + 1);
-        }
-      } else {
-        notifier.setCurrentPosition(newPos, chapter.pageNambers);
+    if (newPos < 0) {
+      if (contentProgress.currentItem > 0) {
+        notifier.setCurrentItem(contentProgress.currentItem - 1);
       }
+    } else if (newPos >= widget.chapter.pages.length) {
+      if (contentProgress.currentItem < widget.mediaItems.length) {
+        notifier.setCurrentItem(contentProgress.currentItem + 1);
+      }
+    } else {
+      notifier.setCurrentPosition(newPos);
+      pageListenable.value = newPos;
     }
   }
 
@@ -194,10 +217,12 @@ class _MangaReaderViewState extends ConsumerState<MangaReaderView> {
 }
 
 class _ReaderGestureDetector extends ConsumerStatefulWidget {
+  final MangaReaderMode readerMode;
   final TransformationController transformationController;
   final Widget child;
 
   const _ReaderGestureDetector({
+    required this.readerMode,
     required this.transformationController,
     required this.child,
   });
@@ -213,16 +238,9 @@ class _ReaderGestureDetectorState
 
   @override
   Widget build(BuildContext context) {
-    final readerMode = ref.watch(mangaReaderModeSettingsProvider);
-
     final size = MediaQuery.of(context).size;
     return GestureDetector(
-      onTapUp: (details) => switch (readerMode) {
-        MangaReaderMode.vertical ||
-        MangaReaderMode.vericalScroll =>
-          _verticalTapZones(size, details),
-        _ => _horizontalTapZones(size, details)
-      },
+      onTapUp: (details) => _tapZones(details),
       onLongPress: () {
         Actions.invoke(context, const ShowUIIntent());
       },
@@ -239,36 +257,46 @@ class _ReaderGestureDetectorState
     );
   }
 
-  void _horizontalTapZones(Size size, TapUpDetails details) {
-    const zoneFraction = 3;
-    final screenWidth = size.width;
+  bool _isInZone(
+    int testZone,
+    int zonesNum,
+    Offset point,
+  ) {
+    final viewport = MediaQuery.sizeOf(context);
+    final position =
+        widget.readerMode.direction == Axis.horizontal ? point.dx : point.dy;
+    final range = widget.readerMode.direction == Axis.horizontal
+        ? viewport.width
+        : viewport.height;
 
-    if (details.globalPosition.dx < screenWidth / zoneFraction) {
-      Actions.invoke(context, const PrevPageIntent());
-    } else if (details.globalPosition.dx >
-        screenWidth - (screenWidth / zoneFraction)) {
-      Actions.invoke(context, const NextPageIntent());
-    }
+    final zoneSize = range / zonesNum.toDouble();
+    final lowerBoundry = (testZone - 1) * zoneSize;
+    final upperBoundry = testZone * zoneSize;
+
+    return lowerBoundry <= position && position < upperBoundry;
   }
 
-  void _verticalTapZones(Size size, TapUpDetails details) {
-    const zoneFraction = 3;
-    final screenHeigt = size.height;
-
-    if (details.globalPosition.dy < screenHeigt / zoneFraction) {
+  void _tapZones(
+    TapUpDetails details,
+  ) {
+    if (_isInZone(1, 3, details.globalPosition)) {
       Actions.invoke(context, const PrevPageIntent());
-    } else if (details.globalPosition.dy >
-        screenHeigt - (screenHeigt / zoneFraction)) {
+    } else if (_isInZone(3, 3, details.globalPosition)) {
       Actions.invoke(context, const NextPageIntent());
     }
   }
 
   void _toggleZoom() {
+    final position = _lastTapDetails.globalPosition;
     final transfomationController = widget.transformationController;
+
+    if (!_isInZone(2, 3, position)) {
+      return;
+    }
+
     if (!transfomationController.value.isIdentity()) {
       transfomationController.value = Matrix4.identity();
     } else {
-      final position = _lastTapDetails.localPosition;
       // For a 3x zoom
       transfomationController.value = Matrix4.identity()
         ..translate(-position.dx, -position.dy)
@@ -277,102 +305,81 @@ class _ReaderGestureDetectorState
   }
 }
 
-typedef _InitialPageBuilder = Widget Function(
-    int, CurrentMangaChapterPageNumProvider);
+class _PagedView extends ConsumerStatefulWidget {
+  final MangaReaderMode readerMode;
+  final List<ImageProvider<Object>> pages;
+  final int initialPage;
+  final TransformationController transformationController;
+  final ValueListenable<int> pageListinable;
 
-class _InitialPageLoader extends ConsumerWidget {
-  final ContentDetails contentDetails;
-  final List<ContentMediaItem> mediaItems;
-  final _InitialPageBuilder builder;
-
-  const _InitialPageLoader({
-    required this.contentDetails,
-    required this.mediaItems,
-    required this.builder,
+  const _PagedView({
+    required this.readerMode,
+    required this.pages,
+    required this.initialPage,
+    required this.transformationController,
+    required this.pageListinable,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final pageNumProvider = currentMangaChapterPageNumProvider(
-      contentDetails,
-      mediaItems,
-    );
-
-    final initialPageFuture = ref.read(pageNumProvider.future);
-
-    return FutureBuilder(
-      future: initialPageFuture,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox.shrink();
-        }
-
-        return builder(snapshot.data!, pageNumProvider);
-      },
-    );
-  }
+  ConsumerState<_PagedView> createState() => _PagedViewState();
 }
 
-class _PagedView extends ConsumerWidget {
-  final List<ImageProvider<Object>> pages;
-  final TransformationController transformationController;
-  final CurrentMangaChapterPageNumProvider pageNumProvider;
-  final PageController pageController;
-
-  _PagedView({
-    required this.pages,
-    required int initialPage,
-    required this.transformationController,
-    required this.pageNumProvider,
-  }) : pageController = PageController(initialPage: initialPage);
+class _PagedViewState extends ConsumerState<_PagedView> {
+  PageController? _pageController;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final readerMode = ref.watch(mangaReaderModeSettingsProvider);
+  void initState() {
+    _pageController = PageController(initialPage: widget.initialPage);
+    widget.pageListinable.addListener(_onPageChanged);
 
-    ref.listen(
-      pageNumProvider,
-      (previous, next) {
-        if (next.hasValue) {
-          final pageNum = next.requireValue;
+    super.initState();
+  }
 
-          precacheImage(pages[pageNum], context);
-          for (int i = 1; i < 2; i++) {
-            final r = pageNum + i;
-            final l = pageNum - i;
+  @override
+  void dispose() {
+    widget.pageListinable.removeListener(_onPageChanged);
+    super.dispose();
+  }
 
-            if (r < pages.length) {
-              precacheImage(pages[r], context);
-            }
+  void _onPageChanged() {
+    final pageNum = widget.pageListinable.value;
+    final pages = widget.pages;
 
-            if (l >= 0) {
-              precacheImage(pages[l], context);
-            }
-          }
+    precacheImage(pages[pageNum], context);
+    for (int i = 1; i < 2; i++) {
+      final r = pageNum + i;
+      final l = pageNum - i;
 
-          pageController.animateToPage(
-            pageNum,
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeInOut,
-          );
-        }
-      },
+      if (r < pages.length) {
+        precacheImage(pages[r], context);
+      }
+
+      if (l >= 0) {
+        precacheImage(pages[l], context);
+      }
+    }
+
+    _pageController?.animateToPage(
+      pageNum,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
     );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return PageView.builder(
-      controller: pageController,
+      controller: _pageController,
       physics: const NeverScrollableScrollPhysics(),
-      reverse: readerMode == MangaReaderMode.rightToLeft,
+      reverse: widget.readerMode.rtl,
       itemBuilder: (context, index) {
         return _SinglePageView(
-          page: pages[index],
-          transformationController: transformationController,
+          page: widget.pages[index],
+          transformationController: widget.transformationController,
         );
       },
-      itemCount: pages.length,
-      scrollDirection: readerMode == MangaReaderMode.vertical
-          ? Axis.vertical
-          : Axis.horizontal,
+      itemCount: widget.pages.length,
+      scrollDirection: widget.readerMode.direction,
     );
   }
 }
@@ -467,19 +474,21 @@ class _PageImage extends StatelessWidget {
 }
 
 class _ScrolledView extends ConsumerStatefulWidget {
+  final MangaReaderMode readerMode;
   final List<ImageProvider<Object>> pages;
   final int initialPage;
   final TransformationController transformationController;
   final ScrollOffsetController scrollOffsetController;
-  final CurrentMangaChapterPageNumProvider pageNumProvider;
+  final ValueListenable<int> pageListinable;
   final CollectionItemProvider collectionItemProvider;
 
   const _ScrolledView({
+    required this.readerMode,
     required this.pages,
     required this.initialPage,
-    required this.scrollOffsetController,
     required this.transformationController,
-    required this.pageNumProvider,
+    required this.scrollOffsetController,
+    required this.pageListinable,
     required this.collectionItemProvider,
   });
 
@@ -491,31 +500,47 @@ class _ScrolledViewState extends ConsumerState<_ScrolledView> {
   bool isScaling = false;
   final ItemPositionsListener _itemPositionsListener =
       ItemPositionsListener.create();
+  final ItemScrollController _itemScrollController = ItemScrollController();
 
   @override
   void initState() {
     widget.transformationController.addListener(_onTransformationChange);
+    widget.pageListinable.addListener(_onPageChanged);
     _itemPositionsListener.itemPositions.addListener(_onPositionChanged);
+
     super.initState();
   }
 
   @override
   void dispose() {
     widget.transformationController.removeListener(_onTransformationChange);
+    widget.pageListinable.removeListener(_onPageChanged);
     _itemPositionsListener.itemPositions.removeListener(_onPositionChanged);
     super.dispose();
   }
 
   void _onPositionChanged() {
-    final curItem = _itemPositionsListener.itemPositions.value.lastOrNull;
+    final firstItem = _itemPositionsListener.itemPositions.value.firstOrNull;
+    // final lastItem = _itemPositionsListener.itemPositions.value.lastOrNull;
 
-    if (curItem == null) {
+    if (firstItem == null) {
       return;
     }
 
+    // final pageIndex = lastItem.index == widget.pages.length - 1
+    //     ? lastItem.index
+    //     : firstItem.index;
+
     ref
-        .read(widget.collectionItemProvider.notifier)
-        .setCurrentPosition(curItem.index);
+        .watch(widget.collectionItemProvider.notifier)
+        .setCurrentPosition(firstItem.index);
+  }
+
+  void _onPageChanged() {
+    _itemScrollController.jumpTo(
+      index: widget.pageListinable.value,
+      // duration: const Duration(milliseconds: 200),
+    );
   }
 
   void _onTransformationChange() {
@@ -529,25 +554,31 @@ class _ScrolledViewState extends ConsumerState<_ScrolledView> {
 
   @override
   Widget build(BuildContext context) {
-    final readerMode = ref.watch(mangaReaderModeSettingsProvider);
-
     return LayoutBuilder(builder: (context, constraints) {
       return InteractiveViewer(
         transformationController: widget.transformationController,
         scaleEnabled: isScaling,
         panEnabled: isScaling,
         child: ScrollablePositionedList.separated(
+          reverse: widget.readerMode.rtl,
           separatorBuilder: (context, index) =>
               const SizedBox.square(dimension: 8),
-          scrollDirection: readerMode == MangaReaderMode.hotizontalScroll
-              ? Axis.horizontal
-              : Axis.vertical,
+          scrollDirection: widget.readerMode.direction,
           scrollOffsetController: widget.scrollOffsetController,
+          itemScrollController: _itemScrollController,
           itemPositionsListener: _itemPositionsListener,
           physics: isScaling ? const NeverScrollableScrollPhysics() : null,
           itemCount: widget.pages.length,
           initialScrollIndex: widget.initialPage,
-          itemBuilder: (context, index) => Image(image: widget.pages[index]),
+          itemBuilder: (context, index) => Image(
+            image: widget.pages[index],
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) {
+                return child;
+              }
+              return const CircularProgressIndicator();
+            },
+          ),
         ),
       );
     });

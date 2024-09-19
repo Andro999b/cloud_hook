@@ -3,13 +3,11 @@ import 'package:go_router/go_router.dart';
 
 class DisplayError extends StatelessWidget {
   final Object error;
-  final StackTrace stackTrace;
   final VoidCallback? onRefresh;
 
   const DisplayError({
     super.key,
     required this.error,
-    required this.stackTrace,
     this.onRefresh,
   });
 

@@ -19,7 +19,6 @@ class MangaReaderSettingsDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final currentMode = ref.watch(mangaReaderModeSettingsProvider);
 
     return Dialog(
@@ -104,7 +103,10 @@ class _MangaTranslationSelector extends ConsumerWidget {
         .valueOrNull;
 
     return ref
-            .watch(currentMangaChaptersProvider(contentDetails, mediaItems))
+            .watch(mangaChapterScansProvider(
+              contentDetails,
+              mediaItems,
+            ))
             .whenOrNull(
               data: (value) =>
                   _renderSources(context, ref, value, currentSource),

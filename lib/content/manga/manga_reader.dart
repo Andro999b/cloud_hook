@@ -19,7 +19,7 @@ class MangaReader extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen<AsyncValue<MangaMediaItemSource?>>(
-      currentMangaChapterProvider(contentDetails, mediaItems),
+      mangaChapterScanProvider(contentDetails, mediaItems),
       (previous, next) {
         final chapter = next.valueOrNull;
         if (chapter != null) {

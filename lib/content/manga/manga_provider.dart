@@ -1,24 +1,14 @@
 import 'package:cloud_hook/collection/collection_item_provider.dart';
+import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manga_provider.g.dart';
 
-class MangaChapterPages {
-  final int currentPage;
-  final List<ImageProvider> pages;
-
-  MangaChapterPages({
-    required this.currentPage,
-    required this.pages,
-  });
-}
-
 @riverpod
-Future<List<MangaMediaItemSource>> currentMangaChapters(
-  CurrentMangaChaptersRef ref,
+Future<List<MangaMediaItemSource>> mangaChapterScans(
+  MangaChapterScansRef ref,
   ContentDetails contentDetails,
   List<ContentMediaItem> mediaItems,
 ) async {
@@ -35,13 +25,14 @@ Future<List<MangaMediaItemSource>> currentMangaChapters(
 }
 
 @riverpod
-Future<MangaMediaItemSource?> currentMangaChapter(
-  CurrentMangaChapterRef ref,
+Future<MangaMediaItemSource?> mangaChapterScan(
+  MangaChapterScanRef ref,
   ContentDetails contentDetails,
   List<ContentMediaItem> mediaItems,
 ) async {
   final sources = await ref
-      .watch(currentMangaChaptersProvider(contentDetails, mediaItems).future);
+      .watch(mangaChapterScansProvider(contentDetails, mediaItems).future);
+
   final currentSource = await ref
       .watch(collectionItemCurrentSourceNameProvider(contentDetails).future);
 
@@ -51,42 +42,22 @@ Future<MangaMediaItemSource?> currentMangaChapter(
 }
 
 @riverpod
-Future<int> currentMangaChapterPageNum(
-  CurrentMangaChapterPageNumRef ref,
-  ContentDetails contentDetails,
-  List<ContentMediaItem> mediaItems,
-) async {
-  int currentPage = await ref
-      .watch(collectionItemCurrentPositionProvider(contentDetails).future);
-
-  final currentSource = await ref
-      .watch(currentMangaChapterProvider(contentDetails, mediaItems).future);
-
-  if (currentSource == null) {
-    return 0;
-  }
-
-  if (currentPage > currentSource.pageNambers) {
-    currentPage = 0;
-  }
-
-  return currentPage;
-}
-
-@riverpod
-Future<List<ImageProvider<Object>>?> currentMangaChapterPages(
-  CurrentMangaChapterPagesRef ref,
+Future<MangaReaderChapter?> currentMangaReaderChapter(
+  CurrentMangaReaderChapterRef ref,
   ContentDetails contentDetails,
   List<ContentMediaItem> mediaItems,
 ) async {
   final currentSource = await ref
-      .watch(currentMangaChapterProvider(contentDetails, mediaItems).future);
+      .watch(mangaChapterScanProvider(contentDetails, mediaItems).future);
 
   if (currentSource == null) {
     return null;
   }
 
+  final initialPage = await ref
+      .read(collectionItemCurrentPositionProvider(contentDetails).future);
+
   final pages = await currentSource.allPages();
 
-  return pages;
+  return MangaReaderChapter(pages: pages, initialPage: initialPage);
 }

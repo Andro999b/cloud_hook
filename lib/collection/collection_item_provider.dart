@@ -59,6 +59,10 @@ class CollectionItem extends _$CollectionItem {
         state = await AsyncValue.guard(() => _saveNewValue(newValue));
       }
     } else {
+      if (position == value.currentPosition) {
+        return;
+      }
+
       final newValue = value.copyWith(
         positions: {
           value.currentItem: currentItemPosition.copyWith(

@@ -26,7 +26,6 @@ class ContentDetailsScreen extends ConsumerWidget {
         data: (data) => ContentDetailsView(data),
         error: (error, stackTrace) => DisplayError(
           error: error,
-          stackTrace: stackTrace,
           onRefresh: () => ref.refresh(detailsProvider(supplier, id).future),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
