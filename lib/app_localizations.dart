@@ -96,5 +96,7 @@ String mangaReaderModeLabel(BuildContext context, MangaReaderMode mode) {
     MangaReaderMode.vericalScroll => localization.mangaReaderModeVericalScroll,
     MangaReaderMode.hotizontalScroll =>
       localization.mangaReaderModeHorizontalScroll,
+    MangaReaderMode.hotizontalRtlScroll =>
+      localization.mangaReaderModeHorizontalRtlScroll,
   };
 }

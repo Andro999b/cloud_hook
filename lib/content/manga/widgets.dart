@@ -169,3 +169,56 @@ class MangaChapterProgressIndicator extends ConsumerWidget {
     return LinearProgressIndicator(value: pos.progress);
   }
 }
+
+class MangaPagePlaceholder extends StatefulWidget {
+  static const aspectRation = 1.5;
+  final MangaReaderMode readerMode;
+  final BoxConstraints constraints;
+
+  const MangaPagePlaceholder({
+    super.key,
+    required this.readerMode,
+    required this.constraints,
+  });
+
+  @override
+  State<MangaPagePlaceholder> createState() => _MangaPagePlaceholderState();
+}
+
+class _MangaPagePlaceholderState extends State<MangaPagePlaceholder> {
+  double _opacity = 1;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _opacity = 0;
+        });
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      opacity: _opacity,
+      duration: const Duration(milliseconds: 1800),
+      child: Container(
+        width: widget.readerMode.direction == Axis.vertical
+            ? widget.constraints.maxWidth
+            : widget.constraints.maxHeight / MangaPagePlaceholder.aspectRation,
+        height: widget.readerMode.direction == Axis.horizontal
+            ? widget.constraints.maxHeight
+            : widget.constraints.maxWidth * MangaPagePlaceholder.aspectRation,
+        color: Colors.grey.shade400,
+      ),
+      onEnd: () {
+        setState(() {
+          _opacity = _opacity == 0 ? 1.0 : 0.0;
+        });
+      },
+    );
+  }
+}

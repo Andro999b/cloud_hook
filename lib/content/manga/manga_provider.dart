@@ -1,7 +1,7 @@
 import 'package:cloud_hook/collection/collection_item_provider.dart';
-import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manga_provider.g.dart';
@@ -42,8 +42,8 @@ Future<MangaMediaItemSource?> mangaChapterScan(
 }
 
 @riverpod
-Future<MangaReaderChapter?> currentMangaReaderChapter(
-  CurrentMangaReaderChapterRef ref,
+Future<List<ImageProvider>> currentMangaPages(
+  CurrentMangaPagesRef ref,
   ContentDetails contentDetails,
   List<ContentMediaItem> mediaItems,
 ) async {
@@ -51,13 +51,10 @@ Future<MangaReaderChapter?> currentMangaReaderChapter(
       .watch(mangaChapterScanProvider(contentDetails, mediaItems).future);
 
   if (currentSource == null) {
-    return null;
+    return [];
   }
-
-  final initialPage = await ref
-      .read(collectionItemCurrentPositionProvider(contentDetails).future);
 
   final pages = await currentSource.allPages();
 
-  return MangaReaderChapter(pages: pages, initialPage: initialPage);
+  return pages;
 }

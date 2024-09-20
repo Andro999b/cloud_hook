@@ -11,10 +11,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class MangaReaderControlsRoute<T> extends PopupRoute<T> {
   final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
+  final ValueChanged<int> onPageChanged;
 
   MangaReaderControlsRoute({
     required this.contentDetails,
     required this.mediaItems,
+    required this.onPageChanged,
   });
 
   @override
@@ -39,6 +41,7 @@ class MangaReaderControlsRoute<T> extends PopupRoute<T> {
           child: MangaReaderControls(
             contentDetails: contentDetails,
             mediaItems: mediaItems,
+            onPageChanged: onPageChanged,
           ),
         ),
       ),
@@ -49,26 +52,37 @@ class MangaReaderControlsRoute<T> extends PopupRoute<T> {
 class MangaReaderControls extends ConsumerWidget {
   final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
+  final ValueChanged<int> onPageChanged;
 
   const MangaReaderControls({
     super.key,
     required this.contentDetails,
     required this.mediaItems,
+    required this.onPageChanged,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(children: [
-      MangaReaderControlTopBar(
-        contentDetails: contentDetails,
-        mediaItems: mediaItems,
+    return GestureDetector(
+      onTapUp: (details) {
+        context.pop();
+      },
+      child: Material(
+        color: Colors.transparent,
+        child: Column(children: [
+          MangaReaderControlTopBar(
+            contentDetails: contentDetails,
+            mediaItems: mediaItems,
+          ),
+          const Spacer(),
+          MangaReaderControlBottomBar(
+            contentDetails: contentDetails,
+            mediaItems: mediaItems,
+            onPageChanged: onPageChanged,
+          )
+        ]),
       ),
-      const Spacer(),
-      MangaReaderControlBottomBar(
-        contentDetails: contentDetails,
-        mediaItems: mediaItems,
-      )
-    ]);
+    );
   }
 }
 
@@ -104,8 +118,8 @@ class MangaReaderControlTopBar extends ConsumerWidget {
         padding: const EdgeInsets.only(
           top: 16.0,
           bottom: 8,
-          right: 20,
-          left: 20,
+          right: 16,
+          left: 16,
         ),
         child: Row(children: [
           if (!AndroidTVDetector.isTV) ...[
@@ -150,11 +164,13 @@ class MangaReaderControlTopBar extends ConsumerWidget {
 class MangaReaderControlBottomBar extends ConsumerWidget {
   final List<ContentMediaItem> mediaItems;
   final ContentDetails contentDetails;
+  final ValueChanged<int> onPageChanged;
 
   const MangaReaderControlBottomBar({
     super.key,
     required this.contentDetails,
     required this.mediaItems,
+    required this.onPageChanged,
   });
 
   @override
@@ -171,8 +187,9 @@ class MangaReaderControlBottomBar extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final curPage = pos.position + 1;
+    var curPage = pos.position + 1;
     final pageNumbers = pos.length;
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -192,8 +209,19 @@ class MangaReaderControlBottomBar extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          Slider(
+            max: pageNumbers.toDouble() - 1.0,
+            value: pos.position > pageNumbers
+                ? pageNumbers.toDouble()
+                : pos.position.toDouble(),
+            label: curPage.toString(),
+            divisions: pageNumbers,
+            onChanged: (value) {
+              onPageChanged(value.round());
+            },
+          ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+            padding: const EdgeInsets.only(bottom: 8.0, left: 16, right: 16),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [

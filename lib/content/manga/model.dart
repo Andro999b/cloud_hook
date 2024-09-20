@@ -11,7 +11,8 @@ enum MangaReaderMode {
   leftToRight(),
   rightToLeft(rtl: true),
   vericalScroll(scroll: true, direction: Axis.vertical),
-  hotizontalScroll(scroll: true);
+  hotizontalScroll(scroll: true),
+  hotizontalRtlScroll(scroll: true, rtl: true);
 
   final bool scroll;
   final Axis direction;
@@ -27,11 +28,4 @@ enum MangaReaderMode {
 enum MangaReaderBackground {
   light,
   dark,
-}
-
-class MangaReaderChapter {
-  final List<ImageProvider<Object>> pages;
-  final int initialPage;
-
-  MangaReaderChapter({required this.pages, required this.initialPage});
 }

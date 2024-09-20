@@ -65,5 +65,6 @@
     "mangaReaderModeLeftToRight": "З ліва на право",
     "mangaReaderModeRightToLeft": "З права на ліво",
     "mangaReaderModeVericalScroll": "Вертікальна прокрутка",
-    "mangaReaderModeHorizontalScroll": "Горізонтальна прокрутка"
+    "mangaReaderModeHorizontalScroll": "Прокрутка з ліва на право",
+    "mangaReaderModeHorizontalRtlScroll": "Прокрутка з права на ліво"
 }

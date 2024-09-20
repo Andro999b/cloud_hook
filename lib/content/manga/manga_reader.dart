@@ -37,12 +37,6 @@ class MangaReader extends HookConsumerWidget {
           contentDetails: contentDetails,
           mediaItems: mediaItems,
         ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: MangaChapterProgressIndicator(contentDetails: contentDetails),
-        ),
       ],
     );
   }
