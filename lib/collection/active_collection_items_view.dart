@@ -32,11 +32,9 @@ class ActiveCollectionItemsView extends ConsumerWidget {
     }
 
     return HorizontalList(
-      title: Focus(
-        child: Text(
-          title!,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+      title: Text(
+        title!,
+        style: Theme.of(context).textTheme.titleMedium,
       ),
       itemBuilder: (context, index) {
         final item = items![index];

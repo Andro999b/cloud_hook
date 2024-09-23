@@ -299,8 +299,6 @@ class _VideoContentViewState extends ConsumerState<VideoContentView> {
     player.dispose();
     super.dispose();
 
-    // ScaffoldMessenger.of(context).clearSnackBars();
-
     if (isMobileDevice()) {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.landscapeLeft,

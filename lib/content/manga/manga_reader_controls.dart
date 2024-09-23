@@ -4,6 +4,7 @@ import 'package:cloud_hook/content/manga/widgets.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -11,11 +12,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class MangaReaderControlsRoute<T> extends PopupRoute<T> {
   final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
+  final ValueListenable<int> page;
+  final int pageNumbers;
   final ValueChanged<int> onPageChanged;
 
   MangaReaderControlsRoute({
     required this.contentDetails,
     required this.mediaItems,
+    required this.page,
+    required this.pageNumbers,
     required this.onPageChanged,
   });
 
@@ -41,6 +46,8 @@ class MangaReaderControlsRoute<T> extends PopupRoute<T> {
           child: MangaReaderControls(
             contentDetails: contentDetails,
             mediaItems: mediaItems,
+            page: page,
+            pageNumbers: pageNumbers,
             onPageChanged: onPageChanged,
           ),
         ),
@@ -49,20 +56,24 @@ class MangaReaderControlsRoute<T> extends PopupRoute<T> {
   }
 }
 
-class MangaReaderControls extends ConsumerWidget {
+class MangaReaderControls extends StatelessWidget {
   final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
+  final ValueListenable<int> page;
+  final int pageNumbers;
   final ValueChanged<int> onPageChanged;
 
   const MangaReaderControls({
     super.key,
     required this.contentDetails,
     required this.mediaItems,
+    required this.page,
+    required this.pageNumbers,
     required this.onPageChanged,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTapUp: (details) {
         context.pop();
@@ -78,6 +89,8 @@ class MangaReaderControls extends ConsumerWidget {
           MangaReaderControlBottomBar(
             contentDetails: contentDetails,
             mediaItems: mediaItems,
+            page: page,
+            pageNumbers: pageNumbers,
             onPageChanged: onPageChanged,
           )
         ]),
@@ -161,95 +174,91 @@ class MangaReaderControlTopBar extends ConsumerWidget {
   }
 }
 
-class MangaReaderControlBottomBar extends ConsumerWidget {
+class MangaReaderControlBottomBar extends StatelessWidget {
   final List<ContentMediaItem> mediaItems;
   final ContentDetails contentDetails;
+  final ValueListenable<int> page;
+  final int pageNumbers;
   final ValueChanged<int> onPageChanged;
 
   const MangaReaderControlBottomBar({
     super.key,
     required this.contentDetails,
     required this.mediaItems,
+    required this.page,
+    required this.pageNumbers,
     required this.onPageChanged,
   });
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final pos = ref
-        .watch(collectionItemCurrentMediaItemPositionProvider(contentDetails))
-        .valueOrNull;
 
-    if (pos == null) {
-      return const SizedBox.shrink();
-    }
-
-    var curPage = pos.position + 1;
-    final pageNumbers = pos.length;
-
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: [
-            0.1,
-            1.0,
-          ],
-          colors: [
-            Colors.transparent,
-            Colors.black54,
-          ],
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Slider(
-            max: pageNumbers.toDouble() - 1.0,
-            value: pos.position > pageNumbers
-                ? pageNumbers.toDouble()
-                : pos.position.toDouble(),
-            label: curPage.toString(),
-            divisions: pageNumbers,
-            onChanged: (value) {
-              onPageChanged(value.round());
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0, left: 16, right: 16),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
+    return ValueListenableBuilder(
+        valueListenable: page,
+        builder: (context, pageIndex, child) {
+          final pageNumber = pageIndex + 1;
+          return Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: [
+                  0.1,
+                  1.0,
+                ],
+                colors: [
+                  Colors.transparent,
+                  Colors.black54,
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  "$curPage / $pageNumbers",
-                  style: theme.textTheme.bodyMedium!.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => MangaReaderSettingsDialog(
-                        contentDetails: contentDetails,
-                        mediaItems: mediaItems,
-                      ),
-                    );
+                Slider(
+                  allowedInteraction: SliderInteraction.slideOnly,
+                  max: pageNumbers.toDouble() - 1,
+                  value: pageIndex.toDouble(),
+                  label: pageNumber.toString(),
+                  divisions: pageNumbers - 1,
+                  onChanged: (value) {
+                    onPageChanged(value.round());
                   },
-                  icon: const Icon(Icons.settings),
-                  color: Colors.white,
                 ),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(bottom: 8.0, left: 16, right: 16),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Text(
+                        "$pageNumber / $pageNumbers",
+                        style: theme.textTheme.bodyMedium!.copyWith(
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => MangaReaderSettingsDialog(
+                              contentDetails: contentDetails,
+                              mediaItems: mediaItems,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.settings),
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
-          )
-        ],
-      ),
-    );
+          );
+        });
   }
 }

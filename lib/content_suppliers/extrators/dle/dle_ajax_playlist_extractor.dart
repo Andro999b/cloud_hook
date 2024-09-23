@@ -42,7 +42,6 @@ class EpisodeVideo {
       _$EpisodeVideoFromJson(json);
 }
 
-@JsonSerializable(createToJson: false)
 class PlaylistResults {
   final List<EpisodeVideo> videos;
   final List<Label> lables;
@@ -68,7 +67,16 @@ class PlaylistResults {
       lableIds.map((e) => labelById[e]).nonNulls.join(" ");
 
   factory PlaylistResults.fromJson(Map<String, dynamic> json) =>
-      _$PlaylistResultsFromJson(json);
+      PlaylistResults(
+        (json['videos'] as List<dynamic>)
+            .map((e) => e as Map<String, dynamic>)
+            .whereNot((e) => e["id"] == null || e["file"] == null)
+            .map((e) => EpisodeVideo.fromJson(e))
+            .toList(),
+        (json['lables'] as List<dynamic>)
+            .map((e) => Label.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
 }
 
 class DLEAjaxPLaylistExtractor implements ContentMediaItemLoader {

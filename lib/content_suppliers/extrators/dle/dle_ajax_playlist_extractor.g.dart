@@ -16,13 +16,3 @@ EpisodeVideo _$EpisodeVideoFromJson(Map<String, dynamic> json) => EpisodeVideo(
       json['name'] as String,
       json['file'] as String,
     );
-
-PlaylistResults _$PlaylistResultsFromJson(Map<String, dynamic> json) =>
-    PlaylistResults(
-      (json['videos'] as List<dynamic>)
-          .map((e) => EpisodeVideo.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      (json['lables'] as List<dynamic>)
-          .map((e) => Label.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );

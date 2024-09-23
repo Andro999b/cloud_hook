@@ -99,11 +99,11 @@ class _MangaPagesReaderView extends ConsumerStatefulWidget {
 class _MangaPagesReaderViewState extends ConsumerState<_MangaPagesReaderView> {
   final transformationController = TransformationController();
   final scrollOffsetController = ScrollOffsetController();
-  late final ValueNotifier<int> pageListenable;
+  late final ValueNotifier<int> page;
 
   @override
   void initState() {
-    pageListenable = ValueNotifier(widget.initialPage);
+    page = ValueNotifier(widget.initialPage);
     super.initState();
   }
 
@@ -139,6 +139,8 @@ class _MangaPagesReaderViewState extends ConsumerState<_MangaPagesReaderView> {
             MangaReaderControlsRoute(
               contentDetails: widget.contentDetails,
               mediaItems: widget.mediaItems,
+              page: page,
+              pageNumbers: widget.pages.length,
               onPageChanged: _jumpToPage,
             ),
           ),
@@ -164,7 +166,7 @@ class _MangaPagesReaderViewState extends ConsumerState<_MangaPagesReaderView> {
                 initialPage: widget.initialPage,
                 transformationController: transformationController,
                 scrollOffsetController: scrollOffsetController,
-                pageListinable: pageListenable,
+                page: page,
                 collectionItemProvider: widget.collectionItemProvider,
               )
             : _PagedView(
@@ -172,15 +174,16 @@ class _MangaPagesReaderViewState extends ConsumerState<_MangaPagesReaderView> {
                 pages: widget.pages,
                 initialPage: widget.initialPage,
                 transformationController: transformationController,
-                pageListinable: pageListenable,
+                pageListinable: page,
               ),
       ),
     );
   }
 
-  void _jumpToPage(int page) {
-    ref.read(widget.collectionItemProvider.notifier).setCurrentPosition(page);
-    pageListenable.value = page;
+  void _jumpToPage(int value) {
+    print(value);
+    ref.read(widget.collectionItemProvider.notifier).setCurrentPosition(value);
+    page.value = value;
   }
 
   void _movePage(MangaReaderMode readerMode, int inc) async {
@@ -203,7 +206,7 @@ class _MangaPagesReaderViewState extends ConsumerState<_MangaPagesReaderView> {
       }
     } else {
       notifier.setCurrentPosition(newPos);
-      pageListenable.value = newPos;
+      page.value = newPos;
     }
   }
 
@@ -504,7 +507,7 @@ class _ScrolledView extends ConsumerStatefulWidget {
   final int initialPage;
   final TransformationController transformationController;
   final ScrollOffsetController scrollOffsetController;
-  final ValueListenable<int> pageListinable;
+  final ValueListenable<int> page;
   final CollectionItemProvider collectionItemProvider;
 
   const _ScrolledView({
@@ -513,7 +516,7 @@ class _ScrolledView extends ConsumerStatefulWidget {
     required this.initialPage,
     required this.transformationController,
     required this.scrollOffsetController,
-    required this.pageListinable,
+    required this.page,
     required this.collectionItemProvider,
   });
 
@@ -530,7 +533,7 @@ class _ScrolledViewState extends ConsumerState<_ScrolledView> {
   @override
   void initState() {
     widget.transformationController.addListener(_onTransformationChange);
-    widget.pageListinable.addListener(_onPageChanged);
+    widget.page.addListener(_onPageChanged);
     _itemPositionsListener.itemPositions.addListener(_onPositionChanged);
 
     super.initState();
@@ -539,7 +542,7 @@ class _ScrolledViewState extends ConsumerState<_ScrolledView> {
   @override
   void dispose() {
     widget.transformationController.removeListener(_onTransformationChange);
-    widget.pageListinable.removeListener(_onPageChanged);
+    widget.page.removeListener(_onPageChanged);
     _itemPositionsListener.itemPositions.removeListener(_onPositionChanged);
     super.dispose();
   }
@@ -564,7 +567,7 @@ class _ScrolledViewState extends ConsumerState<_ScrolledView> {
 
   void _onPageChanged() {
     _itemScrollController.jumpTo(
-      index: widget.pageListinable.value,
+      index: widget.page.value,
       // duration: const Duration(milliseconds: 200),
     );
   }

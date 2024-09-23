@@ -58,7 +58,7 @@ class AndroidTVControls extends StatefulWidget {
 }
 
 class _AndroidTVControlsState extends State<AndroidTVControls> {
-  late bool mount = false;
+  late bool uiShown = false;
   late bool visible = false;
 
   late bool buffering = controller(context).player.state.buffering;
@@ -105,7 +105,7 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
 
   void onEnter() {
     setState(() {
-      mount = true;
+      uiShown = true;
       visible = true;
     });
     playPauseFocusNode.requestFocus();
@@ -144,7 +144,7 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
   }
 
   void onBack() {
-    if (mount) {
+    if (uiShown) {
       onExit();
     }
   }
@@ -157,20 +157,20 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
   Widget build(BuildContext context) {
     return CallbackShortcuts(
       bindings: {
-        if (!mount) ...{
+        if (!uiShown) ...{
           const SingleActivator(LogicalKeyboardKey.arrowDown): onEnter,
           const SingleActivator(LogicalKeyboardKey.arrowUp): onEnter,
           const SingleActivator(LogicalKeyboardKey.arrowLeft): () => seek(-10),
           const SingleActivator(LogicalKeyboardKey.arrowRight): () => seek(10),
           const SingleActivator(LogicalKeyboardKey.select): onPlayPause,
+          const SingleActivator(LogicalKeyboardKey.enter): onPlayPause,
         } else ...{
-          const SingleActivator(LogicalKeyboardKey.arrowDown): onBack,
-          const SingleActivator(LogicalKeyboardKey.arrowUp): onBack,
+          const SingleActivator(LogicalKeyboardKey.escape): onExit,
         }
       },
       child: BackButtonListener(
         onBackButtonPressed: () async {
-          if (mount) {
+          if (uiShown) {
             onExit();
             return true;
           }
@@ -187,28 +187,30 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
                 onEnd: () {
                   if (!visible) {
                     setState(() {
-                      mount = false;
+                      uiShown = false;
                     });
                   }
                 },
-                child: mount
-                    ? Column(
-                        children: [
-                          // top bar
-                          _renderTopBar(),
-                          const Spacer(),
-                          // bottom bar
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16.0),
-                            child: MaterialSeekBar(),
-                          ),
-                          _AndroidTVBottomBar(
-                            contentDetails:
-                                widget.playerController.contentDetails,
-                            playerController: widget.playerController,
-                            playPauseFocusNode: playPauseFocusNode,
-                          )
-                        ],
+                child: uiShown
+                    ? FocusScope(
+                        child: Column(
+                          children: [
+                            // top bar
+                            _renderTopBar(),
+                            const Spacer(),
+                            // bottom bar
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              child: MaterialSeekBar(),
+                            ),
+                            _AndroidTVBottomBar(
+                              contentDetails:
+                                  widget.playerController.contentDetails,
+                              playerController: widget.playerController,
+                              playPauseFocusNode: playPauseFocusNode,
+                            )
+                          ],
+                        ),
                       )
                     : const SizedBox.shrink(),
               ),
@@ -248,6 +250,7 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
   }
 
   Widget _renderTopBar() {
+    final playerController = widget.playerController;
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -268,10 +271,16 @@ class _AndroidTVControlsState extends State<AndroidTVControls> {
         children: [
           const SizedBox(width: 8),
           MediaTitle(
-            contentDetails: widget.playerController.contentDetails,
-            playlistSize: widget.playerController.mediaItems.length,
+            contentDetails: playerController.contentDetails,
+            playlistSize: playerController.mediaItems.length,
           ),
           const Spacer(),
+          PlayerErrorPopup(playerController: playerController),
+          if (widget.playerController.mediaItems.length > 1)
+            PlayerPlaylistButton(
+              playerController: playerController,
+              contentDetails: playerController.contentDetails,
+            )
         ],
       ),
     );
@@ -352,33 +361,25 @@ class _AndroidTVBottomBar extends ConsumerWidget {
         ),
       ),
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-      child: FocusScope(
-        child: Row(
-          children: [
-            const MaterialDesktopPositionIndicator(),
-            const Spacer(),
-            SkipPrevButton(contentDetails: contentDetails),
-            PlayOrPauseButton(
-              focusNode: !isLastItem ? playPauseFocusNode : null,
-            ),
-            SkipNextButton(
-              contentDetails: contentDetails,
-              mediaItems: playerController.mediaItems,
-              focusNode: isLastItem ? playPauseFocusNode : null,
-            ),
-            const Spacer(),
-            PlayerErrorPopup(playerController: playerController),
-            SourceSelector(
-              mediaItems: playerController.mediaItems,
-              contentDetails: contentDetails,
-            ),
-            if (playerController.mediaItems.length > 1)
-              PlayerPlaylistButton(
-                playerController: playerController,
-                contentDetails: contentDetails,
-              )
-          ],
-        ),
+      child: Row(
+        children: [
+          const MaterialDesktopPositionIndicator(),
+          const Spacer(),
+          SkipPrevButton(contentDetails: contentDetails),
+          PlayOrPauseButton(
+            focusNode: !isLastItem ? playPauseFocusNode : null,
+          ),
+          SkipNextButton(
+            contentDetails: contentDetails,
+            mediaItems: playerController.mediaItems,
+            focusNode: isLastItem ? playPauseFocusNode : null,
+          ),
+          const Spacer(),
+          SourceSelector(
+            mediaItems: playerController.mediaItems,
+            contentDetails: contentDetails,
+          ),
+        ],
       ),
     );
   }
