@@ -139,8 +139,6 @@ class _MangaPagesReaderViewState extends ConsumerState<_MangaPagesReaderView> {
             MangaReaderControlsRoute(
               contentDetails: widget.contentDetails,
               mediaItems: widget.mediaItems,
-              page: page,
-              pageNumbers: widget.pages.length,
               onPageChanged: _jumpToPage,
             ),
           ),
@@ -181,7 +179,6 @@ class _MangaPagesReaderViewState extends ConsumerState<_MangaPagesReaderView> {
   }
 
   void _jumpToPage(int value) {
-    print(value);
     ref.read(widget.collectionItemProvider.notifier).setCurrentPosition(value);
     page.value = value;
   }
