@@ -9,6 +9,7 @@ import 'package:cloud_hook/content/video/video_content_view.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/layouts/app_theme.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:cloud_hook/widgets/dropdown.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -602,22 +603,14 @@ class PlayerErrorPopup extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        return MenuAnchor(
-          builder: (context, controller, child) {
-            return IconButton(
-              onPressed: () {
-                if (controller.isOpen) {
-                  controller.close();
-                } else {
-                  controller.open();
-                }
-              },
-              icon: const Icon(Icons.warning_rounded),
-              color: Colors.white,
-              focusColor: Colors.white.withOpacity(0.4),
-              disabledColor: Colors.white.withOpacity(0.7),
-            );
-          },
+        return Dropdown(
+          anchorBuilder: (context, onPressed, child) => IconButton(
+            onPressed: onPressed,
+            icon: const Icon(Icons.warning_rounded),
+            color: Colors.white,
+            focusColor: Colors.white.withOpacity(0.4),
+            disabledColor: Colors.white.withOpacity(0.7),
+          ),
           menuChildren: [
             ...value.reversed.take(10).mapIndexed(
                   (idx, error) => ListTile(

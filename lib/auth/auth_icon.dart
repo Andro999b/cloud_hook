@@ -3,6 +3,7 @@ import 'package:cloud_hook/auth/auth.dart';
 import 'package:cloud_hook/auth/auth_provider.dart';
 import 'package:cloud_hook/collection/collection_sync.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:cloud_hook/widgets/dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -26,92 +27,54 @@ class AuthIcon extends ConsumerWidget {
 
     return user.maybeWhen(
       data: (user) {
-        return user != null ? const _AuthUserMenu() : _renderLogin(ref);
+        return user != null ? _AuthUserMenu(user: user) : _renderLogin(ref);
       },
       orElse: () => _renderLogin(ref),
     );
   }
 }
 
-class _AuthUserMenu extends ConsumerStatefulWidget {
-  const _AuthUserMenu();
+class _AuthUserMenu extends ConsumerWidget {
+  final User user;
+
+  const _AuthUserMenu({required this.user});
 
   @override
-  ConsumerState<_AuthUserMenu> createState() => _AuthUserMenuState();
-}
-
-class _AuthUserMenuState extends ConsumerState<_AuthUserMenu> {
-  final MenuController _menuController = MenuController();
-  final FocusNode _focusNode = FocusNode();
-
-  @override
-  void dispose() {
-    super.dispose();
-    _focusNode.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final user = ref.watch(userProvider).requireValue!;
-
-    return MenuAnchor(
-      controller: _menuController,
-      builder: (context, controller, child) {
-        return InkResponse(
-          onTap: () {
-            if (controller.isOpen) {
-              controller.close();
-            } else {
-              controller.open();
-              _focusNode.requestFocus();
-            }
-          },
-          radius: 25,
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: Tooltip(
-              message: user.name,
-              child: CircleAvatar(
-                radius: 20,
-                backgroundImage:
-                    user.picture != null ? NetworkImage(user.picture!) : null,
-              ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Dropdown(
+      anchorBuilder: (context, onPressed, child) => InkResponse(
+        onTap: onPressed,
+        radius: 25,
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: Tooltip(
+            message: user.name,
+            child: CircleAvatar(
+              radius: 20,
+              backgroundImage:
+                  user.picture != null ? NetworkImage(user.picture!) : null,
             ),
           ),
-        );
-      },
+        ),
+      ),
       style: MenuStyle(
         alignment:
             isMobile(context) ? Alignment.topCenter : Alignment.bottomLeft,
       ),
       menuChildren: [
-        BackButtonListener(
-          onBackButtonPressed: () async {
-            _menuController.close();
-            return true;
+        MenuItemButton(
+          onPressed: () => CollectionSync.run(),
+          leadingIcon: const Icon(Icons.refresh),
+          child: Text(AppLocalizations.of(context)!.reload),
+        ),
+        MenuItemButton(
+          onPressed: () {
+            Auth.instance.singOut();
           },
-          child: FocusScope(
-            child: Column(
-              children: [
-                MenuItemButton(
-                  focusNode: _focusNode,
-                  onPressed: () => CollectionSync.run(),
-                  leadingIcon: const Icon(Icons.refresh),
-                  child: Text(AppLocalizations.of(context)!.reload),
-                ),
-                MenuItemButton(
-                  onPressed: () {
-                    Auth.instance.singOut();
-                  },
-                  leadingIcon: const Icon(Icons.logout),
-                  child: Text(AppLocalizations.of(context)!.singOut),
-                ),
-              ],
-            ),
-          ),
+          leadingIcon: const Icon(Icons.logout),
+          child: Text(AppLocalizations.of(context)!.singOut),
         ),
       ],
-      consumeOutsideTap: true,
     );
   }
 }

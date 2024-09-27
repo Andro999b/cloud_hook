@@ -142,7 +142,7 @@ class ContentDetailsView extends ConsumerWidget {
       );
     }
 
-    return title;
+    return Focus(child: title);
   }
 
   List<Widget> _renderAdditionalInfo(BuildContext context) {

@@ -75,6 +75,7 @@ class MainApp extends StatelessWidget {
           // initialLocation: "/settings",
           // initialLocation:
           //     "/manga/MangaDex/ef3a66a4-010f-4930-b6d4-0ff28b0ceed5",
+          // initialLocation: "/content/Eneyida/9339-sogun-shogun",
           routes: [
             GoRoute(
               path: NavigationRoute.home.path,

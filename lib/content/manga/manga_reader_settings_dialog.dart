@@ -4,6 +4,7 @@ import 'package:cloud_hook/content/manga/manga_provider.dart';
 import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/settings/settings_provider.dart';
+import 'package:cloud_hook/widgets/dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -66,21 +67,20 @@ class _MangaReaderBackgroundSelector extends ConsumerWidget {
           AppLocalizations.of(context)!.mangaReaderBackground,
           style: theme.textTheme.headlineSmall,
         ),
-        DropdownMenu(
-          initialSelection: currentBackground,
-          onSelected: (value) {
-            ref
-                .read(mangaReaderBackgroundSettingsProvider.notifier)
-                .select(value!);
-          },
-          dropdownMenuEntries: MangaReaderBackground.values.map(
-            (value) {
-              return DropdownMenuEntry(
-                value: value,
-                label: mangaReaderBackgroundLabel(context, value),
-              );
-            },
-          ).toList(),
+        Dropdown.button(
+          lable: mangaReaderBackgroundLabel(context, currentBackground),
+          menuChildren: MangaReaderBackground.values
+              .map(
+                (value) => MenuItemButton(
+                  onPressed: () {
+                    ref
+                        .read(mangaReaderBackgroundSettingsProvider.notifier)
+                        .select(value);
+                  },
+                  child: Text(mangaReaderBackgroundLabel(context, value)),
+                ),
+              )
+              .toList(),
         ),
       ],
     );
@@ -132,21 +132,20 @@ class _MangaTranslationSelector extends ConsumerWidget {
           AppLocalizations.of(context)!.mangaTranslation,
           style: theme.textTheme.headlineSmall,
         ),
-        DropdownMenu(
-          initialSelection: currentSource,
-          onSelected: (value) {
-            ref
-                .read(collectionItemProvider(contentDetails).notifier)
-                .setCurrentSource(value);
-          },
-          dropdownMenuEntries: sources.map(
-            (value) {
-              return DropdownMenuEntry(
-                value: value.description,
-                label: value.description,
-              );
-            },
-          ).toList(),
+        Dropdown.button(
+          lable: currentSource ?? sources.first.description,
+          menuChildren: sources
+              .map(
+                (value) => MenuItemButton(
+                  onPressed: () {
+                    ref
+                        .read(collectionItemProvider(contentDetails).notifier)
+                        .setCurrentSource(value.description);
+                  },
+                  child: Text(value.description),
+                ),
+              )
+              .toList(),
         ),
       ],
     );
@@ -171,19 +170,20 @@ class _MangaReaderModeSelector extends ConsumerWidget {
           AppLocalizations.of(context)!.mangaReaderMode,
           style: theme.textTheme.headlineSmall,
         ),
-        DropdownMenu(
-          initialSelection: currentMode,
-          onSelected: (value) {
-            ref.read(mangaReaderModeSettingsProvider.notifier).select(value!);
-          },
-          dropdownMenuEntries: MangaReaderMode.values.map(
-            (value) {
-              return DropdownMenuEntry(
-                value: value,
-                label: mangaReaderModeLabel(context, value),
-              );
-            },
-          ).toList(),
+        Dropdown.button(
+          lable: mangaReaderModeLabel(context, currentMode),
+          menuChildren: MangaReaderMode.values
+              .map(
+                (value) => MenuItemButton(
+                  onPressed: () {
+                    ref
+                        .read(mangaReaderModeSettingsProvider.notifier)
+                        .select(value);
+                  },
+                  child: Text(mangaReaderModeLabel(context, value)),
+                ),
+              )
+              .toList(),
         ),
       ],
     );
@@ -208,19 +208,20 @@ class _ImageScaleSelector extends ConsumerWidget {
           AppLocalizations.of(context)!.mangaReaderScale,
           style: theme.textTheme.headlineSmall,
         ),
-        DropdownMenu(
-          initialSelection: currentScale,
-          onSelected: (value) {
-            ref.read(mangaReaderScaleSettingsProvider.notifier).select(value!);
-          },
-          dropdownMenuEntries: MangaReaderScale.values.map(
-            (value) {
-              return DropdownMenuEntry(
-                value: value,
-                label: mangaReaderScaleLabel(context, value),
-              );
-            },
-          ).toList(),
+        Dropdown.button(
+          lable: mangaReaderScaleLabel(context, currentScale),
+          menuChildren: MangaReaderScale.values
+              .map(
+                (value) => MenuItemButton(
+                  onPressed: () {
+                    ref
+                        .read(mangaReaderScaleSettingsProvider.notifier)
+                        .select(value);
+                  },
+                  child: Text(mangaReaderScaleLabel(context, value)),
+                ),
+              )
+              .toList(),
         ),
       ],
     );
