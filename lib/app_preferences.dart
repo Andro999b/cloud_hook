@@ -1,6 +1,6 @@
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/content/manga/model.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

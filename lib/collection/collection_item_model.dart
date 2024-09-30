@@ -1,4 +1,4 @@
-import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';

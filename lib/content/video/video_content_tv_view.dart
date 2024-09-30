@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/video/video_content_view.dart';
 import 'package:cloud_hook/content/video/widgets.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

@@ -1,6 +1,6 @@
 import 'package:cloud_hook/collection/collection_item_provider.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:collection/collection.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

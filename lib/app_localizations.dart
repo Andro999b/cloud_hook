@@ -1,7 +1,7 @@
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/content/manga/model.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 
 export 'package:flutter_gen/gen_l10n/app_localizations.dart'

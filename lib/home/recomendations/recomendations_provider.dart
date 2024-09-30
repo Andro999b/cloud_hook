@@ -1,5 +1,5 @@
 import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'recomendations_provider.g.dart';
