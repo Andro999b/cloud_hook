@@ -6,6 +6,7 @@ import 'package:cloud_hook/content/manga/manga_reader_controls.dart';
 import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/content/manga/widgets.dart';
 import 'package:cloud_hook/settings/settings_provider.dart';
+import 'package:cloud_hook/widgets/back_nav_button.dart';
 import 'package:cloud_hook/widgets/display_error.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/foundation.dart';
@@ -48,9 +49,9 @@ class MangaReaderView extends ConsumerWidget {
     List<ImageProvider> pages,
   ) {
     if (pages.isEmpty) {
-      return DisplayError(
-        error: AppLocalizations.of(context)!.mangaUnableToLoadPage,
-        onRefresh: () => ref.refresh(_pagesProvider),
+      return _NoPagesView(
+        contentDetails: contentDetails,
+        mediaItems: mediaItems,
       );
     }
 
@@ -154,26 +155,31 @@ class _MangaPagesReaderViewState extends ConsumerState<_MangaPagesReaderView> {
         ),
       },
       autofocus: true,
-      child: _ReaderGestureDetector(
-        readerMode: readerMode,
-        transformationController: transformationController,
-        child: readerMode.scroll
-            ? _ScrolledView(
-                readerMode: readerMode,
-                pages: widget.pages,
-                initialPage: widget.initialPage,
-                transformationController: transformationController,
-                scrollOffsetController: scrollOffsetController,
-                page: page,
-                collectionItemProvider: widget.collectionItemProvider,
-              )
-            : _PagedView(
-                readerMode: readerMode,
-                pages: widget.pages,
-                initialPage: widget.initialPage,
-                transformationController: transformationController,
-                pageListinable: page,
-              ),
+      child: Stack(
+        children: [
+          const MangaBackground(),
+          _ReaderGestureDetector(
+            readerMode: readerMode,
+            transformationController: transformationController,
+            child: readerMode.scroll
+                ? _ScrolledView(
+                    readerMode: readerMode,
+                    pages: widget.pages,
+                    initialPage: widget.initialPage,
+                    transformationController: transformationController,
+                    scrollOffsetController: scrollOffsetController,
+                    page: page,
+                    collectionItemProvider: widget.collectionItemProvider,
+                  )
+                : _PagedView(
+                    readerMode: readerMode,
+                    pages: widget.pages,
+                    initialPage: widget.initialPage,
+                    transformationController: transformationController,
+                    pageListinable: page,
+                  ),
+          ),
+        ],
       ),
     );
   }
@@ -615,5 +621,48 @@ class _ScrolledViewState extends ConsumerState<_ScrolledView> {
         ),
       );
     });
+  }
+}
+
+class _NoPagesView extends StatelessWidget {
+  final ContentDetails contentDetails;
+  final List<ContentMediaItem> mediaItems;
+
+  const _NoPagesView({
+    required this.contentDetails,
+    required this.mediaItems,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            AppLocalizations.of(context)!.mangaUnableToLoadPage,
+            style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const BackNavButton(),
+              const SizedBox(width: 8),
+              MangaSettingsButton(
+                contentDetails: contentDetails,
+                mediaItems: mediaItems,
+              ),
+              const SizedBox(width: 8),
+              VolumesButton(
+                contentDetails: contentDetails,
+                mediaItems: mediaItems,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

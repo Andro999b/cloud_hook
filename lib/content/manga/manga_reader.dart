@@ -1,7 +1,6 @@
 import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/manga/manga_provider.dart';
 import 'package:cloud_hook/content/manga/manga_reader_view.dart';
-import 'package:cloud_hook/content/manga/widgets.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -30,14 +29,9 @@ class MangaReader extends HookConsumerWidget {
       },
     );
 
-    return Stack(
-      children: [
-        const MangaBackground(),
-        MangaReaderView(
-          contentDetails: contentDetails,
-          mediaItems: mediaItems,
-        ),
-      ],
+    return MangaReaderView(
+      contentDetails: contentDetails,
+      mediaItems: mediaItems,
     );
   }
 }

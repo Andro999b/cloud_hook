@@ -33,7 +33,7 @@ class MangaReaderSettingsDialog extends ConsumerWidget {
             children: [
               const _MangaReaderBackgroundSelector(),
               const SizedBox(height: 8),
-              _MangaTranslationSelector(
+              MangaTranslationSelector(
                 contentDetails: contentDetails,
                 mediaItems: mediaItems,
               ),
@@ -87,11 +87,12 @@ class _MangaReaderBackgroundSelector extends ConsumerWidget {
   }
 }
 
-class _MangaTranslationSelector extends ConsumerWidget {
+class MangaTranslationSelector extends ConsumerWidget {
   final ContentDetails contentDetails;
   final List<ContentMediaItem> mediaItems;
 
-  const _MangaTranslationSelector({
+  const MangaTranslationSelector({
+    super.key,
     required this.contentDetails,
     required this.mediaItems,
   });

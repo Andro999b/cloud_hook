@@ -1,3 +1,4 @@
+import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
 import 'package:cloud_hook/content/manga/manga_reader_settings_dialog.dart';
 import 'package:cloud_hook/content/manga/widgets.dart';
@@ -230,17 +231,9 @@ class MangaReaderControlBottomBar extends ConsumerWidget {
                   ),
                 ),
                 const Spacer(),
-                IconButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => MangaReaderSettingsDialog(
-                        contentDetails: contentDetails,
-                        mediaItems: mediaItems,
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.settings),
+                MangaSettingsButton(
+                  contentDetails: contentDetails,
+                  mediaItems: mediaItems,
                   color: Colors.white,
                 ),
               ],
@@ -248,6 +241,37 @@ class MangaReaderControlBottomBar extends ConsumerWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class MangaSettingsButton extends StatelessWidget {
+  final ContentDetails contentDetails;
+  final List<ContentMediaItem> mediaItems;
+  final Color? color;
+
+  const MangaSettingsButton({
+    super.key,
+    required this.contentDetails,
+    required this.mediaItems,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) => MangaReaderSettingsDialog(
+            contentDetails: contentDetails,
+            mediaItems: mediaItems,
+          ),
+        );
+      },
+      tooltip: AppLocalizations.of(context)!.settings,
+      icon: const Icon(Icons.settings),
+      color: color,
     );
   }
 }
