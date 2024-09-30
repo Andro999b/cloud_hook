@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/widgets/horizontal_list_card.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

@@ -1,18 +1,19 @@
 import 'dart:isolate';
 
-import 'package:cloud_hook/content_suppliers/suppliers/animeua/animeua.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/anitaku/anitaku.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/anitube/anitube.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/eneyida/eneyida.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/hianime/hianime.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/mangadex/mangadex.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/tmdb/tmdb.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/uafilms/uafilms.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/uakinoclub/uakinoclub.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/uaserial/uaserial.dart';
-import 'package:cloud_hook/content_suppliers/suppliers/ufdub/ufdub.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:cloud_hook/app_secrets.dart';
 import 'package:cloud_hook/utils/logger.dart';
+import 'package:content_suppliers_api/model.dart';
+import 'package:content_suppliers_dart/suppliers/animeua/animeua.dart';
+import 'package:content_suppliers_dart/suppliers/anitaku/anitaku.dart';
+import 'package:content_suppliers_dart/suppliers/anitube/anitube.dart';
+import 'package:content_suppliers_dart/suppliers/eneyida/eneyida.dart';
+import 'package:content_suppliers_dart/suppliers/hianime/hianime.dart';
+import 'package:content_suppliers_dart/suppliers/mangadex/mangadex.dart';
+import 'package:content_suppliers_dart/suppliers/tmdb/tmdb.dart';
+import 'package:content_suppliers_dart/suppliers/uafilms/uafilms.dart';
+import 'package:content_suppliers_dart/suppliers/uakinoclub/uakinoclub.dart';
+import 'package:content_suppliers_dart/suppliers/uaserial/uaserial.dart';
+import 'package:content_suppliers_dart/suppliers/ufdub/ufdub.dart';
 
 class ContentSuppliers {
   ContentSuppliers._();
@@ -20,7 +21,7 @@ class ContentSuppliers {
   static final ContentSuppliers instance = ContentSuppliers._();
 
   final List<ContentSupplier> _suppliers = [
-    TmdbSupplier(),
+    TmdbSupplier(secret: AppSecrets.getString("tmdb")),
     Anitaku(),
     HianimeSupplier(),
     MangaDexSupllier(),

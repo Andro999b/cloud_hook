@@ -1,8 +1,8 @@
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/content/content_details_actions.dart';
 import 'package:cloud_hook/content/manga/widgets.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

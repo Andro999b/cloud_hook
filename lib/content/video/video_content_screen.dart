@@ -29,7 +29,6 @@ class VideoContentScreen extends ConsumerWidget {
             ),
             error: (error, stackTrace) => DisplayError(
               error: error,
-              stackTrace: stackTrace,
               onRefresh: () =>
                   ref.refresh(detailsProvider(supplier, id).future),
             ),

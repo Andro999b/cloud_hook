@@ -1,11 +1,12 @@
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
+import 'package:cloud_hook/widgets/dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 typedef PrioritySelectCallback = Function(int priority);
 
-class CollectionItemPrioritySelector extends StatefulWidget {
+class CollectionItemPrioritySelector extends StatelessWidget {
   final MediaCollectionItem collectionItem;
   final PrioritySelectCallback onSelect;
 
@@ -16,66 +17,26 @@ class CollectionItemPrioritySelector extends StatefulWidget {
   });
 
   @override
-  State<CollectionItemPrioritySelector> createState() =>
-      _CollectionItemPrioritySelectorState();
-}
-
-class _CollectionItemPrioritySelectorState
-    extends State<CollectionItemPrioritySelector> {
-  final _menuController = MenuController();
-  final _focusNode = FocusNode();
-
-  @override
-  void dispose() {
-    super.dispose();
-    _focusNode.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return MenuAnchor(
-      controller: _menuController,
-      builder: (context, controller, child) => IconButton(
-        onPressed: () {
-          if (controller.isOpen) {
-            controller.close();
-          } else {
-            _focusNode.requestFocus();
-            controller.open();
-          }
-        },
-        icon: Icon(_priorityIcon(widget.collectionItem.priority)),
-        tooltip: AppLocalizations.of(context)!.priorityTooltip(
-            priorityLabel(context, widget.collectionItem.priority)),
+    return Dropdown(
+      anchorBuilder: (context, onPressed, child) => IconButton(
+        onPressed: onPressed,
+        icon: Icon(_priorityIcon(collectionItem.priority)),
+        tooltip: AppLocalizations.of(context)!
+            .priorityTooltip(priorityLabel(context, collectionItem.priority)),
       ),
       style: const MenuStyle(alignment: Alignment.topLeft),
       alignmentOffset: const Offset(0, -40),
-      menuChildren: [
-        BackButtonListener(
-          onBackButtonPressed: () async {
-            _menuController.close();
-            return true;
-          },
-          child: FocusScope(
-            child: Column(
-              children: List.generate(3, (index) => index)
-                  .reversed
-                  .map(
-                    (index) => MenuItemButton(
-                      focusNode: index == widget.collectionItem.priority
-                          ? _focusNode
-                          : null,
-                      onPressed: () => widget.onSelect(index),
-                      leadingIcon: Icon(_priorityIcon(index)),
-                      child: Text(priorityLabel(context, index)),
-                    ),
-                  )
-                  .toList(),
+      menuChildren: List.generate(3, (index) => index)
+          .reversed
+          .map(
+            (index) => MenuItemButton(
+              onPressed: () => onSelect(index),
+              leadingIcon: Icon(_priorityIcon(index)),
+              child: Text(priorityLabel(context, index)),
             ),
-          ),
-        )
-      ],
-      consumeOutsideTap: true,
+          )
+          .toList(),
     );
   }
 

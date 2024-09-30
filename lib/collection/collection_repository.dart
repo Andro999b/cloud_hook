@@ -4,7 +4,7 @@ import 'package:cloud_hook/app_database.dart';
 import 'package:cloud_hook/auth/auth.dart' as auth;
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_sync.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:firebase_dart/firebase_dart.dart';
 import 'package:isar/isar.dart';
 

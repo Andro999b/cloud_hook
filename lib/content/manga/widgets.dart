@@ -1,8 +1,10 @@
 import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/collection/collection_item_provider.dart';
+import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/content/media_items_list.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
+import 'package:cloud_hook/settings/settings_provider.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -122,6 +124,101 @@ class MangaItemsListItem extends StatelessWidget {
           trailing: selected ? const Icon(Icons.menu_book) : null,
         ),
       ],
+    );
+  }
+}
+
+class MangaBackground extends ConsumerWidget {
+  const MangaBackground({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final size = MediaQuery.sizeOf(context);
+
+    final currentBackground = ref.watch(mangaReaderBackgroundSettingsProvider);
+
+    return Container(
+      width: size.width,
+      height: size.height,
+      color: switch (currentBackground) {
+        MangaReaderBackground.light => Colors.white,
+        MangaReaderBackground.dark => Colors.black,
+      },
+    );
+  }
+}
+
+class MangaChapterProgressIndicator extends ConsumerWidget {
+  final ContentDetails contentDetails;
+
+  const MangaChapterProgressIndicator({
+    super.key,
+    required this.contentDetails,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pos = ref
+        .watch(collectionItemCurrentMediaItemPositionProvider(contentDetails))
+        .valueOrNull;
+
+    if (pos == null || pos.length == 0) {
+      return const SizedBox.shrink();
+    }
+
+    return LinearProgressIndicator(value: pos.progress);
+  }
+}
+
+class MangaPagePlaceholder extends StatefulWidget {
+  static const aspectRation = 1.5;
+  final MangaReaderMode readerMode;
+  final BoxConstraints constraints;
+
+  const MangaPagePlaceholder({
+    super.key,
+    required this.readerMode,
+    required this.constraints,
+  });
+
+  @override
+  State<MangaPagePlaceholder> createState() => _MangaPagePlaceholderState();
+}
+
+class _MangaPagePlaceholderState extends State<MangaPagePlaceholder> {
+  double _opacity = 1;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _opacity = 0;
+        });
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      opacity: _opacity,
+      duration: const Duration(milliseconds: 1800),
+      child: Container(
+        width: widget.readerMode.direction == Axis.vertical
+            ? widget.constraints.maxWidth
+            : widget.constraints.maxHeight / MangaPagePlaceholder.aspectRation,
+        height: widget.readerMode.direction == Axis.horizontal
+            ? widget.constraints.maxHeight
+            : widget.constraints.maxWidth * MangaPagePlaceholder.aspectRation,
+        color: Colors.grey.shade400,
+      ),
+      onEnd: () {
+        setState(() {
+          _opacity = _opacity == 0 ? 1.0 : 0.0;
+        });
+      },
     );
   }
 }

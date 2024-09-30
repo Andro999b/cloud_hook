@@ -1,10 +1,10 @@
 import 'package:cloud_hook/app_preferences.dart';
 import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/search/search_model.dart';
 import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
 import 'package:cloud_hook/utils/collections.dart';
 import 'package:cloud_hook/utils/text.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

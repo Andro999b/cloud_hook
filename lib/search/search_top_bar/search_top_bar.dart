@@ -1,5 +1,4 @@
 import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/content_suppliers/model.dart';
 import 'package:cloud_hook/search/search_provider.dart';
 import 'package:cloud_hook/search/search_top_bar/search_suggestion_model.dart';
 import 'package:cloud_hook/search/search_top_bar/search_suggestion_provider.dart';
@@ -7,6 +6,7 @@ import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/visual.dart';
 import 'package:cloud_hook/widgets/filter_dialog_section.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

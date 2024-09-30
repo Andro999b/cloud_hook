@@ -1,4 +1,5 @@
 import 'package:cloud_hook/settings/settings_provider.dart';
+import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,15 +13,22 @@ class AppTheme extends ConsumerWidget {
     final brightness = ref.watch(brigthnesSettingProvider);
     final color = ref.watch(colorSettingsProvider);
 
-    return Theme(
-      data: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          brightness: brightness ?? MediaQuery.platformBrightnessOf(context),
-          seedColor: color,
-        ),
-        useMaterial3: true,
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        navigationMode: AndroidTVDetector.isTV
+            ? NavigationMode.directional
+            : NavigationMode.traditional,
       ),
-      child: child,
+      child: Theme(
+        data: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            brightness: brightness ?? MediaQuery.platformBrightnessOf(context),
+            seedColor: color,
+          ),
+          useMaterial3: true,
+        ),
+        child: child,
+      ),
     );
   }
 }
