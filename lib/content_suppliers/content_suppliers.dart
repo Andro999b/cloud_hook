@@ -3,38 +3,28 @@ import 'dart:isolate';
 import 'package:cloud_hook/app_secrets.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:content_suppliers_api/model.dart';
-import 'package:content_suppliers_dart/suppliers/animeua/animeua.dart';
-import 'package:content_suppliers_dart/suppliers/anitaku/anitaku.dart';
-import 'package:content_suppliers_dart/suppliers/anitube/anitube.dart';
-import 'package:content_suppliers_dart/suppliers/eneyida/eneyida.dart';
-import 'package:content_suppliers_dart/suppliers/hianime/hianime.dart';
-import 'package:content_suppliers_dart/suppliers/mangadex/mangadex.dart';
-import 'package:content_suppliers_dart/suppliers/tmdb/tmdb.dart';
-import 'package:content_suppliers_dart/suppliers/uafilms/uafilms.dart';
-import 'package:content_suppliers_dart/suppliers/uakinoclub/uakinoclub.dart';
-import 'package:content_suppliers_dart/suppliers/uaserial/uaserial.dart';
-import 'package:content_suppliers_dart/suppliers/ufdub/ufdub.dart';
+import 'package:content_suppliers_dart/bundle.dart';
 
 class ContentSuppliers {
   ContentSuppliers._();
 
   static final ContentSuppliers instance = ContentSuppliers._();
 
-  final List<ContentSupplier> _suppliers = [
-    TmdbSupplier(secret: AppSecrets.getString("tmdb")),
-    Anitaku(),
-    HianimeSupplier(),
-    MangaDexSupllier(),
-    EneyidaSupplier(),
-    UASerialSupplier(),
-    UAKinoClubSupplier(),
-    AniTubeSupplier(),
-    AnimeUASupplier(),
-    UAFilmsSupplier(),
-    UFDubSupplier(),
+  final List<ContentSupplierBundle> _bundles = [
+    DartContentSupplierBundle(tmdbSecret: AppSecrets.getString("tmdb"))
   ];
 
-  late final _suppliersByName = {for (var s in _suppliers) s.name: s};
+  Future<void> load() async {
+    List<ContentSupplier> suppliers = [];
+    for (final bundle in _bundles) {
+      suppliers += await bundle.suppliers;
+    }
+    _suppliers = suppliers;
+    _suppliersByName = {for (var s in suppliers) s.name: s};
+  }
+
+  List<ContentSupplier> _suppliers = [];
+  Map<String, ContentSupplier> _suppliersByName = {};
 
   Set<String> get suppliersName => _suppliersByName.keys.toSet();
 

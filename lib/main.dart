@@ -9,6 +9,7 @@ import 'package:cloud_hook/collection/collection_screen.dart';
 import 'package:cloud_hook/content/content_details_screen.dart';
 import 'package:cloud_hook/content/manga/manga_content_screan.dart';
 import 'package:cloud_hook/content/video/video_content_screen.dart';
+import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
 import 'package:cloud_hook/home/home_screan.dart';
 import 'package:cloud_hook/layouts/navigation_data.dart';
 import 'package:cloud_hook/search/search_screen.dart';
@@ -16,6 +17,7 @@ import 'package:cloud_hook/settings/settings_screan.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/error_observer.dart';
 import 'package:cloud_hook/utils/visual.dart';
+import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,6 +42,9 @@ void main() async {
 
   // init firebase
   await AppInitFirebase.init();
+
+  // load suppliers
+  await ContentSuppliers.instance.load();
 
   // start ui
   runApp(ProviderScope(

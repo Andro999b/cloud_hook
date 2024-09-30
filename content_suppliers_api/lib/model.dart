@@ -296,3 +296,7 @@ class AsyncContentMediaItemSource extends Equatable
   @override
   List<Object?> get props => [link, headers];
 }
+
+abstract interface class ContentSupplierBundle {
+  Future<List<ContentSupplier>> get suppliers;
+}
