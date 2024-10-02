@@ -17,7 +17,6 @@ import 'package:cloud_hook/settings/settings_screan.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/error_observer.dart';
 import 'package:cloud_hook/utils/visual.dart';
-import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
