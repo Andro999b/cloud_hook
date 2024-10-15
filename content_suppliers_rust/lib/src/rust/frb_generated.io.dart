@@ -26,13 +26,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
-  Bridge dco_decode_box_autoadd_bridge(dynamic raw);
-
-  @protected
   ContentDetails dco_decode_box_autoadd_content_details(dynamic raw);
-
-  @protected
-  Bridge dco_decode_bridge(dynamic raw);
 
   @protected
   ContentDetails dco_decode_content_details(dynamic raw);
@@ -90,6 +84,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int dco_decode_u_16(dynamic raw);
 
   @protected
+  int dco_decode_u_32(dynamic raw);
+
+  @protected
   int dco_decode_u_8(dynamic raw);
 
   @protected
@@ -103,14 +100,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
-  Bridge sse_decode_box_autoadd_bridge(SseDeserializer deserializer);
-
-  @protected
   ContentDetails sse_decode_box_autoadd_content_details(
       SseDeserializer deserializer);
-
-  @protected
-  Bridge sse_decode_bridge(SseDeserializer deserializer);
 
   @protected
   ContentDetails sse_decode_content_details(SseDeserializer deserializer);
@@ -173,6 +164,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int sse_decode_u_16(SseDeserializer deserializer);
 
   @protected
+  int sse_decode_u_32(SseDeserializer deserializer);
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer);
 
   @protected
@@ -189,14 +183,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
-  void sse_encode_box_autoadd_bridge(Bridge self, SseSerializer serializer);
-
-  @protected
   void sse_encode_box_autoadd_content_details(
       ContentDetails self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_bridge(Bridge self, SseSerializer serializer);
 
   @protected
   void sse_encode_content_details(
@@ -262,6 +250,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_u_16(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_u_32(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_8(int self, SseSerializer serializer);

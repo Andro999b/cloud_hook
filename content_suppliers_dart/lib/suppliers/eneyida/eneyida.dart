@@ -23,8 +23,7 @@ class EneyidaSupplier extends ContentSupplier
       };
 
   @override
-  Set<ContentLanguage> get supportedLanguages =>
-      const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.uk};
 
   late final _contentInfoFieldSelector = SelectorsToMap({
     "supplier": Const(name),

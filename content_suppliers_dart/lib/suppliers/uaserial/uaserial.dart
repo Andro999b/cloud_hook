@@ -23,7 +23,7 @@ class UASerialSupplier extends ContentSupplier with PageableChannelsLoader {
 
   @override
   Set<ContentLanguage> get supportedLanguages => const {
-        ContentLanguage.ukrainian,
+        ContentLanguage.uk,
       };
 
   @override

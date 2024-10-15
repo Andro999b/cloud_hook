@@ -15,7 +15,7 @@ class HianimeSupplier extends ContentSupplier with PageableChannelsLoader {
   String get name => "Hianime";
 
   @override
-  Set<ContentLanguage> supportedLanguages = const {ContentLanguage.english};
+  Set<ContentLanguage> supportedLanguages = const {ContentLanguage.en};
 
   @override
   Set<ContentType> supportedTypes = const {ContentType.anime};

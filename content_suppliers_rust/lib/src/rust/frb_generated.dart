@@ -69,7 +69,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.4.0';
 
   @override
-  int get rustContentHash => -341653949;
+  int get rustContentHash => -235981467;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -82,36 +82,36 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 abstract class RustLibApi extends BaseApi {
   List<String> crateApiBridgeAvalaibleSuppliers();
 
-  List<String> crateApiBridgeBridgeGetChannels({required Bridge that});
+  List<String> crateApiBridgeGetChannels({required String supplier});
 
-  Future<ContentDetails?> crateApiBridgeBridgeGetContentDetails(
-      {required Bridge that, required String id});
+  Future<ContentDetails?> crateApiBridgeGetContentDetails(
+      {required String supplier, required String id});
 
-  List<String> crateApiBridgeBridgeGetDefaultChannels({required Bridge that});
+  List<String> crateApiBridgeGetDefaultChannels({required String supplier});
 
-  String crateApiBridgeBridgeGetName({required Bridge that});
+  List<String> crateApiBridgeGetSupportedLanguages({required String supplier});
 
-  List<String> crateApiBridgeBridgeGetSupportedLanguages(
-      {required Bridge that});
-
-  List<ContentType> crateApiBridgeBridgeGetSupportedTypes(
-      {required Bridge that});
-
-  Future<List<ContentInfo>> crateApiBridgeBridgeLoadChannel(
-      {required Bridge that, required String channel, required int page});
-
-  Future<List<ContentMediaItemSource>> crateApiBridgeBridgeLoadMediaItemSources(
-      {required Bridge that, required String id, required List<String> params});
-
-  Future<List<ContentMediaItem>> crateApiBridgeBridgeLoadMediaItems(
-      {required Bridge that, required String id, required List<String> params});
-
-  Future<List<ContentInfo>> crateApiBridgeBridgeSearch(
-      {required Bridge that,
-      required String query,
-      required List<String> types});
+  List<ContentType> crateApiBridgeGetSupportedTypes({required String supplier});
 
   Future<void> crateApiBridgeInitApp();
+
+  Future<List<ContentInfo>> crateApiBridgeLoadChannel(
+      {required String supplier, required String channel, required int page});
+
+  Future<List<ContentMediaItemSource>> crateApiBridgeLoadMediaItemSources(
+      {required String supplier,
+      required String id,
+      required List<String> params});
+
+  Future<List<ContentMediaItem>> crateApiBridgeLoadMediaItems(
+      {required String supplier,
+      required String id,
+      required List<String> params});
+
+  Future<List<ContentInfo>> crateApiBridgeSearch(
+      {required String supplier,
+      required String query,
+      required List<String> types});
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -146,36 +146,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  List<String> crateApiBridgeBridgeGetChannels({required Bridge that}) {
+  List<String> crateApiBridgeGetChannels({required String supplier}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_bridge(that, serializer);
+        sse_encode_String(supplier, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiBridgeBridgeGetChannelsConstMeta,
-      argValues: [that],
+      constMeta: kCrateApiBridgeGetChannelsConstMeta,
+      argValues: [supplier],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBridgeBridgeGetChannelsConstMeta =>
-      const TaskConstMeta(
-        debugName: "bridge_get_channels",
-        argNames: ["that"],
+  TaskConstMeta get kCrateApiBridgeGetChannelsConstMeta => const TaskConstMeta(
+        debugName: "get_channels",
+        argNames: ["supplier"],
       );
 
   @override
-  Future<ContentDetails?> crateApiBridgeBridgeGetContentDetails(
-      {required Bridge that, required String id}) {
+  Future<ContentDetails?> crateApiBridgeGetContentDetails(
+      {required String supplier, required String id}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_bridge(that, serializer);
+        sse_encode_String(supplier, serializer);
         sse_encode_String(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 3, port: port_);
@@ -184,231 +183,89 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_opt_box_autoadd_content_details,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiBridgeBridgeGetContentDetailsConstMeta,
-      argValues: [that, id],
+      constMeta: kCrateApiBridgeGetContentDetailsConstMeta,
+      argValues: [supplier, id],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBridgeBridgeGetContentDetailsConstMeta =>
+  TaskConstMeta get kCrateApiBridgeGetContentDetailsConstMeta =>
       const TaskConstMeta(
-        debugName: "bridge_get_content_details",
-        argNames: ["that", "id"],
+        debugName: "get_content_details",
+        argNames: ["supplier", "id"],
       );
 
   @override
-  List<String> crateApiBridgeBridgeGetDefaultChannels({required Bridge that}) {
+  List<String> crateApiBridgeGetDefaultChannels({required String supplier}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_bridge(that, serializer);
+        sse_encode_String(supplier, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiBridgeBridgeGetDefaultChannelsConstMeta,
-      argValues: [that],
+      constMeta: kCrateApiBridgeGetDefaultChannelsConstMeta,
+      argValues: [supplier],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBridgeBridgeGetDefaultChannelsConstMeta =>
+  TaskConstMeta get kCrateApiBridgeGetDefaultChannelsConstMeta =>
       const TaskConstMeta(
-        debugName: "bridge_get_default_channels",
-        argNames: ["that"],
+        debugName: "get_default_channels",
+        argNames: ["supplier"],
       );
 
   @override
-  String crateApiBridgeBridgeGetName({required Bridge that}) {
+  List<String> crateApiBridgeGetSupportedLanguages({required String supplier}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_bridge(that, serializer);
+        sse_encode_String(supplier, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiBridgeBridgeGetNameConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiBridgeBridgeGetNameConstMeta =>
-      const TaskConstMeta(
-        debugName: "bridge_get_name",
-        argNames: ["that"],
-      );
-
-  @override
-  List<String> crateApiBridgeBridgeGetSupportedLanguages(
-      {required Bridge that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_bridge(that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiBridgeBridgeGetSupportedLanguagesConstMeta,
-      argValues: [that],
+      constMeta: kCrateApiBridgeGetSupportedLanguagesConstMeta,
+      argValues: [supplier],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBridgeBridgeGetSupportedLanguagesConstMeta =>
+  TaskConstMeta get kCrateApiBridgeGetSupportedLanguagesConstMeta =>
       const TaskConstMeta(
-        debugName: "bridge_get_supported_languages",
-        argNames: ["that"],
+        debugName: "get_supported_languages",
+        argNames: ["supplier"],
       );
 
   @override
-  List<ContentType> crateApiBridgeBridgeGetSupportedTypes(
-      {required Bridge that}) {
+  List<ContentType> crateApiBridgeGetSupportedTypes(
+      {required String supplier}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_bridge(that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+        sse_encode_String(supplier, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_content_type,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiBridgeBridgeGetSupportedTypesConstMeta,
-      argValues: [that],
+      constMeta: kCrateApiBridgeGetSupportedTypesConstMeta,
+      argValues: [supplier],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBridgeBridgeGetSupportedTypesConstMeta =>
+  TaskConstMeta get kCrateApiBridgeGetSupportedTypesConstMeta =>
       const TaskConstMeta(
-        debugName: "bridge_get_supported_types",
-        argNames: ["that"],
-      );
-
-  @override
-  Future<List<ContentInfo>> crateApiBridgeBridgeLoadChannel(
-      {required Bridge that, required String channel, required int page}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_bridge(that, serializer);
-        sse_encode_String(channel, serializer);
-        sse_encode_u_16(page, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 8, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_list_content_info,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiBridgeBridgeLoadChannelConstMeta,
-      argValues: [that, channel, page],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiBridgeBridgeLoadChannelConstMeta =>
-      const TaskConstMeta(
-        debugName: "bridge_load_channel",
-        argNames: ["that", "channel", "page"],
-      );
-
-  @override
-  Future<List<ContentMediaItemSource>> crateApiBridgeBridgeLoadMediaItemSources(
-      {required Bridge that,
-      required String id,
-      required List<String> params}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_bridge(that, serializer);
-        sse_encode_String(id, serializer);
-        sse_encode_list_String(params, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 9, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_list_content_media_item_source,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiBridgeBridgeLoadMediaItemSourcesConstMeta,
-      argValues: [that, id, params],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiBridgeBridgeLoadMediaItemSourcesConstMeta =>
-      const TaskConstMeta(
-        debugName: "bridge_load_media_item_sources",
-        argNames: ["that", "id", "params"],
-      );
-
-  @override
-  Future<List<ContentMediaItem>> crateApiBridgeBridgeLoadMediaItems(
-      {required Bridge that,
-      required String id,
-      required List<String> params}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_bridge(that, serializer);
-        sse_encode_String(id, serializer);
-        sse_encode_list_String(params, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 10, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_list_content_media_item,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiBridgeBridgeLoadMediaItemsConstMeta,
-      argValues: [that, id, params],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiBridgeBridgeLoadMediaItemsConstMeta =>
-      const TaskConstMeta(
-        debugName: "bridge_load_media_items",
-        argNames: ["that", "id", "params"],
-      );
-
-  @override
-  Future<List<ContentInfo>> crateApiBridgeBridgeSearch(
-      {required Bridge that,
-      required String query,
-      required List<String> types}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_bridge(that, serializer);
-        sse_encode_String(query, serializer);
-        sse_encode_list_String(types, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 11, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_list_content_info,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiBridgeBridgeSearchConstMeta,
-      argValues: [that, query, types],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiBridgeBridgeSearchConstMeta => const TaskConstMeta(
-        debugName: "bridge_search",
-        argNames: ["that", "query", "types"],
+        debugName: "get_supported_types",
+        argNames: ["supplier"],
       );
 
   @override
@@ -417,7 +274,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 12, port: port_);
+            funcId: 7, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -434,6 +291,122 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         argNames: [],
       );
 
+  @override
+  Future<List<ContentInfo>> crateApiBridgeLoadChannel(
+      {required String supplier, required String channel, required int page}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(supplier, serializer);
+        sse_encode_String(channel, serializer);
+        sse_encode_u_16(page, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 8, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_content_info,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBridgeLoadChannelConstMeta,
+      argValues: [supplier, channel, page],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBridgeLoadChannelConstMeta => const TaskConstMeta(
+        debugName: "load_channel",
+        argNames: ["supplier", "channel", "page"],
+      );
+
+  @override
+  Future<List<ContentMediaItemSource>> crateApiBridgeLoadMediaItemSources(
+      {required String supplier,
+      required String id,
+      required List<String> params}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(supplier, serializer);
+        sse_encode_String(id, serializer);
+        sse_encode_list_String(params, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 9, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_content_media_item_source,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBridgeLoadMediaItemSourcesConstMeta,
+      argValues: [supplier, id, params],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBridgeLoadMediaItemSourcesConstMeta =>
+      const TaskConstMeta(
+        debugName: "load_media_item_sources",
+        argNames: ["supplier", "id", "params"],
+      );
+
+  @override
+  Future<List<ContentMediaItem>> crateApiBridgeLoadMediaItems(
+      {required String supplier,
+      required String id,
+      required List<String> params}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(supplier, serializer);
+        sse_encode_String(id, serializer);
+        sse_encode_list_String(params, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 10, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_content_media_item,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBridgeLoadMediaItemsConstMeta,
+      argValues: [supplier, id, params],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBridgeLoadMediaItemsConstMeta =>
+      const TaskConstMeta(
+        debugName: "load_media_items",
+        argNames: ["supplier", "id", "params"],
+      );
+
+  @override
+  Future<List<ContentInfo>> crateApiBridgeSearch(
+      {required String supplier,
+      required String query,
+      required List<String> types}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(supplier, serializer);
+        sse_encode_String(query, serializer);
+        sse_encode_list_String(types, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 11, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_content_info,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBridgeSearchConstMeta,
+      argValues: [supplier, query, types],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBridgeSearchConstMeta => const TaskConstMeta(
+        debugName: "search",
+        argNames: ["supplier", "query", "types"],
+      );
+
   @protected
   Map<String, String> dco_decode_Map_String_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -448,26 +421,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Bridge dco_decode_box_autoadd_bridge(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_bridge(raw);
-  }
-
-  @protected
   ContentDetails dco_decode_box_autoadd_content_details(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_content_details(raw);
-  }
-
-  @protected
-  Bridge dco_decode_bridge(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 1)
-      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
-    return Bridge(
-      name: dco_decode_String(arr[0]),
-    );
   }
 
   @protected
@@ -512,7 +468,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.length != 5)
       throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return ContentMediaItem(
-      number: dco_decode_u_16(arr[0]),
+      number: dco_decode_u_32(arr[0]),
       title: dco_decode_String(arr[1]),
       section: dco_decode_opt_String(arr[2]),
       image: dco_decode_opt_String(arr[3]),
@@ -641,6 +597,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int dco_decode_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
   int dco_decode_u_8(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
@@ -668,23 +630,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Bridge sse_decode_box_autoadd_bridge(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_bridge(deserializer));
-  }
-
-  @protected
   ContentDetails sse_decode_box_autoadd_content_details(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_content_details(deserializer));
-  }
-
-  @protected
-  Bridge sse_decode_bridge(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_name = sse_decode_String(deserializer);
-    return Bridge(name: var_name);
   }
 
   @protected
@@ -732,7 +681,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ContentMediaItem sse_decode_content_media_item(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_number = sse_decode_u_16(deserializer);
+    var var_number = sse_decode_u_32(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_section = sse_decode_opt_String(deserializer);
     var var_image = sse_decode_opt_String(deserializer);
@@ -915,6 +864,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int sse_decode_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint32();
+  }
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8();
@@ -946,22 +901,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_bridge(Bridge self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_bridge(self, serializer);
-  }
-
-  @protected
   void sse_encode_box_autoadd_content_details(
       ContentDetails self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_content_details(self, serializer);
-  }
-
-  @protected
-  void sse_encode_bridge(Bridge self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.name, serializer);
   }
 
   @protected
@@ -994,7 +937,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_content_media_item(
       ContentMediaItem self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_u_16(self.number, serializer);
+    sse_encode_u_32(self.number, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_opt_String(self.section, serializer);
     sse_encode_opt_String(self.image, serializer);
@@ -1154,6 +1097,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_u_16(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint16(self);
+  }
+
+  @protected
+  void sse_encode_u_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint32(self);
   }
 
   @protected

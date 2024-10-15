@@ -1,10 +1,11 @@
 import 'package:cloud_hook/app_localizations.dart';
+import 'package:cloud_hook/collection/active_collection_items_view.dart';
 import 'package:cloud_hook/layouts/general_layout.dart';
 import 'package:cloud_hook/settings/app_version/app_version_settings.dart';
-import 'package:cloud_hook/settings/suppliers/suppliers_settings.dart';
 import 'package:cloud_hook/settings/theme/brightnes_switcher.dart';
 import 'package:cloud_hook/settings/theme/color_switcher.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsScrean extends StatelessWidget {
   const SettingsScrean({super.key});
@@ -26,13 +27,15 @@ class _SettingsView extends StatelessWidget {
     return Center(
       child: Container(
         constraints: const BoxConstraints(maxWidth: 800),
-        padding: const EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppLocalizations.of(context)!.settings,
-              style: Theme.of(context).textTheme.headlineMedium,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                AppLocalizations.of(context)!.settings,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
             ),
             Expanded(
               child: ListView(
@@ -47,8 +50,20 @@ class _SettingsView extends StatelessWidget {
                     AppLocalizations.of(context)!.settingsColor,
                     const ColorSwitcher(),
                   ),
-                  _renderSection(context, "Версія", const AppVersionSettings()),
-                  const SuppliersSettingsSection(),
+                  _renderSection(
+                    context,
+                    AppLocalizations.of(context)!.settingsVersion,
+                    const AppVersionSettings(),
+                  ),
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                    leading: const Icon(Icons.chevron_right),
+                    horizontalTitleGap: 8,
+                    title: Text(AppLocalizations.of(context)!.suppliers),
+                    onTap: () {
+                      context.push("/settings/suppliers");
+                    },
+                  )
                 ],
               ),
             )
@@ -71,34 +86,37 @@ class _SettingsView extends StatelessWidget {
       ),
     );
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 450) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              lableText,
-              Padding(
-                padding: padding,
-                child: section,
-              )
-            ],
-          );
-        } else {
-          return Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              lableText,
-              Expanded(
-                child: Padding(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 450) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                lableText,
+                Padding(
                   padding: padding,
                   child: section,
-                ),
-              )
-            ],
-          );
-        }
-      },
+                )
+              ],
+            );
+          } else {
+            return Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                lableText,
+                Expanded(
+                  child: Padding(
+                    padding: padding,
+                    child: section,
+                  ),
+                )
+              ],
+            );
+          }
+        },
+      ),
     );
   }
 }

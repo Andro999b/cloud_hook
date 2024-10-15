@@ -26,8 +26,7 @@ class UAKinoClubSupplier extends ContentSupplier
       };
 
   @override
-  Set<ContentLanguage> get supportedLanguages =>
-      const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.uk};
 
   late final contentInfoSelector = Iterate(
     itemScope: "#dle-content .movie-item",

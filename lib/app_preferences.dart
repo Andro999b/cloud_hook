@@ -1,5 +1,6 @@
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/content/manga/model.dart';
+import 'package:collection/collection.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,8 +16,8 @@ class AppPreferences {
   static Set<ContentLanguage>? get selectedContentLanguage => instance
       .getStringList("selected_content_language")
       ?.map(
-        (value) =>
-            ContentLanguage.values.firstWhere((lang) => lang.name == value),
+        (value) => ContentLanguage.values
+            .firstWhereOrNull((lang) => lang.name == value),
       )
       .nonNulls
       .toSet();
@@ -30,7 +31,8 @@ class AppPreferences {
   static Set<ContentType>? get selectedContentType => instance
       .getStringList("selected_content_type")
       ?.map(
-        (value) => ContentType.values.firstWhere((type) => type.name == value),
+        (value) =>
+            ContentType.values.firstWhereOrNull((type) => type.name == value),
       )
       .nonNulls
       .toSet();
@@ -72,7 +74,8 @@ class AppPreferences {
   static Set<MediaType>? get collectionMediaType => instance
       .getStringList("collection_media_type")
       ?.map(
-        (value) => MediaType.values.firstWhere((type) => type.name == value),
+        (value) =>
+            MediaType.values.firstWhereOrNull((type) => type.name == value),
       )
       .nonNulls
       .toSet();
@@ -89,7 +92,7 @@ class AppPreferences {
       .getStringList("collection_item_status")
       ?.map(
         (value) => MediaCollectionItemStatus.values
-            .firstWhere((type) => type.name == value),
+            .firstWhereOrNull((type) => type.name == value),
       )
       .nonNulls
       .toSet();

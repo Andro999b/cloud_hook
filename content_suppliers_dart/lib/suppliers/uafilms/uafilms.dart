@@ -23,8 +23,7 @@ class UAFilmsSupplier extends ContentSupplier
       };
 
   @override
-  Set<ContentLanguage> get supportedLanguages =>
-      const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.uk};
 
   late final contentInfoSelector = Iterate(
     itemScope: ".movie-item",

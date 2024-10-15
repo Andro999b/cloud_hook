@@ -8,8 +8,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'models.freezed.dart';
 
-// These functions are ignored (category: IgnoreBecauseExplicitAttribute): `get_channels`, `get_content_details`, `get_default_channels`, `get_name`, `get_supported_languages`, `get_supported_types`, `load_channel`, `load_media_item_sources`, `load_media_items`, `search`
-
 class ContentDetails {
   final String id;
   final String supplier;

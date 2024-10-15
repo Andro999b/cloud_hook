@@ -35,7 +35,7 @@ pub struct ContentDetails {
 }
 
 pub struct ContentMediaItem {
-    pub number: u16,
+    pub number: u32,
     pub title: String,
     pub section: Option<String>,
     pub image: Option<String>,
@@ -57,27 +57,4 @@ pub enum ContentMediaItemSource {
         description: String,
         pages: Vec<String>
     },
-}
-
-pub trait ContentSupplier {
-    #[flutter_rust_bridge::frb(ignore)]
-    fn get_name(&self) -> String;
-    #[flutter_rust_bridge::frb(ignore)]
-    fn get_channels(&self) -> Vec<String>;
-    #[flutter_rust_bridge::frb(ignore)]
-    fn get_default_channels(&self) -> Vec<String>;
-    #[flutter_rust_bridge::frb(ignore)]
-    fn get_supported_types(&self) -> Vec<ContentType>;
-    #[flutter_rust_bridge::frb(ignore)]
-    fn get_supported_languages(&self) -> Vec<String>;
-    #[flutter_rust_bridge::frb(ignore)]
-    fn search(&self, query: &String, types: &Vec<String>) -> Vec<ContentInfo>;
-    #[flutter_rust_bridge::frb(ignore)]
-    fn load_channel(&self, channel: &String, page: u16) -> Vec<ContentInfo>;
-    #[flutter_rust_bridge::frb(ignore)]
-    fn get_content_details(&self, id: &String) -> Option<ContentDetails>;
-    #[flutter_rust_bridge::frb(ignore)]
-    fn load_media_items(&self, id: &String, params: &Vec<String>) -> Vec<ContentMediaItem>;
-    #[flutter_rust_bridge::frb(ignore)]
-    fn load_media_item_sources(&self, id: &String, params: &Vec<String>) -> Vec<ContentMediaItemSource>;
 }

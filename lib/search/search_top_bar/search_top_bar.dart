@@ -156,7 +156,7 @@ class _FilterSelectorsDialog extends ConsumerWidget {
                 final item = ContentLanguage.values[index];
                 return FilterChip(
                   selected: searchSettings.languages.contains(item),
-                  label: Text(item.code),
+                  label: Text(item.label),
                   onSelected: (value) {
                     ref
                         .read(searchSettingsProvider.notifier)
