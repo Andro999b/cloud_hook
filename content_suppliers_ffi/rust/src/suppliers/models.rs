@@ -1,18 +1,25 @@
 use std::collections::HashMap;
 
+use strum_macros::FromRepr;
+
+#[repr(u8)]
+#[derive(Copy, Clone, FromRepr, Debug)]
 pub enum ContentType {
-    Movie,
+    Movie = 0,
     Anime,
     Cartoon,
     Series,
     Manga,
 }
 
+#[repr(u8)]
+#[derive(Copy, Clone, FromRepr, Debug)]
 pub enum MediaType {
     Video,
     Manga
 }
 
+#[derive(Debug)]
 pub struct ContentInfo {
     pub id: String,
     pub supplier: String,
@@ -21,6 +28,7 @@ pub struct ContentInfo {
     pub image: String,
 }
 
+#[derive(Debug)]
 pub struct ContentDetails {
     pub id: String,
     pub supplier: String,
@@ -34,6 +42,7 @@ pub struct ContentDetails {
     pub params: Vec<String>,
 }
 
+#[derive(Debug)]
 pub struct ContentMediaItem {
     pub number: u32,
     pub title: String,

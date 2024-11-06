@@ -1,6 +1,5 @@
-import 'package:content_suppliers_ffi/bridge.dart';
+import 'package:content_suppliers_ffi/ffi_bridge.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +13,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late ExternalBridge _bridge;
+  late FFIBridge _bridge;
 
   bool loading = false;
   String result = "";
@@ -22,7 +21,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _bridge = ExternalBridge.load(
+    _bridge = FFIBridge.load(
       dir: "../rust/target/debug/",
       libName: "libcontent_suppliers_ffi",
     );
@@ -43,7 +42,7 @@ class _MyAppState extends State<MyApp> {
                   setState(() {
                     loading = true;
                   });
-                  final res = await _bridge.search([1, 2, 3, 4]);
+                  final res = _bridge.supportedLanguages("dummy");
                   setState(() {
                     loading = false;
                     result = res.join(",");

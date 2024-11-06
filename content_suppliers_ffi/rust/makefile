@@ -27,8 +27,7 @@ help: makefile
 ## init: Install missing dependencies.
 .PHONY: init
 init:
-	rustup target add aarch64-apple-ios x86_64-apple-ios
-	rustup target add x86_64-unknown-linux-gnu # probably no need
+	#rustup target add aarch64-apple-ios x86_64-apple-ios
 	# rustup target add aarch64-apple-darwin x86_64-apple-darwin
 	rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
 	@if [ $$(uname) == "Darwin" ] ; then cargo install cargo-lipo ; fi

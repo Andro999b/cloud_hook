@@ -1,10 +1,10 @@
 import 'package:content_suppliers_api/model.dart';
-import 'package:content_suppliers_rust/src/bundle.dart';
+import 'package:content_suppliers_ffi/bundle.dart';
 import 'package:flutter/material.dart';
 import 'package:test/test.dart';
 
-const libDirectory = "rust/target/release/";
-const libName = "content_suppliers_rust";
+const libDirectory = "rust/target/release";
+const libName = "libcontent_suppliers_ffi";
 
 void main() async {
   final bundle = RustContentSuppliersBundle(
@@ -61,7 +61,7 @@ void main() async {
 
     expect(searchResult.id, equals(query));
     expect(searchResult.supplier, equals("dummy"));
-    expect(searchResult.title, equals(type.map((t) => t.name).join(",")));
+    expect(searchResult.title, equals(type.map((t) => t.index).join(",")));
     expect(searchResult.secondaryTitle, equals("secondary_dummy_title"));
     expect(searchResult.image, equals("dummy_image"));
   });
