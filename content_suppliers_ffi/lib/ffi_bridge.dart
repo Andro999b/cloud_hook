@@ -254,6 +254,7 @@ class FFIBridge {
       if (result.error != nullptr) {
         final error = result.error.toDartString();
         completer.completeError(Exception("FFI Error: $error"));
+        return;
       }
 
       if (result.buf != nullptr) {

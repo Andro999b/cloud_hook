@@ -34,6 +34,10 @@ impl ContentSupplier for DummyContentSupplier {
     }
 
     fn load_channel(&self, channel: &str, page: u32) -> Result<Vec<ContentInfo>, Box<dyn Error>> {
+        if !self.get_channels().contains(&channel) {
+            return Err("Unknow channel".into());
+        }
+
         Ok(vec![
             ContentInfo {
                 id: format!("{} {}", channel, page),

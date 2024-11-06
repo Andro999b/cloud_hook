@@ -84,6 +84,17 @@ void main() async {
     expect(channelItem.image, equals("dummy_image"));
   });
 
+  test("should return error", () async {
+    const channel = "unknown_channel";
+
+    final supplier = suppliers.first;
+
+    expect(
+      () => supplier.loadChannel(channel, page: 0),
+      throwsException,
+    );
+  });
+
   test("should load content details", () async {
     const id = "dummy_id";
 
