@@ -1,15 +1,6 @@
 use std::{collections::HashMap, error::Error};
 
-use crate::{
-    suppliers::models::{
-        ContentDetails, 
-        ContentInfo, 
-        ContentMediaItem, 
-        ContentMediaItemSource, 
-        ContentType, MediaType,
-    },
-    suppliers::ContentSupplier,
-};
+use crate::{models::{ContentDetails, ContentInfo, ContentMediaItem, ContentMediaItemSource, ContentType, MediaType}, ContentSupplier};
 
 static NAME: &str = "dummy";
 
@@ -17,7 +8,7 @@ pub struct DummyContentSupplier;
 
 impl Default for DummyContentSupplier {
     fn default() -> Self {
-        DummyContentSupplier {}
+        Self {}
     }
 }
 

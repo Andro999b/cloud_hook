@@ -48,11 +48,11 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 name = "content_suppliers_ffi"
 version = "0.1.0"
 dependencies = [
- "enum_dispatch",
  "flatbuffers",
  "lazy_static",
  "strum",
  "strum_macros",
+ "suppliers",
  "tokio",
 ]
 
@@ -200,6 +200,16 @@ dependencies = [
  "quote",
  "rustversion",
  "syn",
+]
+
+[[package]]
+name = "suppliers"
+version = "0.1.0"
+dependencies = [
+ "enum_dispatch",
+ "lazy_static",
+ "strum",
+ "strum_macros",
 ]
 
 [[package]]

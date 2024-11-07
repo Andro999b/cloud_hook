@@ -7,9 +7,9 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
+suppliers = { path = "./suppliers" } 
 tokio = { version = "1", features = ["rt-multi-thread"] }
 flatbuffers = "24.3.25"
 strum = "0.26"
 strum_macros = "0.26"
 lazy_static = "1.5.0"
-enum_dispatch = "0.3.13"
