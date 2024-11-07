@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _bridge = FFIBridge.load(
-      dir: "../rust/target/debug/",
+      dir: "../rust/target/release/",
       libName: "libcontent_suppliers_ffi",
     );
   }
@@ -42,7 +42,7 @@ class _MyAppState extends State<MyApp> {
                   setState(() {
                     loading = true;
                   });
-                  final res = _bridge.supportedLanguages("dummy");
+                  final res = await _bridge.search("dummy", "test", {});
                   setState(() {
                     loading = false;
                     result = res.join(",");

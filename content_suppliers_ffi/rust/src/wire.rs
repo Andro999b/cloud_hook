@@ -2,12 +2,12 @@ use core::slice;
 use std::ffi::{c_char, CString};
 use std::{collections::HashMap, error::Error};
 use std::ptr::null;
-
 use flatbuffers::{FlatBufferBuilder, WIPOffset};
 use lazy_static::lazy_static;
 use strum_macros::FromRepr;
 use tokio::runtime::Runtime as TokioRuntime;
 
+use crate::suppliers::{AllContentSuppliers, ContentSupplier};
 use crate::{
     avalaible_suppliers, get_supplier,
     schema_generated::proto,
@@ -74,7 +74,7 @@ pub extern "C" fn wire(
 ) {
     let req_vec = read_request(size, req);
     RT.spawn(async move {
-        let result = process_command(cmd_index, req_vec);
+        let result = process_command(cmd_index, req_vec).await;
 
         unsafe {
             callback(result.into());
@@ -89,7 +89,7 @@ pub extern "C" fn wire_sync(
     req: *const u8,
 ) -> WireResult {
     let req_vec = read_request(size, req);
-    let result = process_command(cmd_index, req_vec);
+    let result = process_sync_command(cmd_index, req_vec);
 
     result.into()
 }
@@ -109,18 +109,26 @@ pub extern "C" fn free(res: WireResult) {
 
 // wire methods
 
-fn process_command(cmd_index: u8, req: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
+fn process_sync_command(cmd_index: u8, req: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
     match Command::from_repr(cmd_index) {
         Some(Command::SuppliersList) => suppliers_list(),
         Some(Command::Channels) => get_channels(req),
         Some(Command::DefaultChannels) => get_default_channels(req),
         Some(Command::SupportedTypes) => get_supportes_types(req),
         Some(Command::SupportedLanguges) => get_supportes_lanuages(req),
-        Some(Command::LoadChannel) => load_channels(req),
-        Some(Command::Search) => search(req),
-        Some(Command::GetContentDetails) => get_content_detail(req),
-        Some(Command::LoadMediaItems) => load_media_items(req),
-        Some(Command::LoadMediaItemSources) => load_media_item_sources(req),
+        Some(_) => Result::Err(format!("Unknown Sync command index {}", cmd_index).into()),
+        None => Result::Err(format!("Unknown command index {}", cmd_index).into()),
+    }
+}
+
+async fn process_command(cmd_index: u8, req: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
+    match Command::from_repr(cmd_index) {
+        Some(Command::LoadChannel) => load_channels(req).await,
+        Some(Command::Search) => search(req).await,
+        Some(Command::GetContentDetails) => get_content_detail(req).await,
+        Some(Command::LoadMediaItems) => load_media_items(req).await,
+        Some(Command::LoadMediaItemSources) => load_media_item_sources(req).await,
+        Some(_) => Result::Err(format!("Unknown Async command index {}", cmd_index).into()),
         None => Result::Err(format!("Unknown command index {}", cmd_index).into()),
     }
 }
@@ -159,7 +167,7 @@ fn get_channels(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
 
     let supplier = get_supplier(req.supplier())?;
 
-    let channels = supplier.get_channels();
+    let channels = AllContentSuppliers::get_channels(&supplier);
 
     Ok(create_channels_res(channels))
 }
@@ -169,7 +177,7 @@ fn get_default_channels(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
 
     let supplier = get_supplier(req.supplier())?;
 
-    let channels = supplier.get_default_channels();
+    let channels = AllContentSuppliers::get_default_channels(&supplier);
 
     Ok(create_channels_res(channels))
 }
@@ -179,7 +187,7 @@ fn get_supportes_types(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
 
     let supplier = get_supplier(&req.supplier())?;
 
-    let types = supplier.get_supported_types();
+    let types = AllContentSuppliers::get_supported_types(&supplier);
 
     // convert to fb
     let fbb = &mut flatbuffers::FlatBufferBuilder::new();
@@ -200,7 +208,7 @@ fn get_supportes_lanuages(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
 
     let supplier = get_supplier(&req.supplier())?;
 
-    let languages = supplier.get_supported_languages();
+    let languages = AllContentSuppliers::get_supported_languages(&supplier);
 
     // convert to fb
     let fbb = &mut flatbuffers::FlatBufferBuilder::new();
@@ -216,18 +224,18 @@ fn get_supportes_lanuages(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
     Ok(fbb.finished_data().to_vec())
 }
 
-fn load_channels(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
+async fn load_channels(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
     let req = flatbuffers::root::<proto::LoadChannelsReq>(&request)?;
 
     let supplier = get_supplier(&req.supplier())?;
 
-    let items = supplier.load_channel(req.channel(), req.page())?;
+    let items = AllContentSuppliers::load_channel(&supplier, &req.channel(), req.page()).await?;
 
     // convert to fb
     create_content_info_res(items)
 }
 
-fn search(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
+async fn search(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
     let req = flatbuffers::root::<proto::SearchReq>(&request)?;
 
     let supplier = get_supplier(&req.supplier())?;
@@ -239,17 +247,17 @@ fn search(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
         .map(|t| suppliers::models::ContentType::from_repr(t.0).unwrap())
         .collect();
 
-    let items = supplier.search(req.query(), types)?;
+    let items = AllContentSuppliers::search(&supplier, req.query(), types).await?;
 
     // convert to fb
     create_content_info_res(items)
 }
 
-fn get_content_detail(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
+async fn get_content_detail(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
     let req = flatbuffers::root::<proto::ContentDetailsReq>(&request)?;
 
     let supplier = get_supplier(&req.supplier())?;
-    let maybe_details = supplier.get_content_details(req.id())?;
+    let maybe_details = AllContentSuppliers::get_content_details(&supplier, req.id()).await?;
 
     // convert to fb
     let fbb = &mut flatbuffers::FlatBufferBuilder::new();
@@ -273,13 +281,13 @@ fn get_content_detail(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
     Ok(fbb.finished_data().to_vec())
 }
 
-fn load_media_items(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
+async fn load_media_items(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
     let req = flatbuffers::root::<proto::LoadMediaItemsReq>(&request)?;
 
     let supplier = get_supplier(&req.supplier())?;
     let params = req.params().iter().map(|s| s.to_string()).collect();
 
-    let media_items = supplier.load_media_items(req.id(), params)?;
+    let media_items = AllContentSuppliers::load_media_items(&supplier, req.id(), params).await?;
 
     // convert to fb
     let fbb = &mut flatbuffers::FlatBufferBuilder::new();
@@ -301,13 +309,13 @@ fn load_media_items(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
     Ok(fbb.finished_data().to_vec())
 }
 
-fn load_media_item_sources(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
+async fn load_media_item_sources(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Error>> {
     let req = flatbuffers::root::<proto::LoadMediaItemSourcesReq>(&request)?;
 
     let supplier = get_supplier(&req.supplier())?;
     let params = req.params().iter().map(|s| s.to_string()).collect();
 
-    let sources = supplier.load_media_item_sources(req.id(), params)?;
+    let sources = AllContentSuppliers::load_media_item_sources(&supplier, req.id(), params).await?;
 
     // convert to fb
     let fbb = &mut flatbuffers::FlatBufferBuilder::new();

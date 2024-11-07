@@ -15,10 +15,16 @@ static NAME: &str = "dummy";
 
 pub struct DummyContentSupplier;
 
+impl Default for DummyContentSupplier {
+    fn default() -> Self {
+        DummyContentSupplier {}
+    }
+}
+
 impl ContentSupplier for DummyContentSupplier {
 
     fn get_channels(&self) -> Vec<&str> {
-        vec!["dummy_channels"]
+        vec!["dummy_channel"]
     }
 
     fn get_default_channels(&self) -> Vec<&str> {
@@ -33,7 +39,7 @@ impl ContentSupplier for DummyContentSupplier {
         vec!["en", "uk"]
     }
 
-    fn load_channel(&self, channel: &str, page: u32) -> Result<Vec<ContentInfo>, Box<dyn Error>> {
+    async fn load_channel(&self, channel: &str, page: u32) -> Result<Vec<ContentInfo>, Box<dyn Error>> {
         if !self.get_channels().contains(&channel) {
             return Err("Unknow channel".into());
         }
@@ -49,7 +55,7 @@ impl ContentSupplier for DummyContentSupplier {
         ])
     }
 
-    fn search(&self, query: &str, types: Vec<ContentType>) -> Result<Vec<ContentInfo>, Box<dyn Error>> {
+    async fn search(&self, query: &str, types: Vec<ContentType>) -> Result<Vec<ContentInfo>, Box<dyn Error>> {
         Ok(vec![
             ContentInfo {
                 id: query.to_owned(),
@@ -61,7 +67,7 @@ impl ContentSupplier for DummyContentSupplier {
         ])
     }
 
-    fn get_content_details(&self, id: &str) -> Result<Option<ContentDetails>, Box<dyn Error>> {
+    async fn get_content_details(&self, id: &str) -> Result<Option<ContentDetails>, Box<dyn Error>> {
         Ok(Some(
             ContentDetails { 
                 id: id.into(), 
@@ -89,7 +95,7 @@ impl ContentSupplier for DummyContentSupplier {
         ))
     }
 
-    fn load_media_items(&self, id: &str, params: Vec<String>) -> Result<Vec<ContentMediaItem>, Box<dyn Error>>  {
+    async fn load_media_items(&self, id: &str, params: Vec<String>) -> Result<Vec<ContentMediaItem>, Box<dyn Error>>  {
         let mut new_params = params;
 
         new_params.push("3".to_owned());
@@ -105,7 +111,7 @@ impl ContentSupplier for DummyContentSupplier {
         ])
     }
 
-    fn load_media_item_sources(
+    async fn load_media_item_sources(
         &self,
         id: &str,
         params: Vec<String>,

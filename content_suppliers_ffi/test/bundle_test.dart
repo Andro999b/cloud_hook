@@ -24,14 +24,14 @@ void main() async {
     final supplier = suppliers.first;
     final channels = supplier.channels;
 
-    expect(channels, equals(["dummy_channels"]));
+    expect(channels, equals(["dummy_channel"]));
   });
 
   test("should retun default channels", () async {
     final supplier = suppliers.first;
     final channels = supplier.defaultChannels;
 
-    expect(channels, equals(["dummy_channels"]));
+    expect(channels, equals(["dummy_channel"]));
   });
 
   test("should retun supported types", () async {

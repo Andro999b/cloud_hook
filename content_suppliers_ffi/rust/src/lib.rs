@@ -1,19 +1,18 @@
-use std::error::Error;
+use std::{error::Error, str::FromStr};
 
-use suppliers::{dummy::DummyContentSupplier, ContentSupplier};
+use strum::VariantNames;
+use suppliers::AllContentSuppliers;
 
 mod schema_generated;
 mod suppliers;
 mod wire;
 
+
 pub fn avalaible_suppliers() -> Vec<&'static str> {
-    vec!["dummy"]
+    AllContentSuppliers::VARIANTS.to_vec()
 }
 
-pub fn get_supplier(name: &str) -> Result<&dyn ContentSupplier, Box<dyn Error>> {
-    return match name {
-        "dummy" => Ok(&DummyContentSupplier {}),
-        _ => Err(format!("Supplier {} not found", name).into())
-    }
+pub fn get_supplier(name: &str) -> Result<AllContentSuppliers, Box<dyn Error>> {
+    AllContentSuppliers::from_str(name).map_err(|err| err.into())
 }
 
