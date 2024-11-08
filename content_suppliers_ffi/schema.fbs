@@ -15,15 +15,12 @@ enum MediaType: ubyte {
 
 table ContentInfo {
     id: string (required);
-    supplier: string (required);
     title: string (required);
     secondary_title: string;
     image: string (required);
 }
 
 table ContentDetails {
-    id: string (required);
-    supplier: string (required);
     title: string (required);
     original_title: string;
     image: string (required);

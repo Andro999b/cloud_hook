@@ -3,8 +3,11 @@
 
 // @generated
 
+use core::mem;
+use core::cmp::Ordering;
 
 extern crate flatbuffers;
+use self::flatbuffers::{EndianScalar, Follow};
 
 #[allow(unused_imports, dead_code)]
 pub mod proto {
@@ -303,10 +306,9 @@ impl<'a> flatbuffers::Follow<'a> for ContentInfo<'a> {
 
 impl<'a> ContentInfo<'a> {
   pub const VT_ID: flatbuffers::VOffsetT = 4;
-  pub const VT_SUPPLIER: flatbuffers::VOffsetT = 6;
-  pub const VT_TITLE: flatbuffers::VOffsetT = 8;
-  pub const VT_SECONDARY_TITLE: flatbuffers::VOffsetT = 10;
-  pub const VT_IMAGE: flatbuffers::VOffsetT = 12;
+  pub const VT_TITLE: flatbuffers::VOffsetT = 6;
+  pub const VT_SECONDARY_TITLE: flatbuffers::VOffsetT = 8;
+  pub const VT_IMAGE: flatbuffers::VOffsetT = 10;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -321,7 +323,6 @@ impl<'a> ContentInfo<'a> {
     if let Some(x) = args.image { builder.add_image(x); }
     if let Some(x) = args.secondary_title { builder.add_secondary_title(x); }
     if let Some(x) = args.title { builder.add_title(x); }
-    if let Some(x) = args.supplier { builder.add_supplier(x); }
     if let Some(x) = args.id { builder.add_id(x); }
     builder.finish()
   }
@@ -333,13 +334,6 @@ impl<'a> ContentInfo<'a> {
     // Created from valid Table for this object
     // which contains a valid value in this slot
     unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<&str>>(ContentInfo::VT_ID, None).unwrap()}
-  }
-  #[inline]
-  pub fn supplier(&self) -> &'a str {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<&str>>(ContentInfo::VT_SUPPLIER, None).unwrap()}
   }
   #[inline]
   pub fn title(&self) -> &'a str {
@@ -372,7 +366,6 @@ impl flatbuffers::Verifiable for ContentInfo<'_> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
      .visit_field::<flatbuffers::ForwardsUOffset<&str>>("id", Self::VT_ID, true)?
-     .visit_field::<flatbuffers::ForwardsUOffset<&str>>("supplier", Self::VT_SUPPLIER, true)?
      .visit_field::<flatbuffers::ForwardsUOffset<&str>>("title", Self::VT_TITLE, true)?
      .visit_field::<flatbuffers::ForwardsUOffset<&str>>("secondary_title", Self::VT_SECONDARY_TITLE, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<&str>>("image", Self::VT_IMAGE, true)?
@@ -382,7 +375,6 @@ impl flatbuffers::Verifiable for ContentInfo<'_> {
 }
 pub struct ContentInfoArgs<'a> {
     pub id: Option<flatbuffers::WIPOffset<&'a str>>,
-    pub supplier: Option<flatbuffers::WIPOffset<&'a str>>,
     pub title: Option<flatbuffers::WIPOffset<&'a str>>,
     pub secondary_title: Option<flatbuffers::WIPOffset<&'a str>>,
     pub image: Option<flatbuffers::WIPOffset<&'a str>>,
@@ -392,7 +384,6 @@ impl<'a> Default for ContentInfoArgs<'a> {
   fn default() -> Self {
     ContentInfoArgs {
       id: None, // required field
-      supplier: None, // required field
       title: None, // required field
       secondary_title: None,
       image: None, // required field
@@ -408,10 +399,6 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ContentInfoBuilder<'a, 'b, A> {
   #[inline]
   pub fn add_id(&mut self, id: flatbuffers::WIPOffset<&'b  str>) {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(ContentInfo::VT_ID, id);
-  }
-  #[inline]
-  pub fn add_supplier(&mut self, supplier: flatbuffers::WIPOffset<&'b  str>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(ContentInfo::VT_SUPPLIER, supplier);
   }
   #[inline]
   pub fn add_title(&mut self, title: flatbuffers::WIPOffset<&'b  str>) {
@@ -437,7 +424,6 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ContentInfoBuilder<'a, 'b, A> {
   pub fn finish(self) -> flatbuffers::WIPOffset<ContentInfo<'a>> {
     let o = self.fbb_.end_table(self.start_);
     self.fbb_.required(o, ContentInfo::VT_ID,"id");
-    self.fbb_.required(o, ContentInfo::VT_SUPPLIER,"supplier");
     self.fbb_.required(o, ContentInfo::VT_TITLE,"title");
     self.fbb_.required(o, ContentInfo::VT_IMAGE,"image");
     flatbuffers::WIPOffset::new(o.value())
@@ -448,7 +434,6 @@ impl core::fmt::Debug for ContentInfo<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ds = f.debug_struct("ContentInfo");
       ds.field("id", &self.id());
-      ds.field("supplier", &self.supplier());
       ds.field("title", &self.title());
       ds.field("secondary_title", &self.secondary_title());
       ds.field("image", &self.image());
@@ -471,16 +456,14 @@ impl<'a> flatbuffers::Follow<'a> for ContentDetails<'a> {
 }
 
 impl<'a> ContentDetails<'a> {
-  pub const VT_ID: flatbuffers::VOffsetT = 4;
-  pub const VT_SUPPLIER: flatbuffers::VOffsetT = 6;
-  pub const VT_TITLE: flatbuffers::VOffsetT = 8;
-  pub const VT_ORIGINAL_TITLE: flatbuffers::VOffsetT = 10;
-  pub const VT_IMAGE: flatbuffers::VOffsetT = 12;
-  pub const VT_DESCRIPTION: flatbuffers::VOffsetT = 14;
-  pub const VT_MEDIA_TYPE: flatbuffers::VOffsetT = 16;
-  pub const VT_ADDITIONAL_INFO: flatbuffers::VOffsetT = 18;
-  pub const VT_SIMILAR: flatbuffers::VOffsetT = 20;
-  pub const VT_PARAMS: flatbuffers::VOffsetT = 22;
+  pub const VT_TITLE: flatbuffers::VOffsetT = 4;
+  pub const VT_ORIGINAL_TITLE: flatbuffers::VOffsetT = 6;
+  pub const VT_IMAGE: flatbuffers::VOffsetT = 8;
+  pub const VT_DESCRIPTION: flatbuffers::VOffsetT = 10;
+  pub const VT_MEDIA_TYPE: flatbuffers::VOffsetT = 12;
+  pub const VT_ADDITIONAL_INFO: flatbuffers::VOffsetT = 14;
+  pub const VT_SIMILAR: flatbuffers::VOffsetT = 16;
+  pub const VT_PARAMS: flatbuffers::VOffsetT = 18;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -499,27 +482,11 @@ impl<'a> ContentDetails<'a> {
     if let Some(x) = args.image { builder.add_image(x); }
     if let Some(x) = args.original_title { builder.add_original_title(x); }
     if let Some(x) = args.title { builder.add_title(x); }
-    if let Some(x) = args.supplier { builder.add_supplier(x); }
-    if let Some(x) = args.id { builder.add_id(x); }
     builder.add_media_type(args.media_type);
     builder.finish()
   }
 
 
-  #[inline]
-  pub fn id(&self) -> &'a str {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<&str>>(ContentDetails::VT_ID, None).unwrap()}
-  }
-  #[inline]
-  pub fn supplier(&self) -> &'a str {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<&str>>(ContentDetails::VT_SUPPLIER, None).unwrap()}
-  }
   #[inline]
   pub fn title(&self) -> &'a str {
     // Safety:
@@ -585,8 +552,6 @@ impl flatbuffers::Verifiable for ContentDetails<'_> {
   ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
-     .visit_field::<flatbuffers::ForwardsUOffset<&str>>("id", Self::VT_ID, true)?
-     .visit_field::<flatbuffers::ForwardsUOffset<&str>>("supplier", Self::VT_SUPPLIER, true)?
      .visit_field::<flatbuffers::ForwardsUOffset<&str>>("title", Self::VT_TITLE, true)?
      .visit_field::<flatbuffers::ForwardsUOffset<&str>>("original_title", Self::VT_ORIGINAL_TITLE, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<&str>>("image", Self::VT_IMAGE, true)?
@@ -600,8 +565,6 @@ impl flatbuffers::Verifiable for ContentDetails<'_> {
   }
 }
 pub struct ContentDetailsArgs<'a> {
-    pub id: Option<flatbuffers::WIPOffset<&'a str>>,
-    pub supplier: Option<flatbuffers::WIPOffset<&'a str>>,
     pub title: Option<flatbuffers::WIPOffset<&'a str>>,
     pub original_title: Option<flatbuffers::WIPOffset<&'a str>>,
     pub image: Option<flatbuffers::WIPOffset<&'a str>>,
@@ -615,8 +578,6 @@ impl<'a> Default for ContentDetailsArgs<'a> {
   #[inline]
   fn default() -> Self {
     ContentDetailsArgs {
-      id: None, // required field
-      supplier: None, // required field
       title: None, // required field
       original_title: None,
       image: None, // required field
@@ -634,14 +595,6 @@ pub struct ContentDetailsBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
   start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
 impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ContentDetailsBuilder<'a, 'b, A> {
-  #[inline]
-  pub fn add_id(&mut self, id: flatbuffers::WIPOffset<&'b  str>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(ContentDetails::VT_ID, id);
-  }
-  #[inline]
-  pub fn add_supplier(&mut self, supplier: flatbuffers::WIPOffset<&'b  str>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(ContentDetails::VT_SUPPLIER, supplier);
-  }
   #[inline]
   pub fn add_title(&mut self, title: flatbuffers::WIPOffset<&'b  str>) {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(ContentDetails::VT_TITLE, title);
@@ -685,8 +638,6 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ContentDetailsBuilder<'a, 'b, A
   #[inline]
   pub fn finish(self) -> flatbuffers::WIPOffset<ContentDetails<'a>> {
     let o = self.fbb_.end_table(self.start_);
-    self.fbb_.required(o, ContentDetails::VT_ID,"id");
-    self.fbb_.required(o, ContentDetails::VT_SUPPLIER,"supplier");
     self.fbb_.required(o, ContentDetails::VT_TITLE,"title");
     self.fbb_.required(o, ContentDetails::VT_IMAGE,"image");
     self.fbb_.required(o, ContentDetails::VT_DESCRIPTION,"description");
@@ -697,8 +648,6 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ContentDetailsBuilder<'a, 'b, A
 impl core::fmt::Debug for ContentDetails<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ds = f.debug_struct("ContentDetails");
-      ds.field("id", &self.id());
-      ds.field("supplier", &self.supplier());
       ds.field("title", &self.title());
       ds.field("original_title", &self.original_title());
       ds.field("image", &self.image());

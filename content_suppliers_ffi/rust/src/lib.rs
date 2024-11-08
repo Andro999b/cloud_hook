@@ -8,7 +8,8 @@ use flatbuffers::{FlatBufferBuilder, WIPOffset};
 use lazy_static::lazy_static;
 use strum_macros::FromRepr;
 use tokio::runtime::Runtime as TokioRuntime;
-use suppliers::{AllContentSuppliers, ContentSupplier, avalaible_suppliers, get_supplier, models};
+use suppliers::models::ContentSupplier;
+use suppliers::{AllContentSuppliers, avalaible_suppliers, get_supplier, models};
 use crate::schema_generated::proto;
 
 lazy_static! {
@@ -398,8 +399,6 @@ fn create_fb_content_details<'a>(
         .collect();
 
     proto::ContentDetailsArgs {
-        id: Some(fbb.create_string(&details.id)),
-        supplier: Some(fbb.create_string(&details.supplier)),
         title: Some(fbb.create_string(&details.title)),
         original_title: details
             .original_title
@@ -420,7 +419,6 @@ fn create_fb_content_info<'a>(
 ) -> proto::ContentInfoArgs<'a> {
     proto::ContentInfoArgs {
         id: Some(fbb.create_string(&item.id)),
-        supplier: Some(fbb.create_string(&item.supplier)),
         title: Some(fbb.create_string(&item.title)),
         secondary_title: item.secondary_title.as_ref().map(|s| fbb.create_string(s)),
         image: Some(fbb.create_string(&item.image)),

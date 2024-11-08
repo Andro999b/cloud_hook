@@ -146,7 +146,11 @@ class FFIContentSupplier implements ContentSupplier {
       image: result.image!,
       description: result.description!,
       additionalInfo: result.additionalInfo!,
-      similar: (result.similar ?? []).map(_mapSearchResult).toList(),
+      similar: (result.similar ?? [])
+          .map(
+            (e) => _mapSearchResult(name, e),
+          )
+          .toList(),
       bridge: _bridge,
       params: result.params ?? [],
     );
@@ -155,13 +159,21 @@ class FFIContentSupplier implements ContentSupplier {
   @override
   Future<List<ContentInfo>> loadChannel(String channel, {int page = 0}) async {
     final results = await _bridge.loadChannel(name, channel, page);
-    return results.map(_mapSearchResult).toList();
+    return results
+        .map(
+          (e) => _mapSearchResult(name, e),
+        )
+        .toList();
   }
 
   @override
   Future<List<ContentInfo>> search(String query, Set<ContentType> types) async {
     final results = await _bridge.search(name, query, types);
-    return results.map(_mapSearchResult).toList();
+    return results
+        .map(
+          (e) => _mapSearchResult(name, e),
+        )
+        .toList();
   }
 
   @override
@@ -185,10 +197,10 @@ class FFIContentSupplier implements ContentSupplier {
         .toSet();
   }
 
-  ContentSearchResult _mapSearchResult(proto.ContentInfo ci) {
+  ContentSearchResult _mapSearchResult(String supplier, proto.ContentInfo ci) {
     return ContentSearchResult(
       id: ci.id!,
-      supplier: ci.supplier!,
+      supplier: supplier,
       image: ci.image!,
       title: ci.title!,
       secondaryTitle: ci.secondaryTitle,

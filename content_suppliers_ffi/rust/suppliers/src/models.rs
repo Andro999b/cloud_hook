@@ -1,5 +1,6 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, error::Error, future::Future};
 
+use enum_dispatch::enum_dispatch;
 use strum_macros::FromRepr;
 
 #[repr(u8)]
@@ -22,7 +23,6 @@ pub enum MediaType {
 #[derive(Debug)]
 pub struct ContentInfo {
     pub id: String,
-    pub supplier: String,
     pub title: String,
     pub secondary_title: Option<String>,
     pub image: String,
@@ -30,8 +30,6 @@ pub struct ContentInfo {
 
 #[derive(Debug)]
 pub struct ContentDetails {
-    pub id: String,
-    pub supplier: String,
     pub title: String,
     pub original_title: Option<String>,
     pub image: String,
@@ -51,6 +49,7 @@ pub struct ContentMediaItem {
     pub params: Vec<String>,
 }
 
+#[derive(Debug)]
 pub enum ContentMediaItemSource {
     Video {
         link: String,
@@ -66,4 +65,17 @@ pub enum ContentMediaItemSource {
         description: String,
         pages: Vec<String>
     },
+}
+
+#[enum_dispatch]
+pub trait ContentSupplier {
+    fn get_channels(&self) -> Vec<&str>;
+    fn get_default_channels(&self) -> Vec<&str>;
+    fn get_supported_types(&self) -> Vec<ContentType>;
+    fn get_supported_languages(&self) -> Vec<&str>;
+    fn load_channel(&self, channel: &str, page: u32) -> impl Future<Output = Result<Vec<ContentInfo>, Box<dyn Error>>> + Send;
+    fn search(&self, query: &str, types: Vec<ContentType>) -> impl Future<Output = Result<Vec<ContentInfo>, Box<dyn Error>>> + Send;
+    fn get_content_details(&self, id: &str) -> impl Future<Output = Result<Option<ContentDetails>, Box<dyn Error>>> + Send;
+    fn load_media_items(&self, id: &str, params: Vec<String>) -> impl Future<Output = Result<Vec<ContentMediaItem>, Box<dyn Error>>> + Send;
+    fn load_media_item_sources(&self, id: &str, params: Vec<String>) -> impl Future<Output = Result<Vec<ContentMediaItemSource>, Box<dyn Error>>> + Send;
 }

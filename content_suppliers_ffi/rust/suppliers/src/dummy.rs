@@ -38,7 +38,6 @@ impl ContentSupplier for DummyContentSupplier {
         Ok(vec![
             ContentInfo {
                 id: format!("{} {}", channel, page),
-                supplier: NAME.to_owned(),
                 title: "dummy_title".to_owned(),
                 secondary_title: Some("secondary_dummy_title".to_owned()),
                 image: "dummy_image".to_owned()
@@ -50,7 +49,6 @@ impl ContentSupplier for DummyContentSupplier {
         Ok(vec![
             ContentInfo {
                 id: query.to_owned(),
-                supplier: NAME.to_owned(),
                 title: types.iter().map(|&t| (t as i8).to_string()).collect::<Vec<_>>().join(","),
                 secondary_title: Some("secondary_dummy_title".to_owned()),
                 image: "dummy_image".to_owned()
@@ -61,8 +59,6 @@ impl ContentSupplier for DummyContentSupplier {
     async fn get_content_details(&self, id: &str) -> Result<Option<ContentDetails>, Box<dyn Error>> {
         Ok(Some(
             ContentDetails { 
-                id: id.into(), 
-                supplier: NAME.to_owned(), 
                 title: "dummy_title".to_owned(),
                 original_title: Some("original_dummy_title".to_owned()), 
                 image: "dummy_image".to_owned(), 
@@ -75,7 +71,6 @@ impl ContentSupplier for DummyContentSupplier {
                 similar: vec![
                     ContentInfo {
                         id: "dummy_similar".to_owned(),
-                        supplier: NAME.to_owned(),
                         title: "dummy_title".to_owned(),
                         secondary_title: Some("secondary_dummy_title".to_owned()),
                         image: "dummy_image".to_owned()

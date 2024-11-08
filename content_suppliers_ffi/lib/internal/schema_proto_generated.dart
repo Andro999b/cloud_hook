@@ -6,6 +6,7 @@ library proto;
 import 'dart:typed_data' show Uint8List;
 import 'package:flat_buffers/flat_buffers.dart' as fb;
 
+
 class ContentType {
   final int value;
   const ContentType._(this.value);
@@ -13,12 +14,12 @@ class ContentType {
   factory ContentType.fromValue(int value) {
     final result = values[value];
     if (result == null) {
-      throw StateError('Invalid value $value for bit flag enum ContentType');
+        throw StateError('Invalid value $value for bit flag enum ContentType');
     }
     return result;
   }
 
-  static ContentType? _createOrNull(int? value) =>
+  static ContentType? _createOrNull(int? value) => 
       value == null ? null : ContentType.fromValue(value);
 
   static const int minValue = 0;
@@ -35,8 +36,7 @@ class ContentType {
     1: Anime,
     2: Cartoon,
     3: Series,
-    4: Manga
-  };
+    4: Manga};
 
   static const fb.Reader<ContentType> reader = _ContentTypeReader();
 
@@ -64,12 +64,12 @@ class MediaType {
   factory MediaType.fromValue(int value) {
     final result = values[value];
     if (result == null) {
-      throw StateError('Invalid value $value for bit flag enum MediaType');
+        throw StateError('Invalid value $value for bit flag enum MediaType');
     }
     return result;
   }
 
-  static MediaType? _createOrNull(int? value) =>
+  static MediaType? _createOrNull(int? value) => 
       value == null ? null : MediaType.fromValue(value);
 
   static const int minValue = 0;
@@ -78,7 +78,9 @@ class MediaType {
 
   static const MediaType Video = MediaType._(0);
   static const MediaType Manga = MediaType._(1);
-  static const Map<int, MediaType> values = {0: Video, 1: Manga};
+  static const Map<int, MediaType> values = {
+    0: Video,
+    1: Manga};
 
   static const fb.Reader<MediaType> reader = _MediaTypeReader();
 
@@ -106,33 +108,27 @@ class ContentMediaItemSourceType {
   factory ContentMediaItemSourceType.fromValue(int value) {
     final result = values[value];
     if (result == null) {
-      throw StateError(
-          'Invalid value $value for bit flag enum ContentMediaItemSourceType');
+        throw StateError('Invalid value $value for bit flag enum ContentMediaItemSourceType');
     }
     return result;
   }
 
-  static ContentMediaItemSourceType? _createOrNull(int? value) =>
+  static ContentMediaItemSourceType? _createOrNull(int? value) => 
       value == null ? null : ContentMediaItemSourceType.fromValue(value);
 
   static const int minValue = 0;
   static const int maxValue = 2;
   static bool containsValue(int value) => values.containsKey(value);
 
-  static const ContentMediaItemSourceType Video =
-      ContentMediaItemSourceType._(0);
-  static const ContentMediaItemSourceType Subtitle =
-      ContentMediaItemSourceType._(1);
-  static const ContentMediaItemSourceType Manga =
-      ContentMediaItemSourceType._(2);
+  static const ContentMediaItemSourceType Video = ContentMediaItemSourceType._(0);
+  static const ContentMediaItemSourceType Subtitle = ContentMediaItemSourceType._(1);
+  static const ContentMediaItemSourceType Manga = ContentMediaItemSourceType._(2);
   static const Map<int, ContentMediaItemSourceType> values = {
     0: Video,
     1: Subtitle,
-    2: Manga
-  };
+    2: Manga};
 
-  static const fb.Reader<ContentMediaItemSourceType> reader =
-      _ContentMediaItemSourceTypeReader();
+  static const fb.Reader<ContentMediaItemSourceType> reader = _ContentMediaItemSourceTypeReader();
 
   @override
   String toString() {
@@ -140,8 +136,7 @@ class ContentMediaItemSourceType {
   }
 }
 
-class _ContentMediaItemSourceTypeReader
-    extends fb.Reader<ContentMediaItemSourceType> {
+class _ContentMediaItemSourceTypeReader extends fb.Reader<ContentMediaItemSourceType> {
   const _ContentMediaItemSourceTypeReader();
 
   @override
@@ -149,8 +144,7 @@ class _ContentMediaItemSourceTypeReader
 
   @override
   ContentMediaItemSourceType read(fb.BufferContext bc, int offset) =>
-      ContentMediaItemSourceType.fromValue(
-          const fb.Uint8Reader().read(bc, offset));
+      ContentMediaItemSourceType.fromValue(const fb.Uint8Reader().read(bc, offset));
 }
 
 class ContentInfo {
@@ -165,25 +159,18 @@ class ContentInfo {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  String? get id =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
-  String? get supplier =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
-  String? get title =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 8);
-  String? get secondaryTitle =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 10);
-  String? get image =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 12);
+  String? get id => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
+  String? get title => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
+  String? get secondaryTitle => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 8);
+  String? get image => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 10);
 
   @override
   String toString() {
-    return 'ContentInfo{id: $id, supplier: $supplier, title: $title, secondaryTitle: $secondaryTitle, image: $image}';
+    return 'ContentInfo{id: ${id}, title: ${title}, secondaryTitle: ${secondaryTitle}, image: ${image}}';
   }
 
   ContentInfoT unpack() => ContentInfoT(
       id: id,
-      supplier: supplier,
       title: title,
       secondaryTitle: secondaryTitle,
       image: image);
@@ -196,37 +183,37 @@ class ContentInfo {
 
 class ContentInfoT implements fb.Packable {
   String? id;
-  String? supplier;
   String? title;
   String? secondaryTitle;
   String? image;
 
-  ContentInfoT(
-      {this.id, this.supplier, this.title, this.secondaryTitle, this.image});
+  ContentInfoT({
+      this.id,
+      this.title,
+      this.secondaryTitle,
+      this.image});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? idOffset = id == null ? null : fbBuilder.writeString(id!);
-    final int? supplierOffset =
-        supplier == null ? null : fbBuilder.writeString(supplier!);
-    final int? titleOffset =
-        title == null ? null : fbBuilder.writeString(title!);
-    final int? secondaryTitleOffset =
-        secondaryTitle == null ? null : fbBuilder.writeString(secondaryTitle!);
-    final int? imageOffset =
-        image == null ? null : fbBuilder.writeString(image!);
-    fbBuilder.startTable(5);
+    final int? idOffset = id == null ? null
+        : fbBuilder.writeString(id!);
+    final int? titleOffset = title == null ? null
+        : fbBuilder.writeString(title!);
+    final int? secondaryTitleOffset = secondaryTitle == null ? null
+        : fbBuilder.writeString(secondaryTitle!);
+    final int? imageOffset = image == null ? null
+        : fbBuilder.writeString(image!);
+    fbBuilder.startTable(4);
     fbBuilder.addOffset(0, idOffset);
-    fbBuilder.addOffset(1, supplierOffset);
-    fbBuilder.addOffset(2, titleOffset);
-    fbBuilder.addOffset(3, secondaryTitleOffset);
-    fbBuilder.addOffset(4, imageOffset);
+    fbBuilder.addOffset(1, titleOffset);
+    fbBuilder.addOffset(2, secondaryTitleOffset);
+    fbBuilder.addOffset(3, imageOffset);
     return fbBuilder.endTable();
   }
 
   @override
   String toString() {
-    return 'ContentInfoT{id: $id, supplier: $supplier, title: $title, secondaryTitle: $secondaryTitle, image: $image}';
+    return 'ContentInfoT{id: ${id}, title: ${title}, secondaryTitle: ${secondaryTitle}, image: ${image}}';
   }
 }
 
@@ -234,8 +221,8 @@ class _ContentInfoReader extends fb.TableReader<ContentInfo> {
   const _ContentInfoReader();
 
   @override
-  ContentInfo createObject(fb.BufferContext bc, int offset) =>
-      ContentInfo._(bc, offset);
+  ContentInfo createObject(fb.BufferContext bc, int offset) => 
+    ContentInfo._(bc, offset);
 }
 
 class ContentInfoBuilder {
@@ -244,31 +231,23 @@ class ContentInfoBuilder {
   final fb.Builder fbBuilder;
 
   void begin() {
-    fbBuilder.startTable(5);
+    fbBuilder.startTable(4);
   }
 
   int addIdOffset(int? offset) {
     fbBuilder.addOffset(0, offset);
     return fbBuilder.offset;
   }
-
-  int addSupplierOffset(int? offset) {
+  int addTitleOffset(int? offset) {
     fbBuilder.addOffset(1, offset);
     return fbBuilder.offset;
   }
-
-  int addTitleOffset(int? offset) {
+  int addSecondaryTitleOffset(int? offset) {
     fbBuilder.addOffset(2, offset);
     return fbBuilder.offset;
   }
-
-  int addSecondaryTitleOffset(int? offset) {
-    fbBuilder.addOffset(3, offset);
-    return fbBuilder.offset;
-  }
-
   int addImageOffset(int? offset) {
-    fbBuilder.addOffset(4, offset);
+    fbBuilder.addOffset(3, offset);
     return fbBuilder.offset;
   }
 
@@ -279,19 +258,17 @@ class ContentInfoBuilder {
 
 class ContentInfoObjectBuilder extends fb.ObjectBuilder {
   final String? _id;
-  final String? _supplier;
   final String? _title;
   final String? _secondaryTitle;
   final String? _image;
 
   ContentInfoObjectBuilder({
     String? id,
-    String? supplier,
     String? title,
     String? secondaryTitle,
     String? image,
-  })  : _id = id,
-        _supplier = supplier,
+  })
+      : _id = id,
         _title = title,
         _secondaryTitle = secondaryTitle,
         _image = image;
@@ -299,21 +276,19 @@ class ContentInfoObjectBuilder extends fb.ObjectBuilder {
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? idOffset = _id == null ? null : fbBuilder.writeString(_id);
-    final int? supplierOffset =
-        _supplier == null ? null : fbBuilder.writeString(_supplier);
-    final int? titleOffset =
-        _title == null ? null : fbBuilder.writeString(_title);
-    final int? secondaryTitleOffset =
-        _secondaryTitle == null ? null : fbBuilder.writeString(_secondaryTitle);
-    final int? imageOffset =
-        _image == null ? null : fbBuilder.writeString(_image);
-    fbBuilder.startTable(5);
+    final int? idOffset = _id == null ? null
+        : fbBuilder.writeString(_id!);
+    final int? titleOffset = _title == null ? null
+        : fbBuilder.writeString(_title!);
+    final int? secondaryTitleOffset = _secondaryTitle == null ? null
+        : fbBuilder.writeString(_secondaryTitle!);
+    final int? imageOffset = _image == null ? null
+        : fbBuilder.writeString(_image!);
+    fbBuilder.startTable(4);
     fbBuilder.addOffset(0, idOffset);
-    fbBuilder.addOffset(1, supplierOffset);
-    fbBuilder.addOffset(2, titleOffset);
-    fbBuilder.addOffset(3, secondaryTitleOffset);
-    fbBuilder.addOffset(4, imageOffset);
+    fbBuilder.addOffset(1, titleOffset);
+    fbBuilder.addOffset(2, secondaryTitleOffset);
+    fbBuilder.addOffset(3, imageOffset);
     return fbBuilder.endTable();
   }
 
@@ -325,7 +300,6 @@ class ContentInfoObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class ContentDetails {
   ContentDetails._(this._bc, this._bcOffset);
   factory ContentDetails(List<int> bytes) {
@@ -338,48 +312,29 @@ class ContentDetails {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  String? get id =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
-  String? get supplier =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
-  String? get title =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 8);
-  String? get originalTitle =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 10);
-  String? get image =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 12);
-  String? get description =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 14);
-  MediaType get mediaType => MediaType.fromValue(
-      const fb.Uint8Reader().vTableGet(_bc, _bcOffset, 16, 0));
-  List<String>? get additionalInfo =>
-      const fb.ListReader<String>(fb.StringReader())
-          .vTableGetNullable(_bc, _bcOffset, 18);
-  List<ContentInfo>? get similar =>
-      const fb.ListReader<ContentInfo>(ContentInfo.reader)
-          .vTableGetNullable(_bc, _bcOffset, 20);
-  List<String>? get params => const fb.ListReader<String>(fb.StringReader())
-      .vTableGetNullable(_bc, _bcOffset, 22);
+  String? get title => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
+  String? get originalTitle => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
+  String? get image => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 8);
+  String? get description => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 10);
+  MediaType get mediaType => MediaType.fromValue(const fb.Uint8Reader().vTableGet(_bc, _bcOffset, 12, 0));
+  List<String>? get additionalInfo => const fb.ListReader<String>(fb.StringReader()).vTableGetNullable(_bc, _bcOffset, 14);
+  List<ContentInfo>? get similar => const fb.ListReader<ContentInfo>(ContentInfo.reader).vTableGetNullable(_bc, _bcOffset, 16);
+  List<String>? get params => const fb.ListReader<String>(fb.StringReader()).vTableGetNullable(_bc, _bcOffset, 18);
 
   @override
   String toString() {
-    return 'ContentDetails{id: $id, supplier: $supplier, title: $title, originalTitle: $originalTitle, image: $image, description: $description, mediaType: $mediaType, additionalInfo: $additionalInfo, similar: $similar, params: $params}';
+    return 'ContentDetails{title: ${title}, originalTitle: ${originalTitle}, image: ${image}, description: ${description}, mediaType: ${mediaType}, additionalInfo: ${additionalInfo}, similar: ${similar}, params: ${params}}';
   }
 
   ContentDetailsT unpack() => ContentDetailsT(
-      id: id,
-      supplier: supplier,
       title: title,
       originalTitle: originalTitle,
       image: image,
       description: description,
       mediaType: mediaType,
-      additionalInfo:
-          const fb.ListReader<String>(fb.StringReader(), lazy: false)
-              .vTableGetNullable(_bc, _bcOffset, 18),
+      additionalInfo: const fb.ListReader<String>(fb.StringReader(), lazy: false).vTableGetNullable(_bc, _bcOffset, 14),
       similar: similar?.map((e) => e.unpack()).toList(),
-      params: const fb.ListReader<String>(fb.StringReader(), lazy: false)
-          .vTableGetNullable(_bc, _bcOffset, 22));
+      params: const fb.ListReader<String>(fb.StringReader(), lazy: false).vTableGetNullable(_bc, _bcOffset, 18));
 
   static int pack(fb.Builder fbBuilder, ContentDetailsT? object) {
     if (object == null) return 0;
@@ -388,8 +343,6 @@ class ContentDetails {
 }
 
 class ContentDetailsT implements fb.Packable {
-  String? id;
-  String? supplier;
   String? title;
   String? originalTitle;
   String? image;
@@ -399,9 +352,7 @@ class ContentDetailsT implements fb.Packable {
   List<ContentInfoT>? similar;
   List<String>? params;
 
-  ContentDetailsT(
-      {this.id,
-      this.supplier,
+  ContentDetailsT({
       this.title,
       this.originalTitle,
       this.image,
@@ -413,44 +364,35 @@ class ContentDetailsT implements fb.Packable {
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? idOffset = id == null ? null : fbBuilder.writeString(id!);
-    final int? supplierOffset =
-        supplier == null ? null : fbBuilder.writeString(supplier!);
-    final int? titleOffset =
-        title == null ? null : fbBuilder.writeString(title!);
-    final int? originalTitleOffset =
-        originalTitle == null ? null : fbBuilder.writeString(originalTitle!);
-    final int? imageOffset =
-        image == null ? null : fbBuilder.writeString(image!);
-    final int? descriptionOffset =
-        description == null ? null : fbBuilder.writeString(description!);
-    final int? additionalInfoOffset = additionalInfo == null
-        ? null
-        : fbBuilder
-            .writeList(additionalInfo!.map(fbBuilder.writeString).toList());
-    final int? similarOffset = similar == null
-        ? null
+    final int? titleOffset = title == null ? null
+        : fbBuilder.writeString(title!);
+    final int? originalTitleOffset = originalTitle == null ? null
+        : fbBuilder.writeString(originalTitle!);
+    final int? imageOffset = image == null ? null
+        : fbBuilder.writeString(image!);
+    final int? descriptionOffset = description == null ? null
+        : fbBuilder.writeString(description!);
+    final int? additionalInfoOffset = additionalInfo == null ? null
+        : fbBuilder.writeList(additionalInfo!.map(fbBuilder.writeString).toList());
+    final int? similarOffset = similar == null ? null
         : fbBuilder.writeList(similar!.map((b) => b.pack(fbBuilder)).toList());
-    final int? paramsOffset = params == null
-        ? null
+    final int? paramsOffset = params == null ? null
         : fbBuilder.writeList(params!.map(fbBuilder.writeString).toList());
-    fbBuilder.startTable(10);
-    fbBuilder.addOffset(0, idOffset);
-    fbBuilder.addOffset(1, supplierOffset);
-    fbBuilder.addOffset(2, titleOffset);
-    fbBuilder.addOffset(3, originalTitleOffset);
-    fbBuilder.addOffset(4, imageOffset);
-    fbBuilder.addOffset(5, descriptionOffset);
-    fbBuilder.addUint8(6, mediaType.value);
-    fbBuilder.addOffset(7, additionalInfoOffset);
-    fbBuilder.addOffset(8, similarOffset);
-    fbBuilder.addOffset(9, paramsOffset);
+    fbBuilder.startTable(8);
+    fbBuilder.addOffset(0, titleOffset);
+    fbBuilder.addOffset(1, originalTitleOffset);
+    fbBuilder.addOffset(2, imageOffset);
+    fbBuilder.addOffset(3, descriptionOffset);
+    fbBuilder.addUint8(4, mediaType.value);
+    fbBuilder.addOffset(5, additionalInfoOffset);
+    fbBuilder.addOffset(6, similarOffset);
+    fbBuilder.addOffset(7, paramsOffset);
     return fbBuilder.endTable();
   }
 
   @override
   String toString() {
-    return 'ContentDetailsT{id: $id, supplier: $supplier, title: $title, originalTitle: $originalTitle, image: $image, description: $description, mediaType: $mediaType, additionalInfo: $additionalInfo, similar: $similar, params: $params}';
+    return 'ContentDetailsT{title: ${title}, originalTitle: ${originalTitle}, image: ${image}, description: ${description}, mediaType: ${mediaType}, additionalInfo: ${additionalInfo}, similar: ${similar}, params: ${params}}';
   }
 }
 
@@ -458,8 +400,8 @@ class _ContentDetailsReader extends fb.TableReader<ContentDetails> {
   const _ContentDetailsReader();
 
   @override
-  ContentDetails createObject(fb.BufferContext bc, int offset) =>
-      ContentDetails._(bc, offset);
+  ContentDetails createObject(fb.BufferContext bc, int offset) => 
+    ContentDetails._(bc, offset);
 }
 
 class ContentDetailsBuilder {
@@ -468,56 +410,39 @@ class ContentDetailsBuilder {
   final fb.Builder fbBuilder;
 
   void begin() {
-    fbBuilder.startTable(10);
-  }
-
-  int addIdOffset(int? offset) {
-    fbBuilder.addOffset(0, offset);
-    return fbBuilder.offset;
-  }
-
-  int addSupplierOffset(int? offset) {
-    fbBuilder.addOffset(1, offset);
-    return fbBuilder.offset;
+    fbBuilder.startTable(8);
   }
 
   int addTitleOffset(int? offset) {
+    fbBuilder.addOffset(0, offset);
+    return fbBuilder.offset;
+  }
+  int addOriginalTitleOffset(int? offset) {
+    fbBuilder.addOffset(1, offset);
+    return fbBuilder.offset;
+  }
+  int addImageOffset(int? offset) {
     fbBuilder.addOffset(2, offset);
     return fbBuilder.offset;
   }
-
-  int addOriginalTitleOffset(int? offset) {
+  int addDescriptionOffset(int? offset) {
     fbBuilder.addOffset(3, offset);
     return fbBuilder.offset;
   }
-
-  int addImageOffset(int? offset) {
-    fbBuilder.addOffset(4, offset);
+  int addMediaType(MediaType? mediaType) {
+    fbBuilder.addUint8(4, mediaType?.value);
     return fbBuilder.offset;
   }
-
-  int addDescriptionOffset(int? offset) {
+  int addAdditionalInfoOffset(int? offset) {
     fbBuilder.addOffset(5, offset);
     return fbBuilder.offset;
   }
-
-  int addMediaType(MediaType? mediaType) {
-    fbBuilder.addUint8(6, mediaType?.value);
-    return fbBuilder.offset;
-  }
-
-  int addAdditionalInfoOffset(int? offset) {
-    fbBuilder.addOffset(7, offset);
-    return fbBuilder.offset;
-  }
-
   int addSimilarOffset(int? offset) {
-    fbBuilder.addOffset(8, offset);
+    fbBuilder.addOffset(6, offset);
     return fbBuilder.offset;
   }
-
   int addParamsOffset(int? offset) {
-    fbBuilder.addOffset(9, offset);
+    fbBuilder.addOffset(7, offset);
     return fbBuilder.offset;
   }
 
@@ -527,8 +452,6 @@ class ContentDetailsBuilder {
 }
 
 class ContentDetailsObjectBuilder extends fb.ObjectBuilder {
-  final String? _id;
-  final String? _supplier;
   final String? _title;
   final String? _originalTitle;
   final String? _image;
@@ -539,8 +462,6 @@ class ContentDetailsObjectBuilder extends fb.ObjectBuilder {
   final List<String>? _params;
 
   ContentDetailsObjectBuilder({
-    String? id,
-    String? supplier,
     String? title,
     String? originalTitle,
     String? image,
@@ -549,9 +470,8 @@ class ContentDetailsObjectBuilder extends fb.ObjectBuilder {
     List<String>? additionalInfo,
     List<ContentInfoObjectBuilder>? similar,
     List<String>? params,
-  })  : _id = id,
-        _supplier = supplier,
-        _title = title,
+  })
+      : _title = title,
         _originalTitle = originalTitle,
         _image = image,
         _description = description,
@@ -563,39 +483,29 @@ class ContentDetailsObjectBuilder extends fb.ObjectBuilder {
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? idOffset = _id == null ? null : fbBuilder.writeString(_id);
-    final int? supplierOffset =
-        _supplier == null ? null : fbBuilder.writeString(_supplier);
-    final int? titleOffset =
-        _title == null ? null : fbBuilder.writeString(_title);
-    final int? originalTitleOffset =
-        _originalTitle == null ? null : fbBuilder.writeString(_originalTitle);
-    final int? imageOffset =
-        _image == null ? null : fbBuilder.writeString(_image);
-    final int? descriptionOffset =
-        _description == null ? null : fbBuilder.writeString(_description);
-    final int? additionalInfoOffset = _additionalInfo == null
-        ? null
-        : fbBuilder
-            .writeList(_additionalInfo.map(fbBuilder.writeString).toList());
-    final int? similarOffset = _similar == null
-        ? null
-        : fbBuilder.writeList(
-            _similar.map((b) => b.getOrCreateOffset(fbBuilder)).toList());
-    final int? paramsOffset = _params == null
-        ? null
-        : fbBuilder.writeList(_params.map(fbBuilder.writeString).toList());
-    fbBuilder.startTable(10);
-    fbBuilder.addOffset(0, idOffset);
-    fbBuilder.addOffset(1, supplierOffset);
-    fbBuilder.addOffset(2, titleOffset);
-    fbBuilder.addOffset(3, originalTitleOffset);
-    fbBuilder.addOffset(4, imageOffset);
-    fbBuilder.addOffset(5, descriptionOffset);
-    fbBuilder.addUint8(6, _mediaType?.value);
-    fbBuilder.addOffset(7, additionalInfoOffset);
-    fbBuilder.addOffset(8, similarOffset);
-    fbBuilder.addOffset(9, paramsOffset);
+    final int? titleOffset = _title == null ? null
+        : fbBuilder.writeString(_title!);
+    final int? originalTitleOffset = _originalTitle == null ? null
+        : fbBuilder.writeString(_originalTitle!);
+    final int? imageOffset = _image == null ? null
+        : fbBuilder.writeString(_image!);
+    final int? descriptionOffset = _description == null ? null
+        : fbBuilder.writeString(_description!);
+    final int? additionalInfoOffset = _additionalInfo == null ? null
+        : fbBuilder.writeList(_additionalInfo!.map(fbBuilder.writeString).toList());
+    final int? similarOffset = _similar == null ? null
+        : fbBuilder.writeList(_similar!.map((b) => b.getOrCreateOffset(fbBuilder)).toList());
+    final int? paramsOffset = _params == null ? null
+        : fbBuilder.writeList(_params!.map(fbBuilder.writeString).toList());
+    fbBuilder.startTable(8);
+    fbBuilder.addOffset(0, titleOffset);
+    fbBuilder.addOffset(1, originalTitleOffset);
+    fbBuilder.addOffset(2, imageOffset);
+    fbBuilder.addOffset(3, descriptionOffset);
+    fbBuilder.addUint8(4, _mediaType?.value);
+    fbBuilder.addOffset(5, additionalInfoOffset);
+    fbBuilder.addOffset(6, similarOffset);
+    fbBuilder.addOffset(7, paramsOffset);
     return fbBuilder.endTable();
   }
 
@@ -607,7 +517,6 @@ class ContentDetailsObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class ContentMediaItem {
   ContentMediaItem._(this._bc, this._bcOffset);
   factory ContentMediaItem(List<int> bytes) {
@@ -621,18 +530,14 @@ class ContentMediaItem {
   final int _bcOffset;
 
   int get number => const fb.Uint32Reader().vTableGet(_bc, _bcOffset, 4, 0);
-  String? get title =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
-  String? get section =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 8);
-  String? get image =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 10);
-  List<String>? get params => const fb.ListReader<String>(fb.StringReader())
-      .vTableGetNullable(_bc, _bcOffset, 12);
+  String? get title => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
+  String? get section => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 8);
+  String? get image => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 10);
+  List<String>? get params => const fb.ListReader<String>(fb.StringReader()).vTableGetNullable(_bc, _bcOffset, 12);
 
   @override
   String toString() {
-    return 'ContentMediaItem{number: $number, title: $title, section: $section, image: $image, params: $params}';
+    return 'ContentMediaItem{number: ${number}, title: ${title}, section: ${section}, image: ${image}, params: ${params}}';
   }
 
   ContentMediaItemT unpack() => ContentMediaItemT(
@@ -640,8 +545,7 @@ class ContentMediaItem {
       title: title,
       section: section,
       image: image,
-      params: const fb.ListReader<String>(fb.StringReader(), lazy: false)
-          .vTableGetNullable(_bc, _bcOffset, 12));
+      params: const fb.ListReader<String>(fb.StringReader(), lazy: false).vTableGetNullable(_bc, _bcOffset, 12));
 
   static int pack(fb.Builder fbBuilder, ContentMediaItemT? object) {
     if (object == null) return 0;
@@ -656,19 +560,22 @@ class ContentMediaItemT implements fb.Packable {
   String? image;
   List<String>? params;
 
-  ContentMediaItemT(
-      {this.number = 0, this.title, this.section, this.image, this.params});
+  ContentMediaItemT({
+      this.number = 0,
+      this.title,
+      this.section,
+      this.image,
+      this.params});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? titleOffset =
-        title == null ? null : fbBuilder.writeString(title!);
-    final int? sectionOffset =
-        section == null ? null : fbBuilder.writeString(section!);
-    final int? imageOffset =
-        image == null ? null : fbBuilder.writeString(image!);
-    final int? paramsOffset = params == null
-        ? null
+    final int? titleOffset = title == null ? null
+        : fbBuilder.writeString(title!);
+    final int? sectionOffset = section == null ? null
+        : fbBuilder.writeString(section!);
+    final int? imageOffset = image == null ? null
+        : fbBuilder.writeString(image!);
+    final int? paramsOffset = params == null ? null
         : fbBuilder.writeList(params!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(5);
     fbBuilder.addUint32(0, number);
@@ -681,7 +588,7 @@ class ContentMediaItemT implements fb.Packable {
 
   @override
   String toString() {
-    return 'ContentMediaItemT{number: $number, title: $title, section: $section, image: $image, params: $params}';
+    return 'ContentMediaItemT{number: ${number}, title: ${title}, section: ${section}, image: ${image}, params: ${params}}';
   }
 }
 
@@ -689,8 +596,8 @@ class _ContentMediaItemReader extends fb.TableReader<ContentMediaItem> {
   const _ContentMediaItemReader();
 
   @override
-  ContentMediaItem createObject(fb.BufferContext bc, int offset) =>
-      ContentMediaItem._(bc, offset);
+  ContentMediaItem createObject(fb.BufferContext bc, int offset) => 
+    ContentMediaItem._(bc, offset);
 }
 
 class ContentMediaItemBuilder {
@@ -706,22 +613,18 @@ class ContentMediaItemBuilder {
     fbBuilder.addUint32(0, number);
     return fbBuilder.offset;
   }
-
   int addTitleOffset(int? offset) {
     fbBuilder.addOffset(1, offset);
     return fbBuilder.offset;
   }
-
   int addSectionOffset(int? offset) {
     fbBuilder.addOffset(2, offset);
     return fbBuilder.offset;
   }
-
   int addImageOffset(int? offset) {
     fbBuilder.addOffset(3, offset);
     return fbBuilder.offset;
   }
-
   int addParamsOffset(int? offset) {
     fbBuilder.addOffset(4, offset);
     return fbBuilder.offset;
@@ -745,7 +648,8 @@ class ContentMediaItemObjectBuilder extends fb.ObjectBuilder {
     String? section,
     String? image,
     List<String>? params,
-  })  : _number = number,
+  })
+      : _number = number,
         _title = title,
         _section = section,
         _image = image,
@@ -754,15 +658,14 @@ class ContentMediaItemObjectBuilder extends fb.ObjectBuilder {
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? titleOffset =
-        _title == null ? null : fbBuilder.writeString(_title);
-    final int? sectionOffset =
-        _section == null ? null : fbBuilder.writeString(_section);
-    final int? imageOffset =
-        _image == null ? null : fbBuilder.writeString(_image);
-    final int? paramsOffset = _params == null
-        ? null
-        : fbBuilder.writeList(_params.map(fbBuilder.writeString).toList());
+    final int? titleOffset = _title == null ? null
+        : fbBuilder.writeString(_title!);
+    final int? sectionOffset = _section == null ? null
+        : fbBuilder.writeString(_section!);
+    final int? imageOffset = _image == null ? null
+        : fbBuilder.writeString(_image!);
+    final int? paramsOffset = _params == null ? null
+        : fbBuilder.writeList(_params!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(5);
     fbBuilder.addUint32(0, _number);
     fbBuilder.addOffset(1, titleOffset);
@@ -780,7 +683,6 @@ class ContentMediaItemObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class Header {
   Header._(this._bc, this._bcOffset);
   factory Header(List<int> bytes) {
@@ -793,17 +695,17 @@ class Header {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  String? get name =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
-  String? get value =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
+  String? get name => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
+  String? get value => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
 
   @override
   String toString() {
-    return 'Header{name: $name, value: $value}';
+    return 'Header{name: ${name}, value: ${value}}';
   }
 
-  HeaderT unpack() => HeaderT(name: name, value: value);
+  HeaderT unpack() => HeaderT(
+      name: name,
+      value: value);
 
   static int pack(fb.Builder fbBuilder, HeaderT? object) {
     if (object == null) return 0;
@@ -815,13 +717,16 @@ class HeaderT implements fb.Packable {
   String? name;
   String? value;
 
-  HeaderT({this.name, this.value});
+  HeaderT({
+      this.name,
+      this.value});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? nameOffset = name == null ? null : fbBuilder.writeString(name!);
-    final int? valueOffset =
-        value == null ? null : fbBuilder.writeString(value!);
+    final int? nameOffset = name == null ? null
+        : fbBuilder.writeString(name!);
+    final int? valueOffset = value == null ? null
+        : fbBuilder.writeString(value!);
     fbBuilder.startTable(2);
     fbBuilder.addOffset(0, nameOffset);
     fbBuilder.addOffset(1, valueOffset);
@@ -830,7 +735,7 @@ class HeaderT implements fb.Packable {
 
   @override
   String toString() {
-    return 'HeaderT{name: $name, value: $value}';
+    return 'HeaderT{name: ${name}, value: ${value}}';
   }
 }
 
@@ -838,7 +743,8 @@ class _HeaderReader extends fb.TableReader<Header> {
   const _HeaderReader();
 
   @override
-  Header createObject(fb.BufferContext bc, int offset) => Header._(bc, offset);
+  Header createObject(fb.BufferContext bc, int offset) => 
+    Header._(bc, offset);
 }
 
 class HeaderBuilder {
@@ -854,7 +760,6 @@ class HeaderBuilder {
     fbBuilder.addOffset(0, offset);
     return fbBuilder.offset;
   }
-
   int addValueOffset(int? offset) {
     fbBuilder.addOffset(1, offset);
     return fbBuilder.offset;
@@ -872,15 +777,17 @@ class HeaderObjectBuilder extends fb.ObjectBuilder {
   HeaderObjectBuilder({
     String? name,
     String? value,
-  })  : _name = name,
+  })
+      : _name = name,
         _value = value;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? nameOffset = _name == null ? null : fbBuilder.writeString(_name);
-    final int? valueOffset =
-        _value == null ? null : fbBuilder.writeString(_value);
+    final int? nameOffset = _name == null ? null
+        : fbBuilder.writeString(_name!);
+    final int? valueOffset = _value == null ? null
+        : fbBuilder.writeString(_value!);
     fbBuilder.startTable(2);
     fbBuilder.addOffset(0, nameOffset);
     fbBuilder.addOffset(1, valueOffset);
@@ -895,7 +802,6 @@ class HeaderObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class ContentMediaItemSource {
   ContentMediaItemSource._(this._bc, this._bcOffset);
   factory ContentMediaItemSource(List<int> bytes) {
@@ -903,32 +809,26 @@ class ContentMediaItemSource {
     return reader.read(rootRef, 0);
   }
 
-  static const fb.Reader<ContentMediaItemSource> reader =
-      _ContentMediaItemSourceReader();
+  static const fb.Reader<ContentMediaItemSource> reader = _ContentMediaItemSourceReader();
 
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  ContentMediaItemSourceType get type => ContentMediaItemSourceType.fromValue(
-      const fb.Uint8Reader().vTableGet(_bc, _bcOffset, 4, 0));
-  String? get description =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
-  List<Header>? get headers => const fb.ListReader<Header>(Header.reader)
-      .vTableGetNullable(_bc, _bcOffset, 8);
-  List<String>? get links => const fb.ListReader<String>(fb.StringReader())
-      .vTableGetNullable(_bc, _bcOffset, 10);
+  ContentMediaItemSourceType get type => ContentMediaItemSourceType.fromValue(const fb.Uint8Reader().vTableGet(_bc, _bcOffset, 4, 0));
+  String? get description => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
+  List<Header>? get headers => const fb.ListReader<Header>(Header.reader).vTableGetNullable(_bc, _bcOffset, 8);
+  List<String>? get links => const fb.ListReader<String>(fb.StringReader()).vTableGetNullable(_bc, _bcOffset, 10);
 
   @override
   String toString() {
-    return 'ContentMediaItemSource{type: $type, description: $description, headers: $headers, links: $links}';
+    return 'ContentMediaItemSource{type: ${type}, description: ${description}, headers: ${headers}, links: ${links}}';
   }
 
   ContentMediaItemSourceT unpack() => ContentMediaItemSourceT(
       type: type,
       description: description,
       headers: headers?.map((e) => e.unpack()).toList(),
-      links: const fb.ListReader<String>(fb.StringReader(), lazy: false)
-          .vTableGetNullable(_bc, _bcOffset, 10));
+      links: const fb.ListReader<String>(fb.StringReader(), lazy: false).vTableGetNullable(_bc, _bcOffset, 10));
 
   static int pack(fb.Builder fbBuilder, ContentMediaItemSourceT? object) {
     if (object == null) return 0;
@@ -942,21 +842,19 @@ class ContentMediaItemSourceT implements fb.Packable {
   List<HeaderT>? headers;
   List<String>? links;
 
-  ContentMediaItemSourceT(
-      {this.type = ContentMediaItemSourceType.Video,
+  ContentMediaItemSourceT({
+      this.type = ContentMediaItemSourceType.Video,
       this.description,
       this.headers,
       this.links});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? descriptionOffset =
-        description == null ? null : fbBuilder.writeString(description!);
-    final int? headersOffset = headers == null
-        ? null
+    final int? descriptionOffset = description == null ? null
+        : fbBuilder.writeString(description!);
+    final int? headersOffset = headers == null ? null
         : fbBuilder.writeList(headers!.map((b) => b.pack(fbBuilder)).toList());
-    final int? linksOffset = links == null
-        ? null
+    final int? linksOffset = links == null ? null
         : fbBuilder.writeList(links!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(4);
     fbBuilder.addUint8(0, type.value);
@@ -968,17 +866,16 @@ class ContentMediaItemSourceT implements fb.Packable {
 
   @override
   String toString() {
-    return 'ContentMediaItemSourceT{type: $type, description: $description, headers: $headers, links: $links}';
+    return 'ContentMediaItemSourceT{type: ${type}, description: ${description}, headers: ${headers}, links: ${links}}';
   }
 }
 
-class _ContentMediaItemSourceReader
-    extends fb.TableReader<ContentMediaItemSource> {
+class _ContentMediaItemSourceReader extends fb.TableReader<ContentMediaItemSource> {
   const _ContentMediaItemSourceReader();
 
   @override
-  ContentMediaItemSource createObject(fb.BufferContext bc, int offset) =>
-      ContentMediaItemSource._(bc, offset);
+  ContentMediaItemSource createObject(fb.BufferContext bc, int offset) => 
+    ContentMediaItemSource._(bc, offset);
 }
 
 class ContentMediaItemSourceBuilder {
@@ -994,17 +891,14 @@ class ContentMediaItemSourceBuilder {
     fbBuilder.addUint8(0, type?.value);
     return fbBuilder.offset;
   }
-
   int addDescriptionOffset(int? offset) {
     fbBuilder.addOffset(1, offset);
     return fbBuilder.offset;
   }
-
   int addHeadersOffset(int? offset) {
     fbBuilder.addOffset(2, offset);
     return fbBuilder.offset;
   }
-
   int addLinksOffset(int? offset) {
     fbBuilder.addOffset(3, offset);
     return fbBuilder.offset;
@@ -1026,7 +920,8 @@ class ContentMediaItemSourceObjectBuilder extends fb.ObjectBuilder {
     String? description,
     List<HeaderObjectBuilder>? headers,
     List<String>? links,
-  })  : _type = type,
+  })
+      : _type = type,
         _description = description,
         _headers = headers,
         _links = links;
@@ -1034,15 +929,12 @@ class ContentMediaItemSourceObjectBuilder extends fb.ObjectBuilder {
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? descriptionOffset =
-        _description == null ? null : fbBuilder.writeString(_description);
-    final int? headersOffset = _headers == null
-        ? null
-        : fbBuilder.writeList(
-            _headers.map((b) => b.getOrCreateOffset(fbBuilder)).toList());
-    final int? linksOffset = _links == null
-        ? null
-        : fbBuilder.writeList(_links.map(fbBuilder.writeString).toList());
+    final int? descriptionOffset = _description == null ? null
+        : fbBuilder.writeString(_description!);
+    final int? headersOffset = _headers == null ? null
+        : fbBuilder.writeList(_headers!.map((b) => b.getOrCreateOffset(fbBuilder)).toList());
+    final int? linksOffset = _links == null ? null
+        : fbBuilder.writeList(_links!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(4);
     fbBuilder.addUint8(0, _type?.value);
     fbBuilder.addOffset(1, descriptionOffset);
@@ -1059,7 +951,6 @@ class ContentMediaItemSourceObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class SuppliersRes {
   SuppliersRes._(this._bc, this._bcOffset);
   factory SuppliersRes(List<int> bytes) {
@@ -1072,17 +963,15 @@ class SuppliersRes {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  List<String>? get suppliers => const fb.ListReader<String>(fb.StringReader())
-      .vTableGetNullable(_bc, _bcOffset, 4);
+  List<String>? get suppliers => const fb.ListReader<String>(fb.StringReader()).vTableGetNullable(_bc, _bcOffset, 4);
 
   @override
   String toString() {
-    return 'SuppliersRes{suppliers: $suppliers}';
+    return 'SuppliersRes{suppliers: ${suppliers}}';
   }
 
   SuppliersResT unpack() => SuppliersResT(
-      suppliers: const fb.ListReader<String>(fb.StringReader(), lazy: false)
-          .vTableGetNullable(_bc, _bcOffset, 4));
+      suppliers: const fb.ListReader<String>(fb.StringReader(), lazy: false).vTableGetNullable(_bc, _bcOffset, 4));
 
   static int pack(fb.Builder fbBuilder, SuppliersResT? object) {
     if (object == null) return 0;
@@ -1093,12 +982,12 @@ class SuppliersRes {
 class SuppliersResT implements fb.Packable {
   List<String>? suppliers;
 
-  SuppliersResT({this.suppliers});
+  SuppliersResT({
+      this.suppliers});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? suppliersOffset = suppliers == null
-        ? null
+    final int? suppliersOffset = suppliers == null ? null
         : fbBuilder.writeList(suppliers!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, suppliersOffset);
@@ -1107,7 +996,7 @@ class SuppliersResT implements fb.Packable {
 
   @override
   String toString() {
-    return 'SuppliersResT{suppliers: $suppliers}';
+    return 'SuppliersResT{suppliers: ${suppliers}}';
   }
 }
 
@@ -1115,8 +1004,8 @@ class _SuppliersResReader extends fb.TableReader<SuppliersRes> {
   const _SuppliersResReader();
 
   @override
-  SuppliersRes createObject(fb.BufferContext bc, int offset) =>
-      SuppliersRes._(bc, offset);
+  SuppliersRes createObject(fb.BufferContext bc, int offset) => 
+    SuppliersRes._(bc, offset);
 }
 
 class SuppliersResBuilder {
@@ -1143,14 +1032,14 @@ class SuppliersResObjectBuilder extends fb.ObjectBuilder {
 
   SuppliersResObjectBuilder({
     List<String>? suppliers,
-  }) : _suppliers = suppliers;
+  })
+      : _suppliers = suppliers;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? suppliersOffset = _suppliers == null
-        ? null
-        : fbBuilder.writeList(_suppliers.map(fbBuilder.writeString).toList());
+    final int? suppliersOffset = _suppliers == null ? null
+        : fbBuilder.writeList(_suppliers!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, suppliersOffset);
     return fbBuilder.endTable();
@@ -1164,7 +1053,6 @@ class SuppliersResObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class SupplierNameReq {
   SupplierNameReq._(this._bc, this._bcOffset);
   factory SupplierNameReq(List<int> bytes) {
@@ -1177,15 +1065,15 @@ class SupplierNameReq {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  String? get supplier =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
+  String? get supplier => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
 
   @override
   String toString() {
-    return 'SupplierNameReq{supplier: $supplier}';
+    return 'SupplierNameReq{supplier: ${supplier}}';
   }
 
-  SupplierNameReqT unpack() => SupplierNameReqT(supplier: supplier);
+  SupplierNameReqT unpack() => SupplierNameReqT(
+      supplier: supplier);
 
   static int pack(fb.Builder fbBuilder, SupplierNameReqT? object) {
     if (object == null) return 0;
@@ -1196,12 +1084,13 @@ class SupplierNameReq {
 class SupplierNameReqT implements fb.Packable {
   String? supplier;
 
-  SupplierNameReqT({this.supplier});
+  SupplierNameReqT({
+      this.supplier});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? supplierOffset =
-        supplier == null ? null : fbBuilder.writeString(supplier!);
+    final int? supplierOffset = supplier == null ? null
+        : fbBuilder.writeString(supplier!);
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, supplierOffset);
     return fbBuilder.endTable();
@@ -1209,7 +1098,7 @@ class SupplierNameReqT implements fb.Packable {
 
   @override
   String toString() {
-    return 'SupplierNameReqT{supplier: $supplier}';
+    return 'SupplierNameReqT{supplier: ${supplier}}';
   }
 }
 
@@ -1217,8 +1106,8 @@ class _SupplierNameReqReader extends fb.TableReader<SupplierNameReq> {
   const _SupplierNameReqReader();
 
   @override
-  SupplierNameReq createObject(fb.BufferContext bc, int offset) =>
-      SupplierNameReq._(bc, offset);
+  SupplierNameReq createObject(fb.BufferContext bc, int offset) => 
+    SupplierNameReq._(bc, offset);
 }
 
 class SupplierNameReqBuilder {
@@ -1245,13 +1134,14 @@ class SupplierNameReqObjectBuilder extends fb.ObjectBuilder {
 
   SupplierNameReqObjectBuilder({
     String? supplier,
-  }) : _supplier = supplier;
+  })
+      : _supplier = supplier;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? supplierOffset =
-        _supplier == null ? null : fbBuilder.writeString(_supplier);
+    final int? supplierOffset = _supplier == null ? null
+        : fbBuilder.writeString(_supplier!);
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, supplierOffset);
     return fbBuilder.endTable();
@@ -1265,7 +1155,6 @@ class SupplierNameReqObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class ChannelsRes {
   ChannelsRes._(this._bc, this._bcOffset);
   factory ChannelsRes(List<int> bytes) {
@@ -1278,17 +1167,15 @@ class ChannelsRes {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  List<String>? get channels => const fb.ListReader<String>(fb.StringReader())
-      .vTableGetNullable(_bc, _bcOffset, 4);
+  List<String>? get channels => const fb.ListReader<String>(fb.StringReader()).vTableGetNullable(_bc, _bcOffset, 4);
 
   @override
   String toString() {
-    return 'ChannelsRes{channels: $channels}';
+    return 'ChannelsRes{channels: ${channels}}';
   }
 
   ChannelsResT unpack() => ChannelsResT(
-      channels: const fb.ListReader<String>(fb.StringReader(), lazy: false)
-          .vTableGetNullable(_bc, _bcOffset, 4));
+      channels: const fb.ListReader<String>(fb.StringReader(), lazy: false).vTableGetNullable(_bc, _bcOffset, 4));
 
   static int pack(fb.Builder fbBuilder, ChannelsResT? object) {
     if (object == null) return 0;
@@ -1299,12 +1186,12 @@ class ChannelsRes {
 class ChannelsResT implements fb.Packable {
   List<String>? channels;
 
-  ChannelsResT({this.channels});
+  ChannelsResT({
+      this.channels});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? channelsOffset = channels == null
-        ? null
+    final int? channelsOffset = channels == null ? null
         : fbBuilder.writeList(channels!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, channelsOffset);
@@ -1313,7 +1200,7 @@ class ChannelsResT implements fb.Packable {
 
   @override
   String toString() {
-    return 'ChannelsResT{channels: $channels}';
+    return 'ChannelsResT{channels: ${channels}}';
   }
 }
 
@@ -1321,8 +1208,8 @@ class _ChannelsResReader extends fb.TableReader<ChannelsRes> {
   const _ChannelsResReader();
 
   @override
-  ChannelsRes createObject(fb.BufferContext bc, int offset) =>
-      ChannelsRes._(bc, offset);
+  ChannelsRes createObject(fb.BufferContext bc, int offset) => 
+    ChannelsRes._(bc, offset);
 }
 
 class ChannelsResBuilder {
@@ -1349,14 +1236,14 @@ class ChannelsResObjectBuilder extends fb.ObjectBuilder {
 
   ChannelsResObjectBuilder({
     List<String>? channels,
-  }) : _channels = channels;
+  })
+      : _channels = channels;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? channelsOffset = _channels == null
-        ? null
-        : fbBuilder.writeList(_channels.map(fbBuilder.writeString).toList());
+    final int? channelsOffset = _channels == null ? null
+        : fbBuilder.writeList(_channels!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, channelsOffset);
     return fbBuilder.endTable();
@@ -1370,7 +1257,6 @@ class ChannelsResObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class SupportedTypesRes {
   SupportedTypesRes._(this._bc, this._bcOffset);
   factory SupportedTypesRes(List<int> bytes) {
@@ -1383,18 +1269,15 @@ class SupportedTypesRes {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  List<ContentType>? get types =>
-      const fb.ListReader<ContentType>(ContentType.reader)
-          .vTableGetNullable(_bc, _bcOffset, 4);
+  List<ContentType>? get types => const fb.ListReader<ContentType>(ContentType.reader).vTableGetNullable(_bc, _bcOffset, 4);
 
   @override
   String toString() {
-    return 'SupportedTypesRes{types: $types}';
+    return 'SupportedTypesRes{types: ${types}}';
   }
 
   SupportedTypesResT unpack() => SupportedTypesResT(
-      types: const fb.ListReader<ContentType>(ContentType.reader, lazy: false)
-          .vTableGetNullable(_bc, _bcOffset, 4));
+      types: const fb.ListReader<ContentType>(ContentType.reader, lazy: false).vTableGetNullable(_bc, _bcOffset, 4));
 
   static int pack(fb.Builder fbBuilder, SupportedTypesResT? object) {
     if (object == null) return 0;
@@ -1405,12 +1288,12 @@ class SupportedTypesRes {
 class SupportedTypesResT implements fb.Packable {
   List<ContentType>? types;
 
-  SupportedTypesResT({this.types});
+  SupportedTypesResT({
+      this.types});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? typesOffset = types == null
-        ? null
+    final int? typesOffset = types == null ? null
         : fbBuilder.writeListUint8(types!.map((f) => f.value).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, typesOffset);
@@ -1419,7 +1302,7 @@ class SupportedTypesResT implements fb.Packable {
 
   @override
   String toString() {
-    return 'SupportedTypesResT{types: $types}';
+    return 'SupportedTypesResT{types: ${types}}';
   }
 }
 
@@ -1427,8 +1310,8 @@ class _SupportedTypesResReader extends fb.TableReader<SupportedTypesRes> {
   const _SupportedTypesResReader();
 
   @override
-  SupportedTypesRes createObject(fb.BufferContext bc, int offset) =>
-      SupportedTypesRes._(bc, offset);
+  SupportedTypesRes createObject(fb.BufferContext bc, int offset) => 
+    SupportedTypesRes._(bc, offset);
 }
 
 class SupportedTypesResBuilder {
@@ -1455,14 +1338,14 @@ class SupportedTypesResObjectBuilder extends fb.ObjectBuilder {
 
   SupportedTypesResObjectBuilder({
     List<ContentType>? types,
-  }) : _types = types;
+  })
+      : _types = types;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? typesOffset = _types == null
-        ? null
-        : fbBuilder.writeListUint8(_types.map((f) => f.value).toList());
+    final int? typesOffset = _types == null ? null
+        : fbBuilder.writeListUint8(_types!.map((f) => f.value).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, typesOffset);
     return fbBuilder.endTable();
@@ -1476,7 +1359,6 @@ class SupportedTypesResObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class SupportedLanuagesRes {
   SupportedLanuagesRes._(this._bc, this._bcOffset);
   factory SupportedLanuagesRes(List<int> bytes) {
@@ -1484,23 +1366,20 @@ class SupportedLanuagesRes {
     return reader.read(rootRef, 0);
   }
 
-  static const fb.Reader<SupportedLanuagesRes> reader =
-      _SupportedLanuagesResReader();
+  static const fb.Reader<SupportedLanuagesRes> reader = _SupportedLanuagesResReader();
 
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  List<String>? get langs => const fb.ListReader<String>(fb.StringReader())
-      .vTableGetNullable(_bc, _bcOffset, 4);
+  List<String>? get langs => const fb.ListReader<String>(fb.StringReader()).vTableGetNullable(_bc, _bcOffset, 4);
 
   @override
   String toString() {
-    return 'SupportedLanuagesRes{langs: $langs}';
+    return 'SupportedLanuagesRes{langs: ${langs}}';
   }
 
   SupportedLanuagesResT unpack() => SupportedLanuagesResT(
-      langs: const fb.ListReader<String>(fb.StringReader(), lazy: false)
-          .vTableGetNullable(_bc, _bcOffset, 4));
+      langs: const fb.ListReader<String>(fb.StringReader(), lazy: false).vTableGetNullable(_bc, _bcOffset, 4));
 
   static int pack(fb.Builder fbBuilder, SupportedLanuagesResT? object) {
     if (object == null) return 0;
@@ -1511,12 +1390,12 @@ class SupportedLanuagesRes {
 class SupportedLanuagesResT implements fb.Packable {
   List<String>? langs;
 
-  SupportedLanuagesResT({this.langs});
+  SupportedLanuagesResT({
+      this.langs});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? langsOffset = langs == null
-        ? null
+    final int? langsOffset = langs == null ? null
         : fbBuilder.writeList(langs!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, langsOffset);
@@ -1525,7 +1404,7 @@ class SupportedLanuagesResT implements fb.Packable {
 
   @override
   String toString() {
-    return 'SupportedLanuagesResT{langs: $langs}';
+    return 'SupportedLanuagesResT{langs: ${langs}}';
   }
 }
 
@@ -1533,8 +1412,8 @@ class _SupportedLanuagesResReader extends fb.TableReader<SupportedLanuagesRes> {
   const _SupportedLanuagesResReader();
 
   @override
-  SupportedLanuagesRes createObject(fb.BufferContext bc, int offset) =>
-      SupportedLanuagesRes._(bc, offset);
+  SupportedLanuagesRes createObject(fb.BufferContext bc, int offset) => 
+    SupportedLanuagesRes._(bc, offset);
 }
 
 class SupportedLanuagesResBuilder {
@@ -1561,14 +1440,14 @@ class SupportedLanuagesResObjectBuilder extends fb.ObjectBuilder {
 
   SupportedLanuagesResObjectBuilder({
     List<String>? langs,
-  }) : _langs = langs;
+  })
+      : _langs = langs;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? langsOffset = _langs == null
-        ? null
-        : fbBuilder.writeList(_langs.map(fbBuilder.writeString).toList());
+    final int? langsOffset = _langs == null ? null
+        : fbBuilder.writeList(_langs!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, langsOffset);
     return fbBuilder.endTable();
@@ -1582,7 +1461,6 @@ class SupportedLanuagesResObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class LoadChannelsReq {
   LoadChannelsReq._(this._bc, this._bcOffset);
   factory LoadChannelsReq(List<int> bytes) {
@@ -1595,19 +1473,19 @@ class LoadChannelsReq {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  String? get supplier =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
-  String? get channel =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
+  String? get supplier => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
+  String? get channel => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
   int get page => const fb.Uint32Reader().vTableGet(_bc, _bcOffset, 8, 0);
 
   @override
   String toString() {
-    return 'LoadChannelsReq{supplier: $supplier, channel: $channel, page: $page}';
+    return 'LoadChannelsReq{supplier: ${supplier}, channel: ${channel}, page: ${page}}';
   }
 
-  LoadChannelsReqT unpack() =>
-      LoadChannelsReqT(supplier: supplier, channel: channel, page: page);
+  LoadChannelsReqT unpack() => LoadChannelsReqT(
+      supplier: supplier,
+      channel: channel,
+      page: page);
 
   static int pack(fb.Builder fbBuilder, LoadChannelsReqT? object) {
     if (object == null) return 0;
@@ -1620,14 +1498,17 @@ class LoadChannelsReqT implements fb.Packable {
   String? channel;
   int page;
 
-  LoadChannelsReqT({this.supplier, this.channel, this.page = 0});
+  LoadChannelsReqT({
+      this.supplier,
+      this.channel,
+      this.page = 0});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? supplierOffset =
-        supplier == null ? null : fbBuilder.writeString(supplier!);
-    final int? channelOffset =
-        channel == null ? null : fbBuilder.writeString(channel!);
+    final int? supplierOffset = supplier == null ? null
+        : fbBuilder.writeString(supplier!);
+    final int? channelOffset = channel == null ? null
+        : fbBuilder.writeString(channel!);
     fbBuilder.startTable(3);
     fbBuilder.addOffset(0, supplierOffset);
     fbBuilder.addOffset(1, channelOffset);
@@ -1637,7 +1518,7 @@ class LoadChannelsReqT implements fb.Packable {
 
   @override
   String toString() {
-    return 'LoadChannelsReqT{supplier: $supplier, channel: $channel, page: $page}';
+    return 'LoadChannelsReqT{supplier: ${supplier}, channel: ${channel}, page: ${page}}';
   }
 }
 
@@ -1645,8 +1526,8 @@ class _LoadChannelsReqReader extends fb.TableReader<LoadChannelsReq> {
   const _LoadChannelsReqReader();
 
   @override
-  LoadChannelsReq createObject(fb.BufferContext bc, int offset) =>
-      LoadChannelsReq._(bc, offset);
+  LoadChannelsReq createObject(fb.BufferContext bc, int offset) => 
+    LoadChannelsReq._(bc, offset);
 }
 
 class LoadChannelsReqBuilder {
@@ -1662,12 +1543,10 @@ class LoadChannelsReqBuilder {
     fbBuilder.addOffset(0, offset);
     return fbBuilder.offset;
   }
-
   int addChannelOffset(int? offset) {
     fbBuilder.addOffset(1, offset);
     return fbBuilder.offset;
   }
-
   int addPage(int? page) {
     fbBuilder.addUint32(2, page);
     return fbBuilder.offset;
@@ -1687,17 +1566,18 @@ class LoadChannelsReqObjectBuilder extends fb.ObjectBuilder {
     String? supplier,
     String? channel,
     int? page,
-  })  : _supplier = supplier,
+  })
+      : _supplier = supplier,
         _channel = channel,
         _page = page;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? supplierOffset =
-        _supplier == null ? null : fbBuilder.writeString(_supplier);
-    final int? channelOffset =
-        _channel == null ? null : fbBuilder.writeString(_channel);
+    final int? supplierOffset = _supplier == null ? null
+        : fbBuilder.writeString(_supplier!);
+    final int? channelOffset = _channel == null ? null
+        : fbBuilder.writeString(_channel!);
     fbBuilder.startTable(3);
     fbBuilder.addOffset(0, supplierOffset);
     fbBuilder.addOffset(1, channelOffset);
@@ -1713,7 +1593,6 @@ class LoadChannelsReqObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class SearchReq {
   SearchReq._(this._bc, this._bcOffset);
   factory SearchReq(List<int> bytes) {
@@ -1726,24 +1605,19 @@ class SearchReq {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  String? get supplier =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
-  String? get query =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
-  List<ContentType>? get types =>
-      const fb.ListReader<ContentType>(ContentType.reader)
-          .vTableGetNullable(_bc, _bcOffset, 8);
+  String? get supplier => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
+  String? get query => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
+  List<ContentType>? get types => const fb.ListReader<ContentType>(ContentType.reader).vTableGetNullable(_bc, _bcOffset, 8);
 
   @override
   String toString() {
-    return 'SearchReq{supplier: $supplier, query: $query, types: $types}';
+    return 'SearchReq{supplier: ${supplier}, query: ${query}, types: ${types}}';
   }
 
   SearchReqT unpack() => SearchReqT(
       supplier: supplier,
       query: query,
-      types: const fb.ListReader<ContentType>(ContentType.reader, lazy: false)
-          .vTableGetNullable(_bc, _bcOffset, 8));
+      types: const fb.ListReader<ContentType>(ContentType.reader, lazy: false).vTableGetNullable(_bc, _bcOffset, 8));
 
   static int pack(fb.Builder fbBuilder, SearchReqT? object) {
     if (object == null) return 0;
@@ -1756,16 +1630,18 @@ class SearchReqT implements fb.Packable {
   String? query;
   List<ContentType>? types;
 
-  SearchReqT({this.supplier, this.query, this.types});
+  SearchReqT({
+      this.supplier,
+      this.query,
+      this.types});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? supplierOffset =
-        supplier == null ? null : fbBuilder.writeString(supplier!);
-    final int? queryOffset =
-        query == null ? null : fbBuilder.writeString(query!);
-    final int? typesOffset = types == null
-        ? null
+    final int? supplierOffset = supplier == null ? null
+        : fbBuilder.writeString(supplier!);
+    final int? queryOffset = query == null ? null
+        : fbBuilder.writeString(query!);
+    final int? typesOffset = types == null ? null
         : fbBuilder.writeListUint8(types!.map((f) => f.value).toList());
     fbBuilder.startTable(3);
     fbBuilder.addOffset(0, supplierOffset);
@@ -1776,7 +1652,7 @@ class SearchReqT implements fb.Packable {
 
   @override
   String toString() {
-    return 'SearchReqT{supplier: $supplier, query: $query, types: $types}';
+    return 'SearchReqT{supplier: ${supplier}, query: ${query}, types: ${types}}';
   }
 }
 
@@ -1784,8 +1660,8 @@ class _SearchReqReader extends fb.TableReader<SearchReq> {
   const _SearchReqReader();
 
   @override
-  SearchReq createObject(fb.BufferContext bc, int offset) =>
-      SearchReq._(bc, offset);
+  SearchReq createObject(fb.BufferContext bc, int offset) => 
+    SearchReq._(bc, offset);
 }
 
 class SearchReqBuilder {
@@ -1801,12 +1677,10 @@ class SearchReqBuilder {
     fbBuilder.addOffset(0, offset);
     return fbBuilder.offset;
   }
-
   int addQueryOffset(int? offset) {
     fbBuilder.addOffset(1, offset);
     return fbBuilder.offset;
   }
-
   int addTypesOffset(int? offset) {
     fbBuilder.addOffset(2, offset);
     return fbBuilder.offset;
@@ -1826,20 +1700,20 @@ class SearchReqObjectBuilder extends fb.ObjectBuilder {
     String? supplier,
     String? query,
     List<ContentType>? types,
-  })  : _supplier = supplier,
+  })
+      : _supplier = supplier,
         _query = query,
         _types = types;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? supplierOffset =
-        _supplier == null ? null : fbBuilder.writeString(_supplier);
-    final int? queryOffset =
-        _query == null ? null : fbBuilder.writeString(_query);
-    final int? typesOffset = _types == null
-        ? null
-        : fbBuilder.writeListUint8(_types.map((f) => f.value).toList());
+    final int? supplierOffset = _supplier == null ? null
+        : fbBuilder.writeString(_supplier!);
+    final int? queryOffset = _query == null ? null
+        : fbBuilder.writeString(_query!);
+    final int? typesOffset = _types == null ? null
+        : fbBuilder.writeListUint8(_types!.map((f) => f.value).toList());
     fbBuilder.startTable(3);
     fbBuilder.addOffset(0, supplierOffset);
     fbBuilder.addOffset(1, queryOffset);
@@ -1855,7 +1729,6 @@ class SearchReqObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class ContentInfoRes {
   ContentInfoRes._(this._bc, this._bcOffset);
   factory ContentInfoRes(List<int> bytes) {
@@ -1868,17 +1741,15 @@ class ContentInfoRes {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  List<ContentInfo>? get items =>
-      const fb.ListReader<ContentInfo>(ContentInfo.reader)
-          .vTableGetNullable(_bc, _bcOffset, 4);
+  List<ContentInfo>? get items => const fb.ListReader<ContentInfo>(ContentInfo.reader).vTableGetNullable(_bc, _bcOffset, 4);
 
   @override
   String toString() {
-    return 'ContentInfoRes{items: $items}';
+    return 'ContentInfoRes{items: ${items}}';
   }
 
-  ContentInfoResT unpack() =>
-      ContentInfoResT(items: items?.map((e) => e.unpack()).toList());
+  ContentInfoResT unpack() => ContentInfoResT(
+      items: items?.map((e) => e.unpack()).toList());
 
   static int pack(fb.Builder fbBuilder, ContentInfoResT? object) {
     if (object == null) return 0;
@@ -1889,12 +1760,12 @@ class ContentInfoRes {
 class ContentInfoResT implements fb.Packable {
   List<ContentInfoT>? items;
 
-  ContentInfoResT({this.items});
+  ContentInfoResT({
+      this.items});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? itemsOffset = items == null
-        ? null
+    final int? itemsOffset = items == null ? null
         : fbBuilder.writeList(items!.map((b) => b.pack(fbBuilder)).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, itemsOffset);
@@ -1903,7 +1774,7 @@ class ContentInfoResT implements fb.Packable {
 
   @override
   String toString() {
-    return 'ContentInfoResT{items: $items}';
+    return 'ContentInfoResT{items: ${items}}';
   }
 }
 
@@ -1911,8 +1782,8 @@ class _ContentInfoResReader extends fb.TableReader<ContentInfoRes> {
   const _ContentInfoResReader();
 
   @override
-  ContentInfoRes createObject(fb.BufferContext bc, int offset) =>
-      ContentInfoRes._(bc, offset);
+  ContentInfoRes createObject(fb.BufferContext bc, int offset) => 
+    ContentInfoRes._(bc, offset);
 }
 
 class ContentInfoResBuilder {
@@ -1939,15 +1810,14 @@ class ContentInfoResObjectBuilder extends fb.ObjectBuilder {
 
   ContentInfoResObjectBuilder({
     List<ContentInfoObjectBuilder>? items,
-  }) : _items = items;
+  })
+      : _items = items;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? itemsOffset = _items == null
-        ? null
-        : fbBuilder.writeList(
-            _items.map((b) => b.getOrCreateOffset(fbBuilder)).toList());
+    final int? itemsOffset = _items == null ? null
+        : fbBuilder.writeList(_items!.map((b) => b.getOrCreateOffset(fbBuilder)).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, itemsOffset);
     return fbBuilder.endTable();
@@ -1961,7 +1831,6 @@ class ContentInfoResObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class ContentDetailsReq {
   ContentDetailsReq._(this._bc, this._bcOffset);
   factory ContentDetailsReq(List<int> bytes) {
@@ -1974,17 +1843,17 @@ class ContentDetailsReq {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  String? get supplier =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
-  String? get id =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
+  String? get supplier => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
+  String? get id => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
 
   @override
   String toString() {
-    return 'ContentDetailsReq{supplier: $supplier, id: $id}';
+    return 'ContentDetailsReq{supplier: ${supplier}, id: ${id}}';
   }
 
-  ContentDetailsReqT unpack() => ContentDetailsReqT(supplier: supplier, id: id);
+  ContentDetailsReqT unpack() => ContentDetailsReqT(
+      supplier: supplier,
+      id: id);
 
   static int pack(fb.Builder fbBuilder, ContentDetailsReqT? object) {
     if (object == null) return 0;
@@ -1996,13 +1865,16 @@ class ContentDetailsReqT implements fb.Packable {
   String? supplier;
   String? id;
 
-  ContentDetailsReqT({this.supplier, this.id});
+  ContentDetailsReqT({
+      this.supplier,
+      this.id});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? supplierOffset =
-        supplier == null ? null : fbBuilder.writeString(supplier!);
-    final int? idOffset = id == null ? null : fbBuilder.writeString(id!);
+    final int? supplierOffset = supplier == null ? null
+        : fbBuilder.writeString(supplier!);
+    final int? idOffset = id == null ? null
+        : fbBuilder.writeString(id!);
     fbBuilder.startTable(2);
     fbBuilder.addOffset(0, supplierOffset);
     fbBuilder.addOffset(1, idOffset);
@@ -2011,7 +1883,7 @@ class ContentDetailsReqT implements fb.Packable {
 
   @override
   String toString() {
-    return 'ContentDetailsReqT{supplier: $supplier, id: $id}';
+    return 'ContentDetailsReqT{supplier: ${supplier}, id: ${id}}';
   }
 }
 
@@ -2019,8 +1891,8 @@ class _ContentDetailsReqReader extends fb.TableReader<ContentDetailsReq> {
   const _ContentDetailsReqReader();
 
   @override
-  ContentDetailsReq createObject(fb.BufferContext bc, int offset) =>
-      ContentDetailsReq._(bc, offset);
+  ContentDetailsReq createObject(fb.BufferContext bc, int offset) => 
+    ContentDetailsReq._(bc, offset);
 }
 
 class ContentDetailsReqBuilder {
@@ -2036,7 +1908,6 @@ class ContentDetailsReqBuilder {
     fbBuilder.addOffset(0, offset);
     return fbBuilder.offset;
   }
-
   int addIdOffset(int? offset) {
     fbBuilder.addOffset(1, offset);
     return fbBuilder.offset;
@@ -2054,15 +1925,17 @@ class ContentDetailsReqObjectBuilder extends fb.ObjectBuilder {
   ContentDetailsReqObjectBuilder({
     String? supplier,
     String? id,
-  })  : _supplier = supplier,
+  })
+      : _supplier = supplier,
         _id = id;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? supplierOffset =
-        _supplier == null ? null : fbBuilder.writeString(_supplier);
-    final int? idOffset = _id == null ? null : fbBuilder.writeString(_id);
+    final int? supplierOffset = _supplier == null ? null
+        : fbBuilder.writeString(_supplier!);
+    final int? idOffset = _id == null ? null
+        : fbBuilder.writeString(_id!);
     fbBuilder.startTable(2);
     fbBuilder.addOffset(0, supplierOffset);
     fbBuilder.addOffset(1, idOffset);
@@ -2077,7 +1950,6 @@ class ContentDetailsReqObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class ContentDetailsRes {
   ContentDetailsRes._(this._bc, this._bcOffset);
   factory ContentDetailsRes(List<int> bytes) {
@@ -2090,15 +1962,15 @@ class ContentDetailsRes {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  ContentDetails? get details =>
-      ContentDetails.reader.vTableGetNullable(_bc, _bcOffset, 4);
+  ContentDetails? get details => ContentDetails.reader.vTableGetNullable(_bc, _bcOffset, 4);
 
   @override
   String toString() {
-    return 'ContentDetailsRes{details: $details}';
+    return 'ContentDetailsRes{details: ${details}}';
   }
 
-  ContentDetailsResT unpack() => ContentDetailsResT(details: details?.unpack());
+  ContentDetailsResT unpack() => ContentDetailsResT(
+      details: details?.unpack());
 
   static int pack(fb.Builder fbBuilder, ContentDetailsResT? object) {
     if (object == null) return 0;
@@ -2109,7 +1981,8 @@ class ContentDetailsRes {
 class ContentDetailsResT implements fb.Packable {
   ContentDetailsT? details;
 
-  ContentDetailsResT({this.details});
+  ContentDetailsResT({
+      this.details});
 
   @override
   int pack(fb.Builder fbBuilder) {
@@ -2121,7 +1994,7 @@ class ContentDetailsResT implements fb.Packable {
 
   @override
   String toString() {
-    return 'ContentDetailsResT{details: $details}';
+    return 'ContentDetailsResT{details: ${details}}';
   }
 }
 
@@ -2129,8 +2002,8 @@ class _ContentDetailsResReader extends fb.TableReader<ContentDetailsRes> {
   const _ContentDetailsResReader();
 
   @override
-  ContentDetailsRes createObject(fb.BufferContext bc, int offset) =>
-      ContentDetailsRes._(bc, offset);
+  ContentDetailsRes createObject(fb.BufferContext bc, int offset) => 
+    ContentDetailsRes._(bc, offset);
 }
 
 class ContentDetailsResBuilder {
@@ -2157,7 +2030,8 @@ class ContentDetailsResObjectBuilder extends fb.ObjectBuilder {
 
   ContentDetailsResObjectBuilder({
     ContentDetailsObjectBuilder? details,
-  }) : _details = details;
+  })
+      : _details = details;
 
   /// Finish building, and store into the [fbBuilder].
   @override
@@ -2176,7 +2050,6 @@ class ContentDetailsResObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class LoadMediaItemsReq {
   LoadMediaItemsReq._(this._bc, this._bcOffset);
   factory LoadMediaItemsReq(List<int> bytes) {
@@ -2189,23 +2062,19 @@ class LoadMediaItemsReq {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  String? get supplier =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
-  String? get id =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
-  List<String>? get params => const fb.ListReader<String>(fb.StringReader())
-      .vTableGetNullable(_bc, _bcOffset, 8);
+  String? get supplier => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
+  String? get id => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
+  List<String>? get params => const fb.ListReader<String>(fb.StringReader()).vTableGetNullable(_bc, _bcOffset, 8);
 
   @override
   String toString() {
-    return 'LoadMediaItemsReq{supplier: $supplier, id: $id, params: $params}';
+    return 'LoadMediaItemsReq{supplier: ${supplier}, id: ${id}, params: ${params}}';
   }
 
   LoadMediaItemsReqT unpack() => LoadMediaItemsReqT(
       supplier: supplier,
       id: id,
-      params: const fb.ListReader<String>(fb.StringReader(), lazy: false)
-          .vTableGetNullable(_bc, _bcOffset, 8));
+      params: const fb.ListReader<String>(fb.StringReader(), lazy: false).vTableGetNullable(_bc, _bcOffset, 8));
 
   static int pack(fb.Builder fbBuilder, LoadMediaItemsReqT? object) {
     if (object == null) return 0;
@@ -2218,15 +2087,18 @@ class LoadMediaItemsReqT implements fb.Packable {
   String? id;
   List<String>? params;
 
-  LoadMediaItemsReqT({this.supplier, this.id, this.params});
+  LoadMediaItemsReqT({
+      this.supplier,
+      this.id,
+      this.params});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? supplierOffset =
-        supplier == null ? null : fbBuilder.writeString(supplier!);
-    final int? idOffset = id == null ? null : fbBuilder.writeString(id!);
-    final int? paramsOffset = params == null
-        ? null
+    final int? supplierOffset = supplier == null ? null
+        : fbBuilder.writeString(supplier!);
+    final int? idOffset = id == null ? null
+        : fbBuilder.writeString(id!);
+    final int? paramsOffset = params == null ? null
         : fbBuilder.writeList(params!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(3);
     fbBuilder.addOffset(0, supplierOffset);
@@ -2237,7 +2109,7 @@ class LoadMediaItemsReqT implements fb.Packable {
 
   @override
   String toString() {
-    return 'LoadMediaItemsReqT{supplier: $supplier, id: $id, params: $params}';
+    return 'LoadMediaItemsReqT{supplier: ${supplier}, id: ${id}, params: ${params}}';
   }
 }
 
@@ -2245,8 +2117,8 @@ class _LoadMediaItemsReqReader extends fb.TableReader<LoadMediaItemsReq> {
   const _LoadMediaItemsReqReader();
 
   @override
-  LoadMediaItemsReq createObject(fb.BufferContext bc, int offset) =>
-      LoadMediaItemsReq._(bc, offset);
+  LoadMediaItemsReq createObject(fb.BufferContext bc, int offset) => 
+    LoadMediaItemsReq._(bc, offset);
 }
 
 class LoadMediaItemsReqBuilder {
@@ -2262,12 +2134,10 @@ class LoadMediaItemsReqBuilder {
     fbBuilder.addOffset(0, offset);
     return fbBuilder.offset;
   }
-
   int addIdOffset(int? offset) {
     fbBuilder.addOffset(1, offset);
     return fbBuilder.offset;
   }
-
   int addParamsOffset(int? offset) {
     fbBuilder.addOffset(2, offset);
     return fbBuilder.offset;
@@ -2287,19 +2157,20 @@ class LoadMediaItemsReqObjectBuilder extends fb.ObjectBuilder {
     String? supplier,
     String? id,
     List<String>? params,
-  })  : _supplier = supplier,
+  })
+      : _supplier = supplier,
         _id = id,
         _params = params;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? supplierOffset =
-        _supplier == null ? null : fbBuilder.writeString(_supplier);
-    final int? idOffset = _id == null ? null : fbBuilder.writeString(_id);
-    final int? paramsOffset = _params == null
-        ? null
-        : fbBuilder.writeList(_params.map(fbBuilder.writeString).toList());
+    final int? supplierOffset = _supplier == null ? null
+        : fbBuilder.writeString(_supplier!);
+    final int? idOffset = _id == null ? null
+        : fbBuilder.writeString(_id!);
+    final int? paramsOffset = _params == null ? null
+        : fbBuilder.writeList(_params!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(3);
     fbBuilder.addOffset(0, supplierOffset);
     fbBuilder.addOffset(1, idOffset);
@@ -2315,7 +2186,6 @@ class LoadMediaItemsReqObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class LoadMediaItemsRes {
   LoadMediaItemsRes._(this._bc, this._bcOffset);
   factory LoadMediaItemsRes(List<int> bytes) {
@@ -2328,13 +2198,11 @@ class LoadMediaItemsRes {
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  List<ContentMediaItem>? get mediaItems =>
-      const fb.ListReader<ContentMediaItem>(ContentMediaItem.reader)
-          .vTableGetNullable(_bc, _bcOffset, 4);
+  List<ContentMediaItem>? get mediaItems => const fb.ListReader<ContentMediaItem>(ContentMediaItem.reader).vTableGetNullable(_bc, _bcOffset, 4);
 
   @override
   String toString() {
-    return 'LoadMediaItemsRes{mediaItems: $mediaItems}';
+    return 'LoadMediaItemsRes{mediaItems: ${mediaItems}}';
   }
 
   LoadMediaItemsResT unpack() => LoadMediaItemsResT(
@@ -2349,14 +2217,13 @@ class LoadMediaItemsRes {
 class LoadMediaItemsResT implements fb.Packable {
   List<ContentMediaItemT>? mediaItems;
 
-  LoadMediaItemsResT({this.mediaItems});
+  LoadMediaItemsResT({
+      this.mediaItems});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? mediaItemsOffset = mediaItems == null
-        ? null
-        : fbBuilder
-            .writeList(mediaItems!.map((b) => b.pack(fbBuilder)).toList());
+    final int? mediaItemsOffset = mediaItems == null ? null
+        : fbBuilder.writeList(mediaItems!.map((b) => b.pack(fbBuilder)).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, mediaItemsOffset);
     return fbBuilder.endTable();
@@ -2364,7 +2231,7 @@ class LoadMediaItemsResT implements fb.Packable {
 
   @override
   String toString() {
-    return 'LoadMediaItemsResT{mediaItems: $mediaItems}';
+    return 'LoadMediaItemsResT{mediaItems: ${mediaItems}}';
   }
 }
 
@@ -2372,8 +2239,8 @@ class _LoadMediaItemsResReader extends fb.TableReader<LoadMediaItemsRes> {
   const _LoadMediaItemsResReader();
 
   @override
-  LoadMediaItemsRes createObject(fb.BufferContext bc, int offset) =>
-      LoadMediaItemsRes._(bc, offset);
+  LoadMediaItemsRes createObject(fb.BufferContext bc, int offset) => 
+    LoadMediaItemsRes._(bc, offset);
 }
 
 class LoadMediaItemsResBuilder {
@@ -2400,15 +2267,14 @@ class LoadMediaItemsResObjectBuilder extends fb.ObjectBuilder {
 
   LoadMediaItemsResObjectBuilder({
     List<ContentMediaItemObjectBuilder>? mediaItems,
-  }) : _mediaItems = mediaItems;
+  })
+      : _mediaItems = mediaItems;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? mediaItemsOffset = _mediaItems == null
-        ? null
-        : fbBuilder.writeList(
-            _mediaItems.map((b) => b.getOrCreateOffset(fbBuilder)).toList());
+    final int? mediaItemsOffset = _mediaItems == null ? null
+        : fbBuilder.writeList(_mediaItems!.map((b) => b.getOrCreateOffset(fbBuilder)).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, mediaItemsOffset);
     return fbBuilder.endTable();
@@ -2422,7 +2288,6 @@ class LoadMediaItemsResObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class LoadMediaItemSourcesReq {
   LoadMediaItemSourcesReq._(this._bc, this._bcOffset);
   factory LoadMediaItemSourcesReq(List<int> bytes) {
@@ -2430,29 +2295,24 @@ class LoadMediaItemSourcesReq {
     return reader.read(rootRef, 0);
   }
 
-  static const fb.Reader<LoadMediaItemSourcesReq> reader =
-      _LoadMediaItemSourcesReqReader();
+  static const fb.Reader<LoadMediaItemSourcesReq> reader = _LoadMediaItemSourcesReqReader();
 
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  String? get supplier =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
-  String? get id =>
-      const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
-  List<String>? get params => const fb.ListReader<String>(fb.StringReader())
-      .vTableGetNullable(_bc, _bcOffset, 8);
+  String? get supplier => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 4);
+  String? get id => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
+  List<String>? get params => const fb.ListReader<String>(fb.StringReader()).vTableGetNullable(_bc, _bcOffset, 8);
 
   @override
   String toString() {
-    return 'LoadMediaItemSourcesReq{supplier: $supplier, id: $id, params: $params}';
+    return 'LoadMediaItemSourcesReq{supplier: ${supplier}, id: ${id}, params: ${params}}';
   }
 
   LoadMediaItemSourcesReqT unpack() => LoadMediaItemSourcesReqT(
       supplier: supplier,
       id: id,
-      params: const fb.ListReader<String>(fb.StringReader(), lazy: false)
-          .vTableGetNullable(_bc, _bcOffset, 8));
+      params: const fb.ListReader<String>(fb.StringReader(), lazy: false).vTableGetNullable(_bc, _bcOffset, 8));
 
   static int pack(fb.Builder fbBuilder, LoadMediaItemSourcesReqT? object) {
     if (object == null) return 0;
@@ -2465,15 +2325,18 @@ class LoadMediaItemSourcesReqT implements fb.Packable {
   String? id;
   List<String>? params;
 
-  LoadMediaItemSourcesReqT({this.supplier, this.id, this.params});
+  LoadMediaItemSourcesReqT({
+      this.supplier,
+      this.id,
+      this.params});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? supplierOffset =
-        supplier == null ? null : fbBuilder.writeString(supplier!);
-    final int? idOffset = id == null ? null : fbBuilder.writeString(id!);
-    final int? paramsOffset = params == null
-        ? null
+    final int? supplierOffset = supplier == null ? null
+        : fbBuilder.writeString(supplier!);
+    final int? idOffset = id == null ? null
+        : fbBuilder.writeString(id!);
+    final int? paramsOffset = params == null ? null
         : fbBuilder.writeList(params!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(3);
     fbBuilder.addOffset(0, supplierOffset);
@@ -2484,17 +2347,16 @@ class LoadMediaItemSourcesReqT implements fb.Packable {
 
   @override
   String toString() {
-    return 'LoadMediaItemSourcesReqT{supplier: $supplier, id: $id, params: $params}';
+    return 'LoadMediaItemSourcesReqT{supplier: ${supplier}, id: ${id}, params: ${params}}';
   }
 }
 
-class _LoadMediaItemSourcesReqReader
-    extends fb.TableReader<LoadMediaItemSourcesReq> {
+class _LoadMediaItemSourcesReqReader extends fb.TableReader<LoadMediaItemSourcesReq> {
   const _LoadMediaItemSourcesReqReader();
 
   @override
-  LoadMediaItemSourcesReq createObject(fb.BufferContext bc, int offset) =>
-      LoadMediaItemSourcesReq._(bc, offset);
+  LoadMediaItemSourcesReq createObject(fb.BufferContext bc, int offset) => 
+    LoadMediaItemSourcesReq._(bc, offset);
 }
 
 class LoadMediaItemSourcesReqBuilder {
@@ -2510,12 +2372,10 @@ class LoadMediaItemSourcesReqBuilder {
     fbBuilder.addOffset(0, offset);
     return fbBuilder.offset;
   }
-
   int addIdOffset(int? offset) {
     fbBuilder.addOffset(1, offset);
     return fbBuilder.offset;
   }
-
   int addParamsOffset(int? offset) {
     fbBuilder.addOffset(2, offset);
     return fbBuilder.offset;
@@ -2535,19 +2395,20 @@ class LoadMediaItemSourcesReqObjectBuilder extends fb.ObjectBuilder {
     String? supplier,
     String? id,
     List<String>? params,
-  })  : _supplier = supplier,
+  })
+      : _supplier = supplier,
         _id = id,
         _params = params;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? supplierOffset =
-        _supplier == null ? null : fbBuilder.writeString(_supplier);
-    final int? idOffset = _id == null ? null : fbBuilder.writeString(_id);
-    final int? paramsOffset = _params == null
-        ? null
-        : fbBuilder.writeList(_params.map(fbBuilder.writeString).toList());
+    final int? supplierOffset = _supplier == null ? null
+        : fbBuilder.writeString(_supplier!);
+    final int? idOffset = _id == null ? null
+        : fbBuilder.writeString(_id!);
+    final int? paramsOffset = _params == null ? null
+        : fbBuilder.writeList(_params!.map(fbBuilder.writeString).toList());
     fbBuilder.startTable(3);
     fbBuilder.addOffset(0, supplierOffset);
     fbBuilder.addOffset(1, idOffset);
@@ -2563,7 +2424,6 @@ class LoadMediaItemSourcesReqObjectBuilder extends fb.ObjectBuilder {
     return fbBuilder.buffer;
   }
 }
-
 class LoadMediaItemSourcesRes {
   LoadMediaItemSourcesRes._(this._bc, this._bcOffset);
   factory LoadMediaItemSourcesRes(List<int> bytes) {
@@ -2571,19 +2431,16 @@ class LoadMediaItemSourcesRes {
     return reader.read(rootRef, 0);
   }
 
-  static const fb.Reader<LoadMediaItemSourcesRes> reader =
-      _LoadMediaItemSourcesResReader();
+  static const fb.Reader<LoadMediaItemSourcesRes> reader = _LoadMediaItemSourcesResReader();
 
   final fb.BufferContext _bc;
   final int _bcOffset;
 
-  List<ContentMediaItemSource>? get sources =>
-      const fb.ListReader<ContentMediaItemSource>(ContentMediaItemSource.reader)
-          .vTableGetNullable(_bc, _bcOffset, 4);
+  List<ContentMediaItemSource>? get sources => const fb.ListReader<ContentMediaItemSource>(ContentMediaItemSource.reader).vTableGetNullable(_bc, _bcOffset, 4);
 
   @override
   String toString() {
-    return 'LoadMediaItemSourcesRes{sources: $sources}';
+    return 'LoadMediaItemSourcesRes{sources: ${sources}}';
   }
 
   LoadMediaItemSourcesResT unpack() => LoadMediaItemSourcesResT(
@@ -2598,12 +2455,12 @@ class LoadMediaItemSourcesRes {
 class LoadMediaItemSourcesResT implements fb.Packable {
   List<ContentMediaItemSourceT>? sources;
 
-  LoadMediaItemSourcesResT({this.sources});
+  LoadMediaItemSourcesResT({
+      this.sources});
 
   @override
   int pack(fb.Builder fbBuilder) {
-    final int? sourcesOffset = sources == null
-        ? null
+    final int? sourcesOffset = sources == null ? null
         : fbBuilder.writeList(sources!.map((b) => b.pack(fbBuilder)).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, sourcesOffset);
@@ -2612,17 +2469,16 @@ class LoadMediaItemSourcesResT implements fb.Packable {
 
   @override
   String toString() {
-    return 'LoadMediaItemSourcesResT{sources: $sources}';
+    return 'LoadMediaItemSourcesResT{sources: ${sources}}';
   }
 }
 
-class _LoadMediaItemSourcesResReader
-    extends fb.TableReader<LoadMediaItemSourcesRes> {
+class _LoadMediaItemSourcesResReader extends fb.TableReader<LoadMediaItemSourcesRes> {
   const _LoadMediaItemSourcesResReader();
 
   @override
-  LoadMediaItemSourcesRes createObject(fb.BufferContext bc, int offset) =>
-      LoadMediaItemSourcesRes._(bc, offset);
+  LoadMediaItemSourcesRes createObject(fb.BufferContext bc, int offset) => 
+    LoadMediaItemSourcesRes._(bc, offset);
 }
 
 class LoadMediaItemSourcesResBuilder {
@@ -2649,15 +2505,14 @@ class LoadMediaItemSourcesResObjectBuilder extends fb.ObjectBuilder {
 
   LoadMediaItemSourcesResObjectBuilder({
     List<ContentMediaItemSourceObjectBuilder>? sources,
-  }) : _sources = sources;
+  })
+      : _sources = sources;
 
   /// Finish building, and store into the [fbBuilder].
   @override
   int finish(fb.Builder fbBuilder) {
-    final int? sourcesOffset = _sources == null
-        ? null
-        : fbBuilder.writeList(
-            _sources.map((b) => b.getOrCreateOffset(fbBuilder)).toList());
+    final int? sourcesOffset = _sources == null ? null
+        : fbBuilder.writeList(_sources!.map((b) => b.getOrCreateOffset(fbBuilder)).toList());
     fbBuilder.startTable(1);
     fbBuilder.addOffset(0, sourcesOffset);
     return fbBuilder.endTable();
