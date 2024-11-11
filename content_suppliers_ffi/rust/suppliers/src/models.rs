@@ -55,12 +55,12 @@ pub enum ContentMediaItemSource {
     Video {
         link: String,
         description: String,
-        headers: HashMap<String, String>,
+        headers: Option<HashMap<String, String>>,
     },
     Subtitle {
         link: String,
         description: String,
-        headers: HashMap<String, String>,
+        headers: Option<HashMap<String, String>>,
     },
     Manga {
         description: String,

@@ -109,16 +109,16 @@ impl ContentSupplier for DummyContentSupplier {
             ContentMediaItemSource::Video {
                 link: "http://dummy_link".to_owned(),
                 description: format!("{} {}", id, params.join(",")),
-                headers: HashMap::from([
+                headers: Some(HashMap::from([
                     ("User-Agent".to_owned(), "dummy".to_owned())
-                ])
+                ]))
             },
             ContentMediaItemSource::Subtitle {
                 link: "http://dummy_link".to_owned(),
                 description: format!("{} {}", id, params.join(",")),
-                headers: HashMap::from([
+                headers: Some(HashMap::from([
                     ("User-Agent".to_owned(), "dummy".to_owned())
-                ])
+                ]))
             },
             ContentMediaItemSource::Manga { 
                 description: format!("{} {}", id, params.join(",")), 

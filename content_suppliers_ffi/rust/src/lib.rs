@@ -1,7 +1,7 @@
 mod schema_generated;
 
 use crate::schema_generated::proto;
-use flatbuffers::{FlatBufferBuilder, WIPOffset};
+use flatbuffers::{FlatBufferBuilder, ForwardsUOffset, Vector, WIPOffset};
 use lazy_static::lazy_static;
 use std::ffi::{c_char, CString};
 use std::ptr::null;
@@ -467,11 +467,12 @@ fn create_fb_media_items_source<'a>(
         } => {
             let fb_links = vec![fbb.create_string(link)];
             let fb_header = create_fb_header(fbb, headers);
+
             proto::ContentMediaItemSourceArgs {
                 type_: proto::ContentMediaItemSourceType::Video,
                 description: Some(fbb.create_string(&description)),
                 links: Some(fbb.create_vector_from_iter(fb_links.iter())),
-                headers: Some(fbb.create_vector_from_iter(fb_header.iter())),
+                headers: fb_header,
                 ..Default::default()
             }
         }
@@ -482,11 +483,12 @@ fn create_fb_media_items_source<'a>(
         } => {
             let fb_links = vec![fbb.create_string(link)];
             let fb_header = create_fb_header(fbb, headers);
+
             proto::ContentMediaItemSourceArgs {
                 type_: proto::ContentMediaItemSourceType::Subtitle,
                 description: Some(fbb.create_string(&description)),
                 links: Some(fbb.create_vector_from_iter(fb_links.iter())),
-                headers: Some(fbb.create_vector_from_iter(fb_header.iter())),
+                headers: fb_header,
                 ..Default::default()
             }
         }
@@ -504,18 +506,23 @@ fn create_fb_media_items_source<'a>(
 
 fn create_fb_header<'a>(
     fbb: &mut FlatBufferBuilder<'a>,
-    map: &HashMap<String, String>,
-) -> Vec<WIPOffset<proto::Header<'a>>> {
-    map.iter()
-        .map(|(key, val)| {
-            let fb_args = proto::HeaderArgs {
-                name: Some(fbb.create_string(key)),
-                value: Some(fbb.create_string(val)),
-            };
+    headers: &Option<HashMap<String, String>>,
+) -> Option<WIPOffset<Vector<'a, ForwardsUOffset<proto::Header<'a>>>>> {
+    headers
+        .as_ref()
+        .map(|h| {
+            let fb_h: Vec<_> = h.iter()
+                .map(|(key, val)| {
+                    let fb_args = proto::HeaderArgs {
+                        name: Some(fbb.create_string(key)),
+                        value: Some(fbb.create_string(val)),
+                    };
+                    proto::Header::create(fbb, &fb_args)
+                })
+                .collect();
 
-            proto::Header::create(fbb, &fb_args)
+            fbb.create_vector_from_iter(fb_h.iter())
         })
-        .collect()
 }
 
 fn from_strings_vec_to_fb<'a>(
