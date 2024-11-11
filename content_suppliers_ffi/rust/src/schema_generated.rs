@@ -679,7 +679,8 @@ impl<'a> ContentMediaItem<'a> {
   pub const VT_TITLE: flatbuffers::VOffsetT = 6;
   pub const VT_SECTION: flatbuffers::VOffsetT = 8;
   pub const VT_IMAGE: flatbuffers::VOffsetT = 10;
-  pub const VT_PARAMS: flatbuffers::VOffsetT = 12;
+  pub const VT_SOURCES: flatbuffers::VOffsetT = 12;
+  pub const VT_PARAMS: flatbuffers::VOffsetT = 14;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -692,6 +693,7 @@ impl<'a> ContentMediaItem<'a> {
   ) -> flatbuffers::WIPOffset<ContentMediaItem<'bldr>> {
     let mut builder = ContentMediaItemBuilder::new(_fbb);
     if let Some(x) = args.params { builder.add_params(x); }
+    if let Some(x) = args.sources { builder.add_sources(x); }
     if let Some(x) = args.image { builder.add_image(x); }
     if let Some(x) = args.section { builder.add_section(x); }
     if let Some(x) = args.title { builder.add_title(x); }
@@ -729,6 +731,13 @@ impl<'a> ContentMediaItem<'a> {
     unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<&str>>(ContentMediaItem::VT_IMAGE, None)}
   }
   #[inline]
+  pub fn sources(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ContentMediaItemSource<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ContentMediaItemSource>>>>(ContentMediaItem::VT_SOURCES, None)}
+  }
+  #[inline]
   pub fn params(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<&'a str>>> {
     // Safety:
     // Created from valid Table for this object
@@ -748,6 +757,7 @@ impl flatbuffers::Verifiable for ContentMediaItem<'_> {
      .visit_field::<flatbuffers::ForwardsUOffset<&str>>("title", Self::VT_TITLE, true)?
      .visit_field::<flatbuffers::ForwardsUOffset<&str>>("section", Self::VT_SECTION, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<&str>>("image", Self::VT_IMAGE, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<ContentMediaItemSource>>>>("sources", Self::VT_SOURCES, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<&'_ str>>>>("params", Self::VT_PARAMS, false)?
      .finish();
     Ok(())
@@ -758,6 +768,7 @@ pub struct ContentMediaItemArgs<'a> {
     pub title: Option<flatbuffers::WIPOffset<&'a str>>,
     pub section: Option<flatbuffers::WIPOffset<&'a str>>,
     pub image: Option<flatbuffers::WIPOffset<&'a str>>,
+    pub sources: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ContentMediaItemSource<'a>>>>>,
     pub params: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<&'a str>>>>,
 }
 impl<'a> Default for ContentMediaItemArgs<'a> {
@@ -768,6 +779,7 @@ impl<'a> Default for ContentMediaItemArgs<'a> {
       title: None, // required field
       section: None,
       image: None,
+      sources: None,
       params: None,
     }
   }
@@ -793,6 +805,10 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ContentMediaItemBuilder<'a, 'b,
   #[inline]
   pub fn add_image(&mut self, image: flatbuffers::WIPOffset<&'b  str>) {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(ContentMediaItem::VT_IMAGE, image);
+  }
+  #[inline]
+  pub fn add_sources(&mut self, sources: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<ContentMediaItemSource<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(ContentMediaItem::VT_SOURCES, sources);
   }
   #[inline]
   pub fn add_params(&mut self, params: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<&'b  str>>>) {
@@ -821,6 +837,7 @@ impl core::fmt::Debug for ContentMediaItem<'_> {
       ds.field("title", &self.title());
       ds.field("section", &self.section());
       ds.field("image", &self.image());
+      ds.field("sources", &self.sources());
       ds.field("params", &self.params());
       ds.finish()
   }

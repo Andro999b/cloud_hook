@@ -533,11 +533,12 @@ class ContentMediaItem {
   String? get title => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 6);
   String? get section => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 8);
   String? get image => const fb.StringReader().vTableGetNullable(_bc, _bcOffset, 10);
-  List<String>? get params => const fb.ListReader<String>(fb.StringReader()).vTableGetNullable(_bc, _bcOffset, 12);
+  List<ContentMediaItemSource>? get sources => const fb.ListReader<ContentMediaItemSource>(ContentMediaItemSource.reader).vTableGetNullable(_bc, _bcOffset, 12);
+  List<String>? get params => const fb.ListReader<String>(fb.StringReader()).vTableGetNullable(_bc, _bcOffset, 14);
 
   @override
   String toString() {
-    return 'ContentMediaItem{number: ${number}, title: ${title}, section: ${section}, image: ${image}, params: ${params}}';
+    return 'ContentMediaItem{number: ${number}, title: ${title}, section: ${section}, image: ${image}, sources: ${sources}, params: ${params}}';
   }
 
   ContentMediaItemT unpack() => ContentMediaItemT(
@@ -545,7 +546,8 @@ class ContentMediaItem {
       title: title,
       section: section,
       image: image,
-      params: const fb.ListReader<String>(fb.StringReader(), lazy: false).vTableGetNullable(_bc, _bcOffset, 12));
+      sources: sources?.map((e) => e.unpack()).toList(),
+      params: const fb.ListReader<String>(fb.StringReader(), lazy: false).vTableGetNullable(_bc, _bcOffset, 14));
 
   static int pack(fb.Builder fbBuilder, ContentMediaItemT? object) {
     if (object == null) return 0;
@@ -558,6 +560,7 @@ class ContentMediaItemT implements fb.Packable {
   String? title;
   String? section;
   String? image;
+  List<ContentMediaItemSourceT>? sources;
   List<String>? params;
 
   ContentMediaItemT({
@@ -565,6 +568,7 @@ class ContentMediaItemT implements fb.Packable {
       this.title,
       this.section,
       this.image,
+      this.sources,
       this.params});
 
   @override
@@ -575,20 +579,23 @@ class ContentMediaItemT implements fb.Packable {
         : fbBuilder.writeString(section!);
     final int? imageOffset = image == null ? null
         : fbBuilder.writeString(image!);
+    final int? sourcesOffset = sources == null ? null
+        : fbBuilder.writeList(sources!.map((b) => b.pack(fbBuilder)).toList());
     final int? paramsOffset = params == null ? null
         : fbBuilder.writeList(params!.map(fbBuilder.writeString).toList());
-    fbBuilder.startTable(5);
+    fbBuilder.startTable(6);
     fbBuilder.addUint32(0, number);
     fbBuilder.addOffset(1, titleOffset);
     fbBuilder.addOffset(2, sectionOffset);
     fbBuilder.addOffset(3, imageOffset);
-    fbBuilder.addOffset(4, paramsOffset);
+    fbBuilder.addOffset(4, sourcesOffset);
+    fbBuilder.addOffset(5, paramsOffset);
     return fbBuilder.endTable();
   }
 
   @override
   String toString() {
-    return 'ContentMediaItemT{number: ${number}, title: ${title}, section: ${section}, image: ${image}, params: ${params}}';
+    return 'ContentMediaItemT{number: ${number}, title: ${title}, section: ${section}, image: ${image}, sources: ${sources}, params: ${params}}';
   }
 }
 
@@ -606,7 +613,7 @@ class ContentMediaItemBuilder {
   final fb.Builder fbBuilder;
 
   void begin() {
-    fbBuilder.startTable(5);
+    fbBuilder.startTable(6);
   }
 
   int addNumber(int? number) {
@@ -625,8 +632,12 @@ class ContentMediaItemBuilder {
     fbBuilder.addOffset(3, offset);
     return fbBuilder.offset;
   }
-  int addParamsOffset(int? offset) {
+  int addSourcesOffset(int? offset) {
     fbBuilder.addOffset(4, offset);
+    return fbBuilder.offset;
+  }
+  int addParamsOffset(int? offset) {
+    fbBuilder.addOffset(5, offset);
     return fbBuilder.offset;
   }
 
@@ -640,6 +651,7 @@ class ContentMediaItemObjectBuilder extends fb.ObjectBuilder {
   final String? _title;
   final String? _section;
   final String? _image;
+  final List<ContentMediaItemSourceObjectBuilder>? _sources;
   final List<String>? _params;
 
   ContentMediaItemObjectBuilder({
@@ -647,12 +659,14 @@ class ContentMediaItemObjectBuilder extends fb.ObjectBuilder {
     String? title,
     String? section,
     String? image,
+    List<ContentMediaItemSourceObjectBuilder>? sources,
     List<String>? params,
   })
       : _number = number,
         _title = title,
         _section = section,
         _image = image,
+        _sources = sources,
         _params = params;
 
   /// Finish building, and store into the [fbBuilder].
@@ -664,14 +678,17 @@ class ContentMediaItemObjectBuilder extends fb.ObjectBuilder {
         : fbBuilder.writeString(_section!);
     final int? imageOffset = _image == null ? null
         : fbBuilder.writeString(_image!);
+    final int? sourcesOffset = _sources == null ? null
+        : fbBuilder.writeList(_sources!.map((b) => b.getOrCreateOffset(fbBuilder)).toList());
     final int? paramsOffset = _params == null ? null
         : fbBuilder.writeList(_params!.map(fbBuilder.writeString).toList());
-    fbBuilder.startTable(5);
+    fbBuilder.startTable(6);
     fbBuilder.addUint32(0, _number);
     fbBuilder.addOffset(1, titleOffset);
     fbBuilder.addOffset(2, sectionOffset);
     fbBuilder.addOffset(3, imageOffset);
-    fbBuilder.addOffset(4, paramsOffset);
+    fbBuilder.addOffset(4, sourcesOffset);
+    fbBuilder.addOffset(5, paramsOffset);
     return fbBuilder.endTable();
   }
 

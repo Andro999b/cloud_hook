@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use std::{collections::HashMap, error::Error};
 
 use crate::{models::{ContentDetails, ContentInfo, ContentMediaItem, ContentMediaItemSource, ContentType, MediaType}, ContentSupplier};
@@ -92,6 +94,7 @@ impl ContentSupplier for DummyContentSupplier {
                 title: id.into(),
                 section: Some(new_params.join(",")),
                 image: Some("dummy_image".to_owned()),
+                sources: None,
                 params: new_params
             }
         ])

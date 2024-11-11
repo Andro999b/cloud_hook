@@ -46,6 +46,7 @@ pub struct ContentMediaItem {
     pub title: String,
     pub section: Option<String>,
     pub image: Option<String>,
+    pub sources: Option<Vec<ContentMediaItemSource>>,
     pub params: Vec<String>,
 }
 

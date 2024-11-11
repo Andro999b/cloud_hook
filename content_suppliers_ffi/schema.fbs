@@ -36,6 +36,7 @@ table ContentMediaItem {
     title: string (required);
     section: string;
     image: string;
+    sources: [ContentMediaItemSource];
     params: [string];
 }
 

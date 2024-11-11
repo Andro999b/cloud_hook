@@ -22,46 +22,70 @@ class FFIMediaItem implements ContentMediaItem {
 
   List<ContentMediaItemSource>? _sources;
 
-  FFIMediaItem({
+  FFIMediaItem._({
     required this.id,
     required this.supplier,
     required this.number,
     required this.title,
     required this.section,
     required this.image,
-    required FFIBridge bridge,
     required List<String> params,
-  })  : _bridge = bridge,
-        _params = params;
+    required List<ContentMediaItemSource>? sources,
+    required FFIBridge bridge,
+  })  : _params = params,
+        _sources = sources,
+        _bridge = bridge;
+
+  factory FFIMediaItem.fromProto(
+    String id,
+    String supplier,
+    FFIBridge bridge,
+    proto.ContentMediaItem item,
+  ) {
+    return FFIMediaItem._(
+      id: id,
+      supplier: supplier,
+      number: item.number,
+      title: item.title!,
+      section: item.section,
+      image: item.image,
+      sources: item.sources?.map(_mapMediaItemSource).toList(),
+      params: item.params ?? [],
+      bridge: bridge,
+    );
+  }
 
   @override
   FutureOr<List<ContentMediaItemSource>> get sources async =>
       _sources ??= (await _bridge.loadMediaItemSources(supplier, id, _params))
           .map(
-            (item) => switch (item.type) {
-              proto.ContentMediaItemSourceType.Video =>
-                SimpleContentMediaItemSource(
-                  kind: FileKind.video,
-                  description: item.description!,
-                  link: Uri.parse(item.links!.first),
-                  headers: _mapHeaders(item.headers),
-                ),
-              proto.ContentMediaItemSourceType.Subtitle =>
-                SimpleContentMediaItemSource(
-                  kind: FileKind.subtitle,
-                  description: item.description!,
-                  link: Uri.parse(item.links!.first),
-                  headers: _mapHeaders(item.headers),
-                ),
-              proto.ContentMediaItemSourceType.Manga =>
-                SimpleMangaMediaItemSource(
-                  description: item.description!,
-                  pages: item.links!,
-                ),
-              proto.ContentMediaItemSourceType() => throw UnimplementedError(),
-            },
+            _mapMediaItemSource,
           )
           .toList();
+
+  static ContentMediaItemSource _mapMediaItemSource(
+    proto.ContentMediaItemSource item,
+  ) {
+    return switch (item.type) {
+      proto.ContentMediaItemSourceType.Video => SimpleContentMediaItemSource(
+          kind: FileKind.video,
+          description: item.description!,
+          link: Uri.parse(item.links!.first),
+          headers: _mapHeaders(item.headers),
+        ),
+      proto.ContentMediaItemSourceType.Subtitle => SimpleContentMediaItemSource(
+          kind: FileKind.subtitle,
+          description: item.description!,
+          link: Uri.parse(item.links!.first),
+          headers: _mapHeaders(item.headers),
+        ),
+      proto.ContentMediaItemSourceType.Manga => SimpleMangaMediaItemSource(
+          description: item.description!,
+          pages: item.links!,
+        ),
+      proto.ContentMediaItemSourceType() => throw UnimplementedError(),
+    };
+  }
 }
 
 Map<String, String>? _mapHeaders(List<proto.Header>? protoHeaders) {
@@ -98,16 +122,7 @@ class FFIContentDetails extends AbstractContentDetails {
   @override
   FutureOr<Iterable<ContentMediaItem>> get mediaItems async =>
       _mediaItems ??= (await _bridge.loadMediaItems(supplier, id, _params))
-          .map((item) => FFIMediaItem(
-                id: id,
-                supplier: supplier,
-                number: item.number,
-                title: item.title!,
-                section: item.section,
-                image: item.image,
-                bridge: _bridge,
-                params: item.params ?? [],
-              ));
+          .map((item) => FFIMediaItem.fromProto(id, supplier, _bridge, item));
 }
 
 class FFIContentSupplier implements ContentSupplier {

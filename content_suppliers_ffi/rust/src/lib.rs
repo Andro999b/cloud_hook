@@ -435,11 +435,28 @@ fn create_fb_media_item<'a>(
         .map(|param| fbb.create_string(param))
         .collect();
 
+
+    let fb_optional_sources =  match &item.sources {
+        Some(sources) => {
+            let fb_sources: Vec<_> = sources.iter()
+                .map(|item| {
+                    let args = &create_fb_media_items_source(fbb, item);
+                    proto::ContentMediaItemSource::create(fbb, args)
+                })
+                .collect();
+
+            Some(fbb.create_vector_from_iter(fb_sources.iter()))
+        },
+        None => None
+    };
+
+
     proto::ContentMediaItemArgs {
         number: item.number,
         title: Some(fbb.create_string(&item.title)),
         section: item.section.as_ref().map(|s| fbb.create_string(s)),
         image: item.image.as_ref().map(|s| fbb.create_string(s)),
+        sources: fb_optional_sources,
         params: Some(fbb.create_vector_from_iter(fb_params.iter())),
         ..Default::default()
     }

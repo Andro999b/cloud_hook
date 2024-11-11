@@ -2,7 +2,6 @@ import 'package:content_suppliers_api/model.dart';
 import 'package:content_suppliers_dart/suppliers/animeua/animeua.dart';
 import 'package:content_suppliers_dart/suppliers/anitaku/anitaku.dart';
 import 'package:content_suppliers_dart/suppliers/anitube/anitube.dart';
-import 'package:content_suppliers_dart/suppliers/eneyida/eneyida.dart';
 import 'package:content_suppliers_dart/suppliers/hianime/hianime.dart';
 import 'package:content_suppliers_dart/suppliers/mangadex/mangadex.dart';
 import 'package:content_suppliers_dart/suppliers/tmdb/tmdb.dart';
@@ -24,7 +23,6 @@ class DartContentSupplierBundle implements ContentSupplierBundle {
         Anitaku(),
         HianimeSupplier(),
         MangaDexSupllier(),
-        EneyidaSupplier(),
         UASerialSupplier(),
         UAKinoClubSupplier(),
         AniTubeSupplier(),
