@@ -1,16 +1,16 @@
 mod schema_generated;
 
-use std::slice;
-use std::ffi::{c_char, CString};
-use std::{collections::HashMap, error::Error};
-use std::ptr::null;
+use crate::schema_generated::proto;
 use flatbuffers::{FlatBufferBuilder, WIPOffset};
 use lazy_static::lazy_static;
+use std::ffi::{c_char, CString};
+use std::ptr::null;
+use std::slice;
+use std::{collections::HashMap, error::Error};
 use strum_macros::FromRepr;
-use tokio::runtime::Runtime as TokioRuntime;
 use suppliers::models::ContentSupplier;
-use suppliers::{AllContentSuppliers, avalaible_suppliers, get_supplier, models};
-use crate::schema_generated::proto;
+use suppliers::{avalaible_suppliers, get_supplier, models, AllContentSuppliers};
+use tokio::runtime::Runtime as TokioRuntime;
 
 lazy_static! {
     static ref RT: TokioRuntime = TokioRuntime::new().unwrap();
@@ -36,7 +36,7 @@ enum Command {
 pub struct WireResult {
     pub size: usize,
     pub buf: *const u8,
-    pub error: *const c_char
+    pub error: *const c_char,
 }
 
 impl From<Result<Vec<u8>, Box<dyn Error>>> for WireResult {
@@ -48,7 +48,7 @@ impl From<Result<Vec<u8>, Box<dyn Error>>> for WireResult {
                 return WireResult {
                     size: size,
                     buf: Box::into_raw(res) as *const _,
-                    error: null()
+                    error: null(),
                 };
             }
             Err(err) => {
@@ -56,7 +56,7 @@ impl From<Result<Vec<u8>, Box<dyn Error>>> for WireResult {
                 return WireResult {
                     size: 0,
                     buf: null(),
-                    error: CString::new(err.to_string()).unwrap().into_raw()
+                    error: CString::new(err.to_string()).unwrap().into_raw(),
                 };
             }
         }
@@ -81,11 +81,7 @@ pub extern "C" fn wire(
 }
 
 #[no_mangle]
-pub extern "C" fn wire_sync(
-    cmd_index: u8,
-    size: usize,
-    req: *const u8,
-) -> WireResult {
+pub extern "C" fn wire_sync(cmd_index: u8, size: usize, req: *const u8) -> WireResult {
     let req_vec = read_request(size, req);
     let result = process_sync_command(cmd_index, req_vec);
 
@@ -318,15 +314,16 @@ async fn load_media_item_sources(request: Vec<u8>) -> Result<Vec<u8>, Box<dyn Er
     // convert to fb
     let fbb = &mut flatbuffers::FlatBufferBuilder::new();
 
-    let fb_sources: Vec<_> = sources.iter()
+    let fb_sources: Vec<_> = sources
+        .iter()
         .map(|s| {
-            let fb_args =  create_fb_media_items_source(fbb, s);
+            let fb_args = create_fb_media_items_source(fbb, s);
             proto::ContentMediaItemSource::create(fbb, &fb_args)
         })
         .collect();
 
     let fb_args = proto::LoadMediaItemSourcesResArgs {
-        sources: Some(fbb.create_vector_from_iter(fb_sources.iter()))
+        sources: Some(fbb.create_vector_from_iter(fb_sources.iter())),
     };
 
     let fb_media_items_res = proto::LoadMediaItemSourcesRes::create(fbb, &fb_args);
@@ -435,21 +432,17 @@ fn create_fb_media_item<'a>(
         .map(|param| fbb.create_string(param))
         .collect();
 
-
-    let fb_optional_sources =  match &item.sources {
-        Some(sources) => {
-            let fb_sources: Vec<_> = sources.iter()
-                .map(|item| {
-                    let args = &create_fb_media_items_source(fbb, item);
-                    proto::ContentMediaItemSource::create(fbb, args)
-                })
-                .collect();
-
-            Some(fbb.create_vector_from_iter(fb_sources.iter()))
-        },
-        None => None
-    };
-
+    let optional_sources = &item.sources;
+    let fb_optional_sources = optional_sources.as_ref().map(|sources| {
+        let fb_sources: Vec<_> = sources
+            .iter()
+            .map(|item| {
+                let args = &create_fb_media_items_source(fbb, item);
+                proto::ContentMediaItemSource::create(fbb, args)
+            })
+            .collect();
+        fbb.create_vector_from_iter(fb_sources.iter())
+    });
 
     proto::ContentMediaItemArgs {
         number: item.number,
@@ -509,22 +502,32 @@ fn create_fb_media_items_source<'a>(
     }
 }
 
-fn create_fb_header<'a>(fbb: &mut FlatBufferBuilder<'a>, map: &HashMap<String, String>) -> Vec<WIPOffset<proto::Header<'a>>> {
+fn create_fb_header<'a>(
+    fbb: &mut FlatBufferBuilder<'a>,
+    map: &HashMap<String, String>,
+) -> Vec<WIPOffset<proto::Header<'a>>> {
     map.iter()
         .map(|(key, val)| {
             let fb_args = proto::HeaderArgs {
                 name: Some(fbb.create_string(key)),
-                value: Some(fbb.create_string(val))
+                value: Some(fbb.create_string(val)),
             };
 
             proto::Header::create(fbb, &fb_args)
-        }).collect()
+        })
+        .collect()
 }
 
-fn from_strings_vec_to_fb<'a>(fbb: &mut FlatBufferBuilder<'a>, v: &Vec<String>) -> Vec<WIPOffset<&'a str>> {
+fn from_strings_vec_to_fb<'a>(
+    fbb: &mut FlatBufferBuilder<'a>,
+    v: &Vec<String>,
+) -> Vec<WIPOffset<&'a str>> {
     v.iter().map(|s| fbb.create_string(s)).collect()
 }
 
-fn from_str_vec_to_fb<'a>(fbb: &mut FlatBufferBuilder<'a>, v: &Vec<&str>) -> Vec<WIPOffset<&'a str>> {
+fn from_str_vec_to_fb<'a>(
+    fbb: &mut FlatBufferBuilder<'a>,
+    v: &Vec<&str>,
+) -> Vec<WIPOffset<&'a str>> {
     v.iter().map(|s| fbb.create_string(s)).collect()
 }
