@@ -1,7 +1,8 @@
 import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/collection/active_collection_items_view.dart';
+import 'package:cloud_hook/app_preferences.dart';
 import 'package:cloud_hook/layouts/general_layout.dart';
 import 'package:cloud_hook/settings/app_version/app_version_settings.dart';
+import 'package:cloud_hook/settings/suppliers/suppliers_bundle_version_settings.dart';
 import 'package:cloud_hook/settings/theme/brightnes_switcher.dart';
 import 'package:cloud_hook/settings/theme/color_switcher.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +55,11 @@ class _SettingsView extends StatelessWidget {
                     context,
                     AppLocalizations.of(context)!.settingsVersion,
                     const AppVersionSettings(),
+                  ),
+                  _renderSection(
+                    context,
+                    AppLocalizations.of(context)!.settingsSuppliersVersion,
+                    const SuppliersBundleVersionSettings(),
                   ),
                   ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8),

@@ -236,6 +236,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  content_suppliers_ffi:
+    dependency: "direct main"
+    description:
+      path: content_suppliers_ffi
+      relative: true
+    source: path
+    version: "0.0.1"
   convert:
     dependency: transitive
     description:
@@ -404,6 +411,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  flat_buffers:
+    dependency: transitive
+    description:
+      name: flat_buffers
+      sha256: "380bdcba5664a718bfd4ea20a45d39e13684f5318fcd8883066a55e21f37f4c3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "23.5.26"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -417,6 +432,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.1"
+  flutter_download_manager:
+    dependency: "direct main"
+    description:
+      name: flutter_download_manager
+      sha256: f0e604be623f2559a2dc2ccb0918e4e5224ff28a02b864ba0c27a3c6aca6c154
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.5"
   flutter_hooks:
     dependency: "direct main"
     description:

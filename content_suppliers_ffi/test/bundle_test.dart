@@ -7,12 +7,11 @@ const libDirectory = "rust/target/release";
 const libName = "libcontent_suppliers_ffi";
 
 void main() async {
-  final bundle = RustContentSuppliersBundle(
-    directory: libDirectory,
-    libName: libName,
+  final bundle = FFIContentSuppliersBundle(
+    libPath: "rust/target/release/libcontent_suppliers_ffi.so",
   );
 
-  await bundle.init();
+  await bundle.load();
 
   final suppliers = await bundle.suppliers;
   test("should return avalaible suppliers", () async {

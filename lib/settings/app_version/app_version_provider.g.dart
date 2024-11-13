@@ -43,7 +43,7 @@ final currentAppVersionProvider = FutureProvider<String>.internal(
 
 typedef CurrentAppVersionRef = FutureProviderRef<String>;
 String _$latestAppVersionInfoHash() =>
-    r'2931a43558daf06c0adf1e9f66d31c8acb44fe65';
+    r'8768e4527192dfdd1a81f7798cf9d8ed72f7f9cb';
 
 /// See also [latestAppVersionInfo].
 @ProviderFor(latestAppVersionInfo)

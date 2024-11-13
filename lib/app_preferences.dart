@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:cloud_hook/collection/collection_item_model.dart';
 import 'package:cloud_hook/content/manga/model.dart';
+import 'package:cloud_hook/content_suppliers/ffi_supplier_bundle_info.dart';
 import 'package:collection/collection.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
@@ -184,4 +187,25 @@ class AppPreferences {
           .where((type) => type.name == instance.getString("manga_reader_mode"))
           .firstOrNull ??
       MangaReaderMode.vertical;
+
+  static set ffiSupplierBundleInfo(FFISupplierBundleInfo? info) {
+    if (info == null) {
+      instance.remove("ffi_supplier_bundle_info");
+      return;
+    }
+
+    final infoJson = json.encode(info.toJson());
+
+    instance.setString("ffi_supplier_bundle_info", infoJson);
+  }
+
+  static FFISupplierBundleInfo? get ffiSupplierBundleInfo {
+    final infoJson = instance.getString("ffi_supplier_bundle_info");
+
+    if (infoJson == null) {
+      return null;
+    }
+
+    return FFISupplierBundleInfo.fromJson(json.decode(infoJson));
+  }
 }

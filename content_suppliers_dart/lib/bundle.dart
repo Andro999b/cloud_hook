@@ -10,7 +10,7 @@ import 'package:content_suppliers_dart/suppliers/uakinoclub/uakinoclub.dart';
 import 'package:content_suppliers_dart/suppliers/uaserial/uaserial.dart';
 import 'package:content_suppliers_dart/suppliers/ufdub/ufdub.dart';
 
-class DartContentSupplierBundle implements ContentSupplierBundle {
+class DartContentSupplierBundle extends ContentSupplierBundle {
   final String tmdbSecret;
 
   DartContentSupplierBundle({

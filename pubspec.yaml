@@ -1,7 +1,7 @@
 name: cloud_hook
 description: "Cloud Hooks"
 publish_to: 'none'
-version: 1.4.3
+version: 1.4.5
 
 isar_version: &isar_version 3.1.8
 media_kit_version: &media_kit_version 50c510d
@@ -55,12 +55,16 @@ dependencies:
   package_info_plus: ^8.0.2
   window_manager: ^0.4.2
   cached_network_image: ^3.4.1
+  flutter_download_manager: ^0.5.5
 
   content_suppliers_api:
     path: content_suppliers_api
 
   content_suppliers_dart:
     path: content_suppliers_dart
+
+  content_suppliers_ffi:
+    path: content_suppliers_ffi
 
 dependency_overrides:
   media_kit: 

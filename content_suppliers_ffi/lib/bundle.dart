@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'dart:io' as io;
 import 'package:collection/collection.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:content_suppliers_ffi/ffi_bridge.dart';
@@ -223,26 +224,44 @@ class FFIContentSupplier implements ContentSupplier {
   }
 }
 
-class RustContentSuppliersBundle implements ContentSupplierBundle {
-  final String directory;
-  final String libName;
+class FFIContentSuppliersBundle extends ContentSupplierBundle {
+  final String libPath;
   FFIBridge? _bridge;
 
-  RustContentSuppliersBundle({
-    required this.directory,
-    required this.libName,
+  FFIContentSuppliersBundle({
+    required this.libPath,
   });
 
-  Future<void> init() async {
-    _bridge ??= FFIBridge.load(
-      dir: directory,
-      libName: libName,
-    );
+  Future<FFIBridge?> load() async {
+    if (libPath.isEmpty) {
+      return null;
+    }
+
+    final exist = await io.File(libPath).exists();
+
+    if (!exist) {
+      print("FFI lib not found: $libPath");
+      return null;
+    }
+
+    _bridge ??= FFIBridge.load(libPath: libPath);
+
+    print("FFI lib loaded: $libPath");
+
+    return _bridge;
+  }
+
+  @override
+  void unload() {
+    _bridge?.unload();
+    _bridge = null;
   }
 
   @override
   Future<List<ContentSupplier>> get suppliers async {
-    final bridge = _bridge;
+    var bridge = _bridge;
+
+    bridge ??= await load();
 
     if (bridge == null) {
       return [];
@@ -250,7 +269,7 @@ class RustContentSuppliersBundle implements ContentSupplierBundle {
 
     return bridge
         .avalaibleSuppliers()
-        .map((supplier) => FFIContentSupplier(name: supplier, bridge: bridge))
+        .map((supplier) => FFIContentSupplier(name: supplier, bridge: bridge!))
         .toList();
   }
 }

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:ffi';
-import 'dart:io' as io;
 import 'dart:typed_data';
 import 'package:content_suppliers_api/model.dart';
 
@@ -61,46 +60,51 @@ typedef FreeFunction = void Function(WireResult);
 typedef FreeNativeFunction = Void Function(WireResult);
 
 class FFIBridge {
+  DynamicLibrary _library;
   WireFunction _wire;
   WireSyncFunction _wireSync;
   FreeFunction _free;
 
   FFIBridge._internal({
+    required DynamicLibrary library,
     required WireFunction wire,
     required WireSyncFunction wireSync,
     required FreeFunction free,
-  })  : _wire = wire,
+  })  : _library = library,
+        _wire = wire,
         _wireSync = wireSync,
         _free = free;
 
   factory FFIBridge.load({
-    required String dir,
-    required String libName,
+    required String libPath,
   }) {
-    var directory = io.Directory(dir);
-    if (!directory.isAbsolute) {
-      final currentPath = io.Directory.current.path;
-      directory = io.Directory("$currentPath/$dir");
-    }
+    // var directory = io.Directory(dir);
+    // if (!directory.isAbsolute) {
+    //   final currentPath = io.Directory.current.path;
+    //   directory = io.Directory("$currentPath/$dir");
+    // }
 
-    final libPath = "${directory.path}/$libName.so";
+    // final libPath = "${directory.path}/$libName.so";
 
-    if (!io.File(libPath).existsSync()) {
-      throw Exception("Library path not found: $libPath");
-    }
+    final library = DynamicLibrary.open(libPath);
 
-    final lib = DynamicLibrary.open(libPath);
-
-    final wire = lib.lookupFunction<WireNativeFunction, WireFunction>("wire");
-    final wireSync = lib
+    final wire =
+        library.lookupFunction<WireNativeFunction, WireFunction>("wire");
+    final wireSync = library
         .lookupFunction<WireSyncNativeFunction, WireSyncFunction>("wire_sync");
-    final free = lib.lookupFunction<FreeNativeFunction, FreeFunction>("free");
+    final free =
+        library.lookupFunction<FreeNativeFunction, FreeFunction>("free");
 
     return FFIBridge._internal(
+      library: library,
       wire: wire,
       wireSync: wireSync,
       free: free,
     );
+  }
+
+  void unload() {
+    _library.close();
   }
 
   List<String> avalaibleSuppliers() {

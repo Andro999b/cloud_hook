@@ -7,19 +7,11 @@
         {
             "name": "cloud_hook",
             "request": "launch",
-            "type": "dart"
-        },
-        {
-            "name": "cloud_hook (profile mode)",
-            "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            // "toolArgs": [
+            //     "--dart-define",
+            //     "FFI_SUPPLIER_LIB_PATH=/home/andrii/Documents/cloud_hook_suppliers/target/release/libcloud_hook_suppliers.so",
+            // ]
         },
-        {
-            "name": "cloud_hook (release mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        }
     ]
 }

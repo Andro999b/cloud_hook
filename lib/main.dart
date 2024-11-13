@@ -10,6 +10,7 @@ import 'package:cloud_hook/content/content_details_screen.dart';
 import 'package:cloud_hook/content/manga/manga_content_screan.dart';
 import 'package:cloud_hook/content/video/video_content_screen.dart';
 import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
+import 'package:cloud_hook/content_suppliers/ffi_suppliers_bundle_storage.dart';
 import 'package:cloud_hook/home/home_screan.dart';
 import 'package:cloud_hook/layouts/navigation_data.dart';
 import 'package:cloud_hook/search/search_screen.dart';
@@ -44,6 +45,7 @@ void main() async {
   await AppInitFirebase.init();
 
   // load suppliers
+  await FFISuppliersBundleStorage.instance.setup();
   await ContentSuppliers.instance.load();
 
   // start ui
