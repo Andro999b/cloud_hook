@@ -32,6 +32,8 @@ class ContentSuppliers {
       bundle.unload();
     }
 
+    logger.i("FFI Lib path: $ffiLibPath");
+
     _bundles = [
       if (ffiLibPath != null) FFIContentSuppliersBundle(libPath: ffiLibPath),
       DartContentSupplierBundle(tmdbSecret: AppSecrets.getString("tmdb"))
@@ -125,6 +127,6 @@ class ContentSuppliers {
         return null;
       }
     }
-    return null;
+    return libPath;
   }
 }

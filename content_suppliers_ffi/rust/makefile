@@ -24,14 +24,16 @@ help: makefile
 	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
 	@echo
 
-## init: Install missing dependencies.
-.PHONY: init
-init:
-	#rustup target add aarch64-apple-ios x86_64-apple-ios
-	# rustup target add aarch64-apple-darwin x86_64-apple-darwin
-	rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
-	@if [ $$(uname) == "Darwin" ] ; then cargo install cargo-lipo ; fi
-	cargo install cbindgen
+# rustup target add aarch64-apple-ios x86_64-apple-ios
+# rustup target add aarch64-apple-darwin x86_64-apple-darwin
+# rustup target add i686-linux-android x86_64-linux-android
+# @if [ $$(uname) == "Darwin" ] ; then cargo install cargo-lipo ; fi
+# cargo install cbindgen
+
+## android-init: Install missing dependencies.
+.PHONY: android-init
+android-init:
+	rustup target add aarch64-linux-android armv7-linux-androideabi 
 
 ## :
 
@@ -70,7 +72,10 @@ all: android linux
 # 	@echo "[DONE] $@"
 
 ## android: Compile the android targets (arm64, armv7 and i686)
-android: target/aarch64-linux-android/release target/armv7-linux-androideabi/release target/i686-linux-android/release target/x86_64-linux-android/release
+android: android-init target/aarch64-linux-android/release target/armv7-linux-androideabi/release #target/i686-linux-android/release target/x86_64-linux-android/release
+
+## linux: Compile Linux
+linux: target/x86_64-unknown-linux-gnu/release
 
 target/aarch64-linux-android/release: $(SOURCES) ndk-home
 	CC_aarch64_linux_android=$(ANDROID_AARCH64_LINKER) \
@@ -84,22 +89,19 @@ target/armv7-linux-androideabi/release: $(SOURCES) ndk-home
 		cargo build --target armv7-linux-androideabi --release
 	@echo "[DONE] $@"
 
-target/i686-linux-android/release: $(SOURCES) ndk-home
-	CC_i686_linux_android=$(ANDROID_I686_LINKER) \
-	CARGO_TARGET_I686_LINUX_ANDROID_LINKER=$(ANDROID_I686_LINKER) \
-		cargo  build --target i686-linux-android --release
-	@echo "[DONE] $@"
+# target/i686-linux-android/release: $(SOURCES) ndk-home
+# 	CC_i686_linux_android=$(ANDROID_I686_LINKER) \
+# 	CARGO_TARGET_I686_LINUX_ANDROID_LINKER=$(ANDROID_I686_LINKER) \
+# 		cargo  build --target i686-linux-android --release
+# 	@echo "[DONE] $@"
 
-target/x86_64-linux-android/release: $(SOURCES) ndk-home
-	CC_x86_64_linux_android=$(ANDROID_X86_64_LINKER) \
-	CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER=$(ANDROID_X86_64_LINKER) \
-		cargo build --target x86_64-linux-android --release
-	@echo "[DONE] $@"
+# target/x86_64-linux-android/release: $(SOURCES) ndk-home
+# 	CC_x86_64_linux_android=$(ANDROID_X86_64_LINKER) \
+# 	CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER=$(ANDROID_X86_64_LINKER) \
+# 		cargo build --target x86_64-linux-android --release
+# 	@echo "[DONE] $@"
 
-## linux: Compile Linux
-linux: target/x86_64-unknown-linux-gnu/release
-
-target/x86_64-unknown-linux-gnu/release:
+target/x86_64-unknown-linux-gnu/release: 
 	cargo  build --target x86_64-unknown-linux-gnu --release
 	@echo "[DONE] $@"
 		

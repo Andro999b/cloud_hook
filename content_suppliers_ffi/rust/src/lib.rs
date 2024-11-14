@@ -4,8 +4,8 @@ use crate::schema_generated::proto;
 use flatbuffers::{FlatBufferBuilder, ForwardsUOffset, Vector, WIPOffset};
 use lazy_static::lazy_static;
 use std::ffi::{c_char, CString};
-use std::ptr::null;
-use std::slice;
+use std::ptr::{null, null_mut};
+use std::{env, mem, slice};
 use std::{collections::HashMap, error::Error};
 use strum_macros::FromRepr;
 use suppliers::models::ContentSupplier;
@@ -34,8 +34,8 @@ enum Command {
 
 #[repr(C)]
 pub struct WireResult {
-    pub size: usize,
-    pub buf: *const u8,
+    pub ptr: *mut u8,
+    pub size: i32,
     pub error: *const c_char,
 }
 
@@ -43,11 +43,11 @@ impl From<Result<Vec<u8>, Box<dyn Error>>> for WireResult {
     fn from(value: Result<Vec<u8>, Box<dyn Error>>) -> Self {
         match value {
             Ok(result) => {
-                let size = result.len();
-                let res = result.into_boxed_slice();
+                let (ptr, size) = into_leak_vec_ptr(result);
+
                 return WireResult {
-                    size: size,
-                    buf: Box::into_raw(res) as *const _,
+                    ptr,
+                    size,
                     error: null(),
                 };
             }
@@ -55,7 +55,7 @@ impl From<Result<Vec<u8>, Box<dyn Error>>> for WireResult {
                 println!("Commnad Processing failed: {}", err);
                 return WireResult {
                     size: 0,
-                    buf: null(),
+                    ptr: null_mut(),
                     error: CString::new(err.to_string()).unwrap().into_raw(),
                 };
             }
@@ -70,6 +70,7 @@ pub extern "C" fn wire(
     req: *const u8,
     callback: unsafe extern "C" fn(WireResult),
 ) {
+    env::set_var("RUST_BACKTRACE", "1");
     let req_vec = read_request(size, req);
     RT.spawn(async move {
         let result = process_command(cmd_index, req_vec).await;
@@ -91,15 +92,39 @@ pub extern "C" fn wire_sync(cmd_index: u8, size: usize, req: *const u8) -> WireR
 #[no_mangle]
 pub extern "C" fn free(res: WireResult) {
     unsafe {
-        if !res.buf.is_null() {
-            _ = Box::from_raw(res.buf as *mut u8);
-        }
+        // if !res.ptr.is_null() {
+            println!("before buffer free");
+            let _ = vec_from_leak_ptr(res.ptr, res.size);
+        // }
 
-        if !res.error.is_null() {
-            _ = CString::from_raw(res.buf as *mut c_char);
-        }
+        println!("after buffer free");
+        // if !res.error.is_null() {
+            // let _ = CString::from_raw(res.error as *mut c_char);
+        // }
     }
+    let _ = res;
 }
+
+#[no_mangle]
+fn free_buff(ptr: *mut u8, size: i32) {
+    let _ = unsafe {
+        Vec::from_raw_parts(ptr, size as usize, size as usize);
+    };
+}
+
+fn into_leak_vec_ptr<T: Clone>(mut v: Vec<T>) -> (*mut T, i32) {
+    v.shrink_to_fit();
+    assert_eq!(v.len(), v.capacity());
+    let ptr = v.as_mut_ptr();
+    let len = v.len() as i32;
+    mem::forget(v);
+    (ptr, len)
+}
+
+unsafe fn vec_from_leak_ptr<T>(ptr: *mut T, len: i32) -> Vec<T> {
+    Vec::from_raw_parts(ptr, len as usize, len as usize)
+}
+
 
 // wire methods
 

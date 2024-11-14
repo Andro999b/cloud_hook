@@ -23,10 +23,9 @@ enum Command {
 }
 
 final class WireResult extends Struct {
-  @Uint32()
-  external int size;
-
   external Pointer<Uint8> buf;
+  @Int32()
+  external int size;
   external Pointer<Utf8> error;
 }
 
@@ -59,33 +58,37 @@ typedef WireSyncNativeFunction = WireResult Function(
 typedef FreeFunction = void Function(WireResult);
 typedef FreeNativeFunction = Void Function(WireResult);
 
+typedef FreeBuffFunction = void Function(
+  Pointer<Uint8>,
+  int,
+);
+typedef FreeBuffNativeFunction = Void Function(
+  Pointer<Uint8>,
+  Int32,
+);
+
 class FFIBridge {
   DynamicLibrary _library;
   WireFunction _wire;
   WireSyncFunction _wireSync;
   FreeFunction _free;
+  FreeBuffFunction _freeBuff;
 
   FFIBridge._internal({
     required DynamicLibrary library,
     required WireFunction wire,
     required WireSyncFunction wireSync,
     required FreeFunction free,
+    required FreeBuffFunction freeBuff,
   })  : _library = library,
         _wire = wire,
         _wireSync = wireSync,
-        _free = free;
+        _free = free,
+        _freeBuff = freeBuff;
 
   factory FFIBridge.load({
     required String libPath,
   }) {
-    // var directory = io.Directory(dir);
-    // if (!directory.isAbsolute) {
-    //   final currentPath = io.Directory.current.path;
-    //   directory = io.Directory("$currentPath/$dir");
-    // }
-
-    // final libPath = "${directory.path}/$libName.so";
-
     final library = DynamicLibrary.open(libPath);
 
     final wire =
@@ -95,11 +98,15 @@ class FFIBridge {
     final free =
         library.lookupFunction<FreeNativeFunction, FreeFunction>("free");
 
+    final freeBuff = library
+        .lookupFunction<FreeBuffNativeFunction, FreeBuffFunction>("free_buff");
+
     return FFIBridge._internal(
       library: library,
       wire: wire,
       wireSync: wireSync,
       free: free,
+      freeBuff: freeBuff,
     );
   }
 
@@ -258,11 +265,13 @@ class FFIBridge {
       if (result.error != nullptr) {
         final error = result.error.toDartString();
         completer.completeError(Exception("FFI Error: $error"));
+        _free(result);
         return;
       }
 
       if (result.buf != nullptr) {
-        final response = List.generate(result.size, (i) => result.buf[i]);
+        final buffer = result.buf.asTypedList(result.size);
+        final response = List.generate(buffer.length, (i) => buffer[i]);
 
         completer.complete(response);
       } else {
@@ -307,9 +316,10 @@ class FFIBridge {
       throw Exception("No response for command: $command");
     }
 
-    final response = List.generate(result.size, (i) => result.buf[i]);
+    final buffer = result.buf.asTypedList(result.size);
+    final response = List.generate(buffer.length, (i) => buffer[i]);
+    _freeBuff(result.buf, result.size);
 
-    _free(result);
     return response;
   }
 

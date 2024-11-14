@@ -8,7 +8,7 @@ const libName = "libcontent_suppliers_ffi";
 
 void main() async {
   final bundle = FFIContentSuppliersBundle(
-    libPath: "rust/target/release/libcontent_suppliers_ffi.so",
+    libPath: "rust/target/debug/libcontent_suppliers_ffi.so",
   );
 
   await bundle.load();
