@@ -109,7 +109,7 @@ class SuppliersBundleDownload extends _$SuppliersBundleDownload {
   void download() async {
     state = state.start();
 
-    final libPath = FFISuppliersBundleStorage.instance.getLibPath(info);
+    final libPath = FFISuppliersBundleStorage.instance.getLibFilePath(info);
     final url = await _downloadUrl(info);
 
     if (url == null) {
@@ -126,7 +126,7 @@ class SuppliersBundleDownload extends _$SuppliersBundleDownload {
         if (task.status.value == DownloadStatus.completed) {
           logger.i("New FFI bundle version donwloaded");
           // reload bundles
-          await ContentSuppliers.instance.reload(libPath);
+          await ContentSuppliers.instance.reload(info.libName);
           // save info
           AppPreferences.ffiSupplierBundleInfo = info;
           // refresh providers

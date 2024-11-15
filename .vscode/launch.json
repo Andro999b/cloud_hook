@@ -10,7 +10,9 @@
             "type": "dart",
             // "toolArgs": [
             //     "--dart-define",
-            //     "FFI_SUPPLIER_LIB_PATH=/home/andrii/Documents/cloud_hook_suppliers/target/release/libcloud_hook_suppliers.so",
+            //     "FFI_SUPPLIER_LIBS_DIR=/home/andrii/Documents/cloud_hook_suppliers/target/release/",
+            //     "--dart-define",
+            //     "FFI_SUPPLIER_LIB_NAME=cloud_hook_suppliers",
             // ]
         },
     ]

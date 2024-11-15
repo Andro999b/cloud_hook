@@ -1,12 +1,10 @@
-import 'dart:isolate';
-
 import 'package:cloud_hook/app_preferences.dart';
 import 'package:cloud_hook/app_secrets.dart';
 import 'package:cloud_hook/content_suppliers/ffi_suppliers_bundle_storage.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:content_suppliers_dart/bundle.dart';
-import 'package:content_suppliers_ffi/bundle.dart';
+import 'package:content_suppliers_rust/bundle.dart';
 
 class ContentSuppliers {
   List<ContentSupplier> _suppliers = [];
@@ -22,25 +20,39 @@ class ContentSuppliers {
   }
 
   Future<void> load() async {
-    return reload(getDefaultFFILibPath());
+    return reload(_getDefaultFFILibName());
   }
 
-  Future<void> reload(String? ffiLibPath) async {
+  Future<void> reload(String? ffiLibName) async {
     List<ContentSupplier> suppliers = [];
 
     for (final bundle in _bundles) {
       bundle.unload();
     }
 
-    logger.i("FFI Lib path: $ffiLibPath");
+    // THIS FLUTTER PIECE OF SHIT NOT WORKS WITHOUT CONST
+    var ffiLibsDir = const String.fromEnvironment("FFI_SUPPLIER_LIBS_DIR");
+    if (ffiLibsDir.isEmpty) {
+      ffiLibsDir = FFISuppliersBundleStorage.instance.libsDir;
+    }
+    logger.i("FFI libs dirirectory: $ffiLibsDir");
 
     _bundles = [
-      if (ffiLibPath != null) FFIContentSuppliersBundle(libPath: ffiLibPath),
+      if (ffiLibName != null)
+        RustContentSuppliersBundle(
+          directory: ffiLibsDir,
+          libName: ffiLibName,
+        ),
       DartContentSupplierBundle(tmdbSecret: AppSecrets.getString("tmdb"))
     ];
 
     for (final bundle in _bundles) {
-      suppliers += await bundle.suppliers;
+      try {
+        await bundle.load();
+        suppliers += await bundle.suppliers;
+      } catch (e) {
+        logger.w("Fail to load suppliers bundel $bundle: $e");
+      }
     }
     _suppliers = suppliers;
     _suppliersByName = {for (var s in suppliers) s.name: s};
@@ -117,16 +129,16 @@ class ContentSuppliers {
 
   static final ContentSuppliers instance = ContentSuppliers._();
 
-  static String? getDefaultFFILibPath() {
-    var libPath = const String.fromEnvironment("FFI_SUPPLIER_LIB_PATH");
-    if (libPath.isEmpty) {
+  static String? _getDefaultFFILibName() {
+    var libName = const String.fromEnvironment("FFI_SUPPLIER_LIB_NAME");
+    if (libName.isEmpty) {
       final bundleInfo = AppPreferences.ffiSupplierBundleInfo;
       if (bundleInfo != null) {
-        return FFISuppliersBundleStorage.instance.getLibPath(bundleInfo);
+        return bundleInfo.libName;
       } else {
         return null;
       }
     }
-    return libPath;
+    return libName;
   }
 }

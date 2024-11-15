@@ -16,19 +16,20 @@ class FFISuppliersBundleStorage {
   Future<void> setup() async {
     final basePath = (await getApplicationSupportDirectory()).path;
 
-    libsDir = "$basePath/$ffiSupplierBundleDir";
+    libsDir = "$basePath/$ffiSupplierBundleDir/";
 
     await io.Directory(libsDir).create();
   }
 
-  String getLibPath(FFISupplierBundleInfo info) {
-    final ext = io.Platform.isWindows ? "dll" : "so";
+  String getLibFilePath(FFISupplierBundleInfo info) {
+    final libFileName =
+        io.Platform.isWindows ? "${info.libName}.dll" : "lib${info.libName}.so";
 
-    return "$libsDir/${info.name}_${info.version}.$ext";
+    return "$libsDir$libFileName";
   }
 
   Future<bool> isInstalled(FFISupplierBundleInfo info) =>
-      io.File(getLibPath(info)).exists();
+      io.File(getLibFilePath(info)).exists();
 
   Future<void> cleanup(FFISupplierBundleInfo info) async {
     try {

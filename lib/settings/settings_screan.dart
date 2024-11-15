@@ -1,5 +1,4 @@
 import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/app_preferences.dart';
 import 'package:cloud_hook/layouts/general_layout.dart';
 import 'package:cloud_hook/settings/app_version/app_version_settings.dart';
 import 'package:cloud_hook/settings/suppliers/suppliers_bundle_version_settings.dart';

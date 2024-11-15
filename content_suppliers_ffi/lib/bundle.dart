@@ -232,23 +232,22 @@ class FFIContentSuppliersBundle extends ContentSupplierBundle {
     required this.libPath,
   });
 
-  Future<FFIBridge?> load() async {
+  @override
+  Future<void> load() async {
     if (libPath.isEmpty) {
-      return null;
+      return;
     }
 
     final exist = await io.File(libPath).exists();
 
     if (!exist) {
       print("FFI lib not found: $libPath");
-      return null;
+      return;
     }
 
     _bridge ??= FFIBridge.load(libPath: libPath);
 
     print("FFI lib loaded: $libPath");
-
-    return _bridge;
   }
 
   @override
@@ -261,15 +260,13 @@ class FFIContentSuppliersBundle extends ContentSupplierBundle {
   Future<List<ContentSupplier>> get suppliers async {
     var bridge = _bridge;
 
-    bridge ??= await load();
-
     if (bridge == null) {
       return [];
     }
 
     return bridge
         .avalaibleSuppliers()
-        .map((supplier) => FFIContentSupplier(name: supplier, bridge: bridge!))
+        .map((supplier) => FFIContentSupplier(name: supplier, bridge: bridge))
         .toList();
   }
 }

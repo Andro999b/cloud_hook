@@ -60,20 +60,5 @@ final latestAppVersionInfoProvider =
 
 typedef LatestAppVersionInfoRef
     = AutoDisposeFutureProviderRef<LatestAppVersionInfo>;
-String _$hasNewVersionHash() => r'4e272e59d12c1321a6353c4fb67efaa24c88befc';
-
-/// See also [hasNewVersion].
-@ProviderFor(hasNewVersion)
-final hasNewVersionProvider = AutoDisposeProvider<bool>.internal(
-  hasNewVersion,
-  name: r'hasNewVersionProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$hasNewVersionHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef HasNewVersionRef = AutoDisposeProviderRef<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

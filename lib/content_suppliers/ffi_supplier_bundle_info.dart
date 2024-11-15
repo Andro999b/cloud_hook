@@ -24,4 +24,6 @@ class FFISupplierBundleInfo extends Equatable {
 
   @override
   List<Object?> get props => [name];
+
+  String get libName => "${name}_$version";
 }

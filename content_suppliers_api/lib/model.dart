@@ -320,5 +320,6 @@ class AsyncContentMediaItemSource extends Equatable
 
 abstract class ContentSupplierBundle {
   Future<List<ContentSupplier>> get suppliers;
+  Future<void> load() async {}
   void unload() {}
 }

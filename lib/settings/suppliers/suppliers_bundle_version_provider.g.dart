@@ -7,7 +7,7 @@ part of 'suppliers_bundle_version_provider.dart';
 // **************************************************************************
 
 String _$installedSupplierBundleInfoHash() =>
-    r'8ab567145052bcec78efd4c9aa2b3972402a19f4';
+    r'743b78551adec3feb4ba4645425450b87905b6aa';
 
 /// See also [installedSupplierBundleInfo].
 @ProviderFor(installedSupplierBundleInfo)
@@ -25,7 +25,7 @@ final installedSupplierBundleInfoProvider =
 typedef InstalledSupplierBundleInfoRef
     = AutoDisposeFutureProviderRef<FFISupplierBundleInfo?>;
 String _$latestSupplierBundleInfoHash() =>
-    r'605b4997a41ed8ccc5368e9f4f48658437be76ca';
+    r'6177e58d28bb3f2b7f59cd7633ae47c834a3f996';
 
 /// See also [latestSupplierBundleInfo].
 @ProviderFor(latestSupplierBundleInfo)
@@ -43,7 +43,7 @@ final latestSupplierBundleInfoProvider =
 typedef LatestSupplierBundleInfoRef
     = AutoDisposeFutureProviderRef<FFISupplierBundleInfo>;
 String _$suppliersBundleDownloadHash() =>
-    r'25c8124f31c338b2a68b3bc066b59001c6232e2d';
+    r'1f7c5c07592e3364f58bbc0521f40611efdd518e';
 
 /// Copied from Dart SDK
 class _SystemHash {

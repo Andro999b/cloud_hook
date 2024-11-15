@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:content_suppliers_rust/rust/frb_generated.dart';
@@ -6,58 +8,6 @@ import 'package:content_suppliers_rust/rust/models.dart' as models;
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // ignore_for_file: invalid_use_of_internal_member
-
-class _CustomRustLib
-    extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
-  final String? directory;
-  final String libName;
-  ExternalLibrary? externalLibrary;
-
-  _CustomRustLib({required this.directory, required this.libName});
-
-  Future<void> init() async {
-    externalLibrary =
-        await loadExternalLibrary(defaultExternalLibraryLoaderConfig);
-
-    return initImpl(
-      api: null,
-      handler: null,
-      externalLibrary: externalLibrary,
-    );
-  }
-
-  @override
-  ApiImplConstructor<RustLibApiImpl, RustLibWire> get apiImplConstructor =>
-      RustLibApiImpl.new;
-
-  @override
-  WireConstructor<RustLibWire> get wireConstructor =>
-      RustLibWire.fromExternalLibrary;
-
-  @override
-  Future<void> executeRustInitializers() async {
-    await api.crateApiInitApp();
-  }
-
-  @override
-  ExternalLibraryLoaderConfig get defaultExternalLibraryLoaderConfig =>
-      ExternalLibraryLoaderConfig(
-        stem: libName,
-        ioDirectory: directory,
-        webPrefix: null,
-      );
-
-  @override
-  String get codegenVersion => RustLib.instance.codegenVersion;
-
-  @override
-  int get rustContentHash => RustLib.instance.rustContentHash;
-
-  dispose() {
-    disposeImpl();
-    externalLibrary?.ffiDynamicLibrary.close();
-  }
-}
 
 class RustMediaItem implements ContentMediaItem {
   final String id;
@@ -292,6 +242,7 @@ class RustContentSuppliersBundle implements ContentSupplierBundle {
     required this.libName,
   });
 
+  @override
   Future<void> load() async {
     if (_lib == null) {
       _lib = _CustomRustLib(
@@ -305,7 +256,7 @@ class RustContentSuppliersBundle implements ContentSupplierBundle {
 
   @override
   void unload() {
-    _lib?.dispose();
+    _lib?.unload();
   }
 
   @override
@@ -321,4 +272,129 @@ class RustContentSuppliersBundle implements ContentSupplierBundle {
         .map((supplier) => RustContentSupplier(name: supplier, api: api))
         .toList();
   }
+}
+
+class _CustomRustLib
+    extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
+  final String? directory;
+  final String libName;
+  ExternalLibrary? externalLibrary;
+
+  _CustomRustLib({required this.directory, required this.libName});
+
+  Future<void> init() async {
+    externalLibrary =
+        await _loadExternalLibrary(defaultExternalLibraryLoaderConfig);
+
+    return initImpl(
+      api: null,
+      handler: null,
+      externalLibrary: externalLibrary,
+    );
+  }
+
+  @override
+  ApiImplConstructor<RustLibApiImpl, RustLibWire> get apiImplConstructor =>
+      RustLibApiImpl.new;
+
+  @override
+  WireConstructor<RustLibWire> get wireConstructor =>
+      RustLibWire.fromExternalLibrary;
+
+  @override
+  Future<void> executeRustInitializers() async {
+    await api.crateApiInitApp();
+  }
+
+  @override
+  ExternalLibraryLoaderConfig get defaultExternalLibraryLoaderConfig =>
+      ExternalLibraryLoaderConfig(
+        stem: libName,
+        ioDirectory: directory,
+        webPrefix: null,
+      );
+
+  @override
+  String get codegenVersion => RustLib.instance.codegenVersion;
+
+  @override
+  int get rustContentHash => RustLib.instance.rustContentHash;
+
+  unload() {
+    externalLibrary?.ffiDynamicLibrary.close();
+  }
+}
+
+FutureOr<ExternalLibrary> _loadExternalLibrary(
+    ExternalLibraryLoaderConfig config) async {
+  final ioDirectory = config.ioDirectory;
+
+  final stem = config.stem;
+  final nativeLibDirWhenNonPackaged =
+      ioDirectory == null ? null : Directory.current.uri.resolve(ioDirectory);
+
+  // ref
+  // * https://flutter.dev/docs/development/platform-integration/c-interop
+  // * https://github.com/fzyzcjy/flutter_rust_bridge/pull/898
+  // * https://github.com/flutter/flutter/blob/8b6277e63868c2029f1e2327879b7899be44fbe2/packages/flutter_tools/templates/plugin_ffi/lib/projectName.dart.tmpl#L47-L58
+
+  ExternalLibrary tryAssumingNonPackaged(
+      String name, ExternalLibrary Function(String debugInfo) fallback) {
+    final effectiveNativeLibDir = Platform
+            .environment['FRB_DART_LOAD_EXTERNAL_LIBRARY_NATIVE_LIB_DIR']
+            ?.toUriDirectory() ??
+        nativeLibDirWhenNonPackaged;
+
+    if (effectiveNativeLibDir == null) {
+      return fallback(
+          '(without trying effectiveNativeLibDir since it is null)');
+    }
+
+    final filePath = effectiveNativeLibDir.resolve(name).toFilePath();
+    if (!File(filePath).existsSync()) {
+      return fallback('(after trying $filePath but it does not exist)');
+    }
+
+    return ExternalLibrary.open(filePath);
+  }
+
+  if (Platform.isWindows) {
+    final name = '$stem.dll';
+    return tryAssumingNonPackaged(
+        name, (debugInfo) => ExternalLibrary.open(name, debugInfo: debugInfo));
+  }
+
+  if (Platform.isIOS || Platform.isMacOS) {
+    return tryAssumingNonPackaged(
+      'lib$stem.dylib',
+      (debugInfo) => _tryOpen(
+        'rust_builder.framework/rust_builder',
+        debugInfo,
+        (debugInfo) =>
+            ExternalLibrary.open('$stem.framework/$stem', debugInfo: debugInfo),
+      ),
+    );
+  }
+
+  if (Platform.isLinux || Platform.isAndroid) {
+    final name = 'lib$stem.so';
+    return tryAssumingNonPackaged(
+        name, (debugInfo) => ExternalLibrary.open(name, debugInfo: debugInfo));
+  }
+
+  throw Exception(
+      'loadExternalLibrary failed: Unknown platform=${Platform.operatingSystem}');
+}
+
+ExternalLibrary _tryOpen(String name, String debugInfo,
+    ExternalLibrary Function(String debugInfo) fallback) {
+  try {
+    return ExternalLibrary.open(name, debugInfo: debugInfo);
+  } catch (e) {
+    return fallback('$debugInfo (after trying $name but has error $e)');
+  }
+}
+
+extension on String {
+  Uri toUriDirectory() => Uri.directory(this);
 }

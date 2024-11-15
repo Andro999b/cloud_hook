@@ -14,19 +14,19 @@ class AppVersionSettings extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentVersion = ref.watch(currentAppVersionProvider);
     final latestVersionInfo = ref.watch(latestAppVersionInfoProvider);
-    final hasNewVersion = ref.watch(hasNewVersionProvider);
 
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        currentVersion.maybeWhen(
-          data: (data) => Text(data),
-          orElse: () => const SizedBox.shrink(),
-        ),
+    return currentVersion.maybeWhen(
+      data: (current) => Row(mainAxisSize: MainAxisSize.max, children: [
+        Text(current),
         const Spacer(),
         latestVersionInfo.when(
           data: (data) {
-            return renderUpdateButton(context, ref, data, hasNewVersion);
+            return renderUpdateButton(
+              context,
+              ref,
+              data,
+              data.version != current,
+            );
           },
           skipLoadingOnRefresh: false,
           loading: () => FilledButton.tonalIcon(
@@ -41,7 +41,8 @@ class AppVersionSettings extends ConsumerWidget {
           error: (Object error, StackTrace stackTrace) =>
               Text(error.toString()),
         )
-      ],
+      ]),
+      orElse: () => const SizedBox.shrink(),
     );
   }
 

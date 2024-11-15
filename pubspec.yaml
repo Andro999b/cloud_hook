@@ -63,8 +63,8 @@ dependencies:
   content_suppliers_dart:
     path: content_suppliers_dart
 
-  content_suppliers_ffi:
-    path: content_suppliers_ffi
+  content_suppliers_rust:
+    path: content_suppliers_rust
 
 dependency_overrides:
   media_kit: 
