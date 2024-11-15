@@ -86,6 +86,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.1"
+  build_cli_annotations:
+    dependency: transitive
+    description:
+      name: build_cli_annotations
+      sha256: b59d2769769efd6c9ff6d4c4cede0be115a566afc591705c2040b707534b1172
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   build_config:
     dependency: transitive
     description:
@@ -233,6 +241,13 @@ packages:
     dependency: "direct main"
     description:
       path: content_suppliers_dart
+      relative: true
+    source: path
+    version: "0.0.1"
+  content_suppliers_rust:
+    dependency: "direct main"
+    description:
+      path: content_suppliers_rust
       relative: true
     source: path
     version: "0.0.1"
@@ -417,6 +432,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.1"
+  flutter_download_manager:
+    dependency: "direct main"
+    description:
+      name: flutter_download_manager
+      sha256: f0e604be623f2559a2dc2ccb0918e4e5224ff28a02b864ba0c27a3c6aca6c154
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.5"
   flutter_hooks:
     dependency: "direct main"
     description:
@@ -446,6 +469,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.5.1"
+  flutter_rust_bridge:
+    dependency: transitive
+    description:
+      name: flutter_rust_bridge
+      sha256: fb9d3c9395eae3c71d4fe3ec343b9f30636c9988150c8bb33b60047549b34e3d
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.6.0"
   flutter_web_plugins:
     dependency: transitive
     description: flutter

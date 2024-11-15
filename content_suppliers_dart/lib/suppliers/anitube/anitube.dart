@@ -48,7 +48,7 @@ class AniTubeSupplier extends ContentSupplier
   Set<ContentType> supportedTypes = const {ContentType.anime};
 
   @override
-  Set<ContentLanguage> supportedLanguages = const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> supportedLanguages = const {ContentLanguage.uk};
 
   @override
   Future<ContentDetails?> detailsById(String id) async {

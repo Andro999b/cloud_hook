@@ -14,19 +14,19 @@ class AppVersionSettings extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentVersion = ref.watch(currentAppVersionProvider);
     final latestVersionInfo = ref.watch(latestAppVersionInfoProvider);
-    final hasNewVersion = ref.watch(hasNewVersionProvider);
 
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        currentVersion.maybeWhen(
-          data: (data) => Text(data),
-          orElse: () => const SizedBox.shrink(),
-        ),
+    return currentVersion.maybeWhen(
+      data: (current) => Row(mainAxisSize: MainAxisSize.max, children: [
+        Text(current),
         const Spacer(),
-        latestVersionInfo.maybeWhen(
+        latestVersionInfo.when(
           data: (data) {
-            return renderUpdateButton(context, ref, data, hasNewVersion);
+            return renderUpdateButton(
+              context,
+              ref,
+              data,
+              data.version != current,
+            );
           },
           skipLoadingOnRefresh: false,
           loading: () => FilledButton.tonalIcon(
@@ -35,12 +35,14 @@ class AppVersionSettings extends ConsumerWidget {
               width: 16,
               child: CircularProgressIndicator.adaptive(),
             ),
-            onPressed: () {},
+            onPressed: null,
             label: Text(AppLocalizations.of(context)!.settingsCheckForUpdate),
           ),
-          orElse: () => const SizedBox.shrink(),
+          error: (Object error, StackTrace stackTrace) =>
+              Text(error.toString()),
         )
-      ],
+      ]),
+      orElse: () => const SizedBox.shrink(),
     );
   }
 
@@ -53,7 +55,8 @@ class AppVersionSettings extends ConsumerWidget {
     if (hasNewVersion) {
       return FilledButton(
         onPressed: () => _downloadNewVersion(context, latestAppVersionInfo),
-        child: Text(AppLocalizations.of(context)!.settingsDownloadUpdate(latestAppVersionInfo.version)),
+        child: Text(AppLocalizations.of(context)!
+            .settingsDownloadUpdate(latestAppVersionInfo.version)),
       );
     }
 
@@ -71,16 +74,24 @@ class AppVersionSettings extends ConsumerWidget {
     if (Platform.isLinux || Platform.isWindows) {
       final platform = Platform.isLinux ? "linux" : "windows";
 
-      asset = latestAppVersionInfo.assets.where((a) => a.name.contains(platform)).firstOrNull;
+      asset = latestAppVersionInfo.assets
+          .where((a) => a.name.contains(platform))
+          .firstOrNull;
     } else if (Platform.isAndroid) {
       final deviceInfo = await DeviceInfoPlugin().androidInfo;
 
       if (deviceInfo.supportedAbis.contains("arm64-v8a")) {
-        asset = latestAppVersionInfo.assets.where((a) => a.name.contains("app-arm64-v8a-release.apk")).firstOrNull;
+        asset = latestAppVersionInfo.assets
+            .where((a) => a.name.contains("app-arm64-v8a-release.apk"))
+            .firstOrNull;
       } else if (deviceInfo.supportedAbis.contains("armeabi-v7a")) {
-        asset = latestAppVersionInfo.assets.where((a) => a.name.contains("app-armeabi-v7a-release.apk")).firstOrNull;
+        asset = latestAppVersionInfo.assets
+            .where((a) => a.name.contains("app-armeabi-v7a-release.apk"))
+            .firstOrNull;
       } else {
-        asset = latestAppVersionInfo.assets.where((a) => a.name.contains("app-release.apk")).firstOrNull;
+        asset = latestAppVersionInfo.assets
+            .where((a) => a.name.contains("app-release.apk"))
+            .firstOrNull;
       }
     }
 

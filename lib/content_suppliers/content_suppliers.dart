@@ -1,35 +1,61 @@
-import 'dart:isolate';
-
+import 'package:cloud_hook/app_preferences.dart';
 import 'package:cloud_hook/app_secrets.dart';
+import 'package:cloud_hook/content_suppliers/ffi_suppliers_bundle_storage.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:content_suppliers_dart/bundle.dart';
+import 'package:content_suppliers_rust/bundle.dart';
 
 class ContentSuppliers {
-  ContentSuppliers._();
-
-  static final ContentSuppliers instance = ContentSuppliers._();
-
-  final List<ContentSupplierBundle> _bundles = [
-    DartContentSupplierBundle(tmdbSecret: AppSecrets.getString("tmdb"))
-  ];
-
-  Future<void> load() async {
-    List<ContentSupplier> suppliers = [];
-    for (final bundle in _bundles) {
-      suppliers += await bundle.suppliers;
-    }
-    _suppliers = suppliers;
-    _suppliersByName = {for (var s in suppliers) s.name: s};
-  }
-
   List<ContentSupplier> _suppliers = [];
+  List<ContentSupplierBundle> _bundles = [];
   Map<String, ContentSupplier> _suppliersByName = {};
+
+  ContentSuppliers._();
 
   Set<String> get suppliersName => _suppliersByName.keys.toSet();
 
   ContentSupplier? getSupplier(String supplierName) {
     return _suppliersByName[supplierName];
+  }
+
+  Future<void> load() async {
+    return reload(_getDefaultFFILibName());
+  }
+
+  Future<void> reload(String? ffiLibName) async {
+    List<ContentSupplier> suppliers = [];
+
+    for (final bundle in _bundles) {
+      bundle.unload();
+    }
+
+    // THIS FLUTTER PIECE OF SHIT NOT WORKS WITHOUT CONST
+    var ffiLibsDir = const String.fromEnvironment("FFI_SUPPLIER_LIBS_DIR");
+    if (ffiLibsDir.isEmpty) {
+      ffiLibsDir = FFISuppliersBundleStorage.instance.libsDir;
+    }
+    logger.i("FFI libs dirirectory: $ffiLibsDir");
+
+    _bundles = [
+      if (ffiLibName != null)
+        RustContentSuppliersBundle(
+          directory: ffiLibsDir,
+          libName: ffiLibName,
+        ),
+      DartContentSupplierBundle(tmdbSecret: AppSecrets.getString("tmdb"))
+    ];
+
+    for (final bundle in _bundles) {
+      try {
+        await bundle.load();
+        suppliers += await bundle.suppliers;
+      } catch (e) {
+        logger.w("Fail to load suppliers bundel $bundle: $e");
+      }
+    }
+    _suppliers = suppliers;
+    _suppliersByName = {for (var s in suppliers) s.name: s};
   }
 
   Stream<Map<String, List<ContentInfo>>> search(
@@ -47,9 +73,7 @@ class ContentSuppliers {
       }
 
       try {
-        final res = await Isolate.run(
-          () => supplier.search(query, contentTypes),
-        );
+        final res = await supplier.search(query, contentTypes);
         results[supplier.name] = res;
         yield results;
       } catch (error, stackTrace) {
@@ -73,7 +97,7 @@ class ContentSuppliers {
       return [];
     }
 
-    return Isolate.run(() => supplier.loadChannel(channel, page: page));
+    return supplier.loadChannel(channel, page: page);
   }
 
   Future<ContentDetails> detailsById(String supplierName, String id) async {
@@ -88,7 +112,7 @@ class ContentSuppliers {
 
     ContentDetails? details;
     try {
-      details = await Isolate.run(() => supplier.detailsById(id));
+      details = await supplier.detailsById(id);
     } catch (error, stackTrace) {
       logger.e("Supplier $supplier fail with $id",
           error: error, stackTrace: stackTrace);
@@ -101,5 +125,20 @@ class ContentSuppliers {
     }
 
     return details;
+  }
+
+  static final ContentSuppliers instance = ContentSuppliers._();
+
+  static String? _getDefaultFFILibName() {
+    var libName = const String.fromEnvironment("FFI_SUPPLIER_LIB_NAME");
+    if (libName.isEmpty) {
+      final bundleInfo = AppPreferences.ffiSupplierBundleInfo;
+      if (bundleInfo != null) {
+        return bundleInfo.libName;
+      } else {
+        return null;
+      }
+    }
+    return libName;
   }
 }

@@ -1,0 +1,25 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "attach",
+            "name": "Debug Android",
+            "pid": "12444",
+            "initCommands": [
+                "settings append target.exec-search-paths ${ANDROID_SRC}/out/target/product/x86_64/symbols/system/lib64/ ${ANDROID_SRC}/out/target/product/x86_64/symbols/system/lib64/hw ${ANDROID_SRC}/out/target/product/x86_64/symbols/system/lib64/egl ${ANDROID_SRC}/out/target/product/x86_64/symbols/system/lib64/extractors ${ANDROID_SRC}/out/target/product/x86_64/symbols/system/vendor/lib64/ ${ANDROID_SRC}/out/target/product/x86_64/symbols/system/vendor/lib64/hw ${ANDROID_SRC}/out/target/product/x86_64/symbols/system/vendor/lib64/egl ${ANDROID_SRC}/out/target/product/x86_64/symbols/system/vendor/lib64/dri ${ANDROID_SRC}/out/target/product/x86_64/symbols/system/vendor/lib64/extractors ${ANDROID_SRC}/out/target/product/x86_64/symbols/system/vendor/lib64/mediacas ${ANDROID_SRC}/out/target/product/x86_64/symbols/system/vendor/lib64/mediadrm ${ANDROID_SRC}/out/target/product/x86_64/symbols/system/vendor/lib64/soundfx",
+                "platform select remote-android", 
+                "platform connect unix-abstract-connect:///data/local/tmp/debug.sock",
+            ], 
+            // Map the current path to the Android code base
+            "sourceMap": {
+                "": "${ANDROID_SRC}", 
+                "/b/f/w": "${ANDROID_SRC}", 
+                ".": "${ANDROID_SRC}"
+            },
+        }
+    ]
+}

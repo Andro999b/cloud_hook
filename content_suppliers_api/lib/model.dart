@@ -15,13 +15,13 @@ enum ContentType {
 }
 
 enum ContentLanguage {
-  english("EN"),
-  ukrainian("UK"),
+  en("EN"),
+  uk("UK"),
   multi("Multi");
 
-  final String code;
+  final String label;
 
-  const ContentLanguage(this.code);
+  const ContentLanguage(this.label);
 }
 
 enum MediaType {
@@ -267,6 +267,27 @@ class SimpleContentMediaItemSource extends Equatable
   List<Object?> get props => [link, headers];
 }
 
+class SimpleMangaMediaItemSource extends MangaMediaItemSource {
+  @override
+  final String description;
+  final List<String> pages;
+
+  SimpleMangaMediaItemSource({
+    required this.description,
+    required this.pages,
+  });
+  @override
+  FileKind get kind => FileKind.manga;
+
+  @override
+  int get pageNambers => pages.length;
+
+  @override
+  FutureOr<List<ImageProvider<Object>>> allPages() {
+    return pages.map((e) => NetworkImage(e)).toList();
+  }
+}
+
 typedef ContentItemMediaSourceLinkLoader = Future<Uri> Function();
 
 // ignore: must_be_immutable
@@ -297,6 +318,8 @@ class AsyncContentMediaItemSource extends Equatable
   List<Object?> get props => [link, headers];
 }
 
-abstract interface class ContentSupplierBundle {
+abstract class ContentSupplierBundle {
   Future<List<ContentSupplier>> get suppliers;
+  Future<void> load() async {}
+  void unload() {}
 }

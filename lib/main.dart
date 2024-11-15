@@ -10,10 +10,12 @@ import 'package:cloud_hook/content/content_details_screen.dart';
 import 'package:cloud_hook/content/manga/manga_content_screan.dart';
 import 'package:cloud_hook/content/video/video_content_screen.dart';
 import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
+import 'package:cloud_hook/content_suppliers/ffi_suppliers_bundle_storage.dart';
 import 'package:cloud_hook/home/home_screan.dart';
 import 'package:cloud_hook/layouts/navigation_data.dart';
 import 'package:cloud_hook/search/search_screen.dart';
 import 'package:cloud_hook/settings/settings_screan.dart';
+import 'package:cloud_hook/settings/suppliers/suppliers_screan.dart';
 import 'package:cloud_hook/utils/android_tv.dart';
 import 'package:cloud_hook/utils/error_observer.dart';
 import 'package:cloud_hook/utils/visual.dart';
@@ -43,6 +45,7 @@ void main() async {
   await AppInitFirebase.init();
 
   // load suppliers
+  await FFISuppliersBundleStorage.instance.setup();
   await ContentSuppliers.instance.load();
 
   // start ui
@@ -77,6 +80,7 @@ class MainApp extends StatelessWidget {
           // initialLocation: "/search",
           // initialLocation: "/collection",
           // initialLocation: "/settings",
+          // initialLocation: "/settings/suppliers",
           // initialLocation:
           //     "/manga/MangaDex/ef3a66a4-010f-4930-b6d4-0ff28b0ceed5",
           // initialLocation: "/content/Eneyida/9339-sogun-shogun",
@@ -103,6 +107,12 @@ class MainApp extends StatelessWidget {
               path: NavigationRoute.settings.path,
               pageBuilder: (context, state) => const NoTransitionPage(
                 child: SettingsScrean(),
+              ),
+            ),
+            GoRoute(
+              path: "/settings/suppliers",
+              pageBuilder: (context, state) => const NoTransitionPage(
+                child: SuppliersSettingsScrean(),
               ),
             ),
             GoRoute(

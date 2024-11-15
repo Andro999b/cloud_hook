@@ -33,6 +33,8 @@
     "settingsThemeSystem": "Авто",
     "settingsThemeDark": "Темна",
     "settingsColor": "Колір",
+    "settingsVersion": "Версія",
+    "settingsSuppliersVersion": "Версія постачальників",
     "singOut": "Вийти",
     "reload": "Оновити",
     "collectionContiue": "Продовжити перегляд",

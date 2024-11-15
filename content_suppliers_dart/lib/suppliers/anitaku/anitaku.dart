@@ -14,8 +14,7 @@ class Anitaku extends ContentSupplier {
   String get name => "Anitaku";
 
   @override
-  Set<ContentLanguage> get supportedLanguages =>
-      const {ContentLanguage.english};
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.en};
 
   @override
   Set<ContentType> get supportedTypes => const {ContentType.anime};

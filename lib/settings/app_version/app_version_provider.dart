@@ -52,15 +52,3 @@ FutureOr<LatestAppVersionInfo> latestAppVersionInfo(
   final res = await Client().get(Uri.parse(appVersionCheckURL));
   return LatestAppVersionInfo.fromJson(json.decode(res.body));
 }
-
-@riverpod
-bool hasNewVersion(HasNewVersionRef ref) {
-  final currentVersion = ref.watch(currentAppVersionProvider).valueOrNull;
-  final latestVersionInfo = ref.watch(latestAppVersionInfoProvider).valueOrNull;
-
-  if (currentVersion == null || latestVersionInfo == null) {
-    return false;
-  }
-
-  return currentVersion != latestVersionInfo.version;
-}

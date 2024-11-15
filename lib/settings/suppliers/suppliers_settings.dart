@@ -1,4 +1,3 @@
-import 'package:cloud_hook/app_localizations.dart';
 import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
 import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
 import 'package:cloud_hook/utils/visual.dart';
@@ -7,29 +6,9 @@ import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SuppliersSettingsSection extends StatelessWidget {
+class SuppliersSettingsSection extends ConsumerWidget {
   const SuppliersSettingsSection({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final padding = getPadding(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.of(context)!.suppliers,
-          style: theme.textTheme.headlineSmall,
-        ),
-        SizedBox(height: padding),
-        _RecomendationsSettingsList()
-      ],
-    );
-  }
-}
-
-class _RecomendationsSettingsList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final suppliersOrder = ref.watch(
@@ -146,7 +125,7 @@ class _RecomendationsSettingsItem extends ConsumerWidget {
             child: Badge(
               backgroundColor: theme.colorScheme.primary,
               textColor: theme.colorScheme.onPrimary,
-              label: Text(e.code),
+              label: Text(e.label),
             ),
           ),
         ),

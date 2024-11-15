@@ -1,0 +1,14 @@
+[package]
+name = "content_suppliers_rust"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+flutter_rust_bridge = "=2.6.0"
+anyhow = "1.0.93"
+enum_dispatch = "0.3.13"
+strum = { version = "0.26.3", features = ["strum_macros"] }
+strum_macros = "0.26.4"

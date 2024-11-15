@@ -44,8 +44,7 @@ class TmdbSupplier extends ContentSupplier {
       };
 
   @override
-  Set<ContentLanguage> get supportedLanguages =>
-      const {ContentLanguage.english};
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.en};
 
   @override
   Future<ContentDetails> detailsById(String id) async {

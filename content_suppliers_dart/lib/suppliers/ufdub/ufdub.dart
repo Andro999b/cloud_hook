@@ -19,8 +19,7 @@ class UFDubSupplier extends ContentSupplier
   Set<ContentType> get supportedTypes => const {ContentType.anime};
 
   @override
-  Set<ContentLanguage> get supportedLanguages =>
-      const {ContentLanguage.ukrainian};
+  Set<ContentLanguage> get supportedLanguages => const {ContentLanguage.uk};
 
   @override
   late final contentInfoSelector = Iterate(
