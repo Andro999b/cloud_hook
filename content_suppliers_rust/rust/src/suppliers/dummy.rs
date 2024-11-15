@@ -68,8 +68,6 @@ impl ContentSupplier for DummyContentSupplier {
     async fn get_content_details(&self, id: String) -> Result<Option<ContentDetails>, anyhow::Error> {
         Ok(Some(
             ContentDetails { 
-                id, 
-                supplier: NAME.to_owned(), 
                 title: "dummy_title".to_owned(),
                 original_title: Some(String::from("original_dummy_title")), 
                 image: "dummy_image".to_owned(), 
@@ -103,6 +101,7 @@ impl ContentSupplier for DummyContentSupplier {
                 title: id,
                 section: Some(new_params.join(",")),
                 image: Some("dummy_image".to_owned()),
+                sources: None,
                 params: new_params
             }
         ])

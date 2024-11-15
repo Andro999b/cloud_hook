@@ -27,8 +27,6 @@ pub struct ContentInfo {
 
 #[derive(Debug)]
 pub struct ContentDetails {
-    pub id: String,
-    pub supplier: String,
     pub title: String,
     pub original_title: Option<String>,
     pub image: String,
@@ -45,6 +43,7 @@ pub struct ContentMediaItem {
     pub title: String,
     pub section: Option<String>,
     pub image: Option<String>,
+    pub sources: Option<Vec<ContentMediaItemSource>>,
     pub params: Vec<String>,
 }
 

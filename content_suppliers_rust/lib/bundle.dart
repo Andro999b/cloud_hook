@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:content_suppliers_rust/rust/frb_generated.dart';
 import 'package:content_suppliers_rust/rust/frb_generated.io.dart';
-import 'package:content_suppliers_rust/rust/models.dart' as bridge_model;
+import 'package:content_suppliers_rust/rust/models.dart' as models;
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // ignore_for_file: invalid_use_of_internal_member
@@ -75,17 +75,38 @@ class RustMediaItem implements ContentMediaItem {
 
   List<ContentMediaItemSource>? _sources;
 
-  RustMediaItem({
+  RustMediaItem._({
     required this.id,
     required this.supplier,
     required this.number,
     required this.title,
     required this.section,
     required this.image,
-    required RustLibApi api,
+    required List<ContentMediaItemSource>? sources,
     required List<String> params,
-  })  : _api = api,
-        _params = params;
+    required RustLibApi api,
+  })  : _sources = sources,
+        _params = params,
+        _api = api;
+
+  factory RustMediaItem.fromRust(
+    String id,
+    String supplier,
+    models.ContentMediaItem item,
+    RustLibApi api,
+  ) {
+    return RustMediaItem._(
+      id: id,
+      supplier: supplier,
+      number: item.number,
+      title: item.title,
+      section: item.section,
+      image: item.image,
+      sources: item.sources?.map(RustMediaItem.mapMediaItemSource).toList(),
+      params: item.params,
+      api: api,
+    );
+  }
 
   @override
   FutureOr<List<ContentMediaItemSource>> get sources async =>
@@ -94,30 +115,31 @@ class RustMediaItem implements ContentMediaItem {
         id: id,
         params: _params,
       ))
-          .map(
-            (item) => switch (item) {
-              bridge_model.ContentMediaItemSource_Video() =>
-                SimpleContentMediaItemSource(
-                  kind: FileKind.video,
-                  description: item.description,
-                  link: Uri.parse(item.link),
-                  headers: item.headers,
-                ),
-              bridge_model.ContentMediaItemSource_Subtitle() =>
-                SimpleContentMediaItemSource(
-                  kind: FileKind.subtitle,
-                  description: item.description,
-                  link: Uri.parse(item.link),
-                  headers: item.headers,
-                ),
-              bridge_model.ContentMediaItemSource_Manga() =>
-                SimpleMangaMediaItemSource(
-                  description: item.description,
-                  pages: item.pages,
-                ),
-            },
-          )
+          .map(mapMediaItemSource)
           .toList();
+
+  static ContentMediaItemSource mapMediaItemSource(
+    models.ContentMediaItemSource item,
+  ) =>
+      switch (item) {
+        models.ContentMediaItemSource_Video() => SimpleContentMediaItemSource(
+            kind: FileKind.video,
+            description: item.description,
+            link: Uri.parse(item.link),
+            headers: item.headers,
+          ),
+        models.ContentMediaItemSource_Subtitle() =>
+          SimpleContentMediaItemSource(
+            kind: FileKind.subtitle,
+            description: item.description,
+            link: Uri.parse(item.link),
+            headers: item.headers,
+          ),
+        models.ContentMediaItemSource_Manga() => SimpleMangaMediaItemSource(
+            description: item.description,
+            pages: item.pages,
+          ),
+      };
 }
 
 // ignore: must_be_immutable
@@ -150,16 +172,7 @@ class RustContentDetails extends AbstractContentDetails {
         id: id,
         params: _params,
       ))
-          .map((item) => RustMediaItem(
-                id: id,
-                supplier: supplier,
-                number: item.number,
-                title: item.title,
-                section: item.section,
-                image: item.image,
-                api: _api,
-                params: item.params,
-              ));
+          .map((item) => RustMediaItem.fromRust(id, supplier, item, _api));
 }
 
 class RustContentSupplier implements ContentSupplier {
@@ -258,7 +271,7 @@ class RustContentSupplier implements ContentSupplier {
         .toSet();
   }
 
-  ContentSearchResult _mapSearchResult(bridge_model.ContentInfo bci) {
+  ContentSearchResult _mapSearchResult(models.ContentInfo bci) {
     return ContentSearchResult(
       id: bci.id,
       supplier: bci.supplier,

@@ -461,8 +461,6 @@ impl SseDecode for String {
 impl SseDecode for crate::models::ContentDetails {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_id = <String>::sse_decode(deserializer);
-        let mut var_supplier = <String>::sse_decode(deserializer);
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_originalTitle = <Option<String>>::sse_decode(deserializer);
         let mut var_image = <String>::sse_decode(deserializer);
@@ -472,8 +470,6 @@ impl SseDecode for crate::models::ContentDetails {
         let mut var_similar = <Vec<crate::models::ContentInfo>>::sse_decode(deserializer);
         let mut var_params = <Vec<String>>::sse_decode(deserializer);
         return crate::models::ContentDetails {
-            id: var_id,
-            supplier: var_supplier,
             title: var_title,
             original_title: var_originalTitle,
             image: var_image,
@@ -511,12 +507,15 @@ impl SseDecode for crate::models::ContentMediaItem {
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_section = <Option<String>>::sse_decode(deserializer);
         let mut var_image = <Option<String>>::sse_decode(deserializer);
+        let mut var_sources =
+            <Option<Vec<crate::models::ContentMediaItemSource>>>::sse_decode(deserializer);
         let mut var_params = <Vec<String>>::sse_decode(deserializer);
         return crate::models::ContentMediaItem {
             number: var_number,
             title: var_title,
             section: var_section,
             image: var_image,
+            sources: var_sources,
             params: var_params,
         };
     }
@@ -706,6 +705,19 @@ impl SseDecode for Option<crate::models::ContentDetails> {
     }
 }
 
+impl SseDecode for Option<Vec<crate::models::ContentMediaItemSource>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<Vec<crate::models::ContentMediaItemSource>>::sse_decode(
+                deserializer,
+            ));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for (String, String) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -790,8 +802,6 @@ fn pde_ffi_dispatcher_sync_impl(
 impl flutter_rust_bridge::IntoDart for crate::models::ContentDetails {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.id.into_into_dart().into_dart(),
-            self.supplier.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
             self.original_title.into_into_dart().into_dart(),
             self.image.into_into_dart().into_dart(),
@@ -839,6 +849,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::ContentMediaItem {
             self.title.into_into_dart().into_dart(),
             self.section.into_into_dart().into_dart(),
             self.image.into_into_dart().into_dart(),
+            self.sources.into_into_dart().into_dart(),
             self.params.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -964,8 +975,6 @@ impl SseEncode for String {
 impl SseEncode for crate::models::ContentDetails {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.id, serializer);
-        <String>::sse_encode(self.supplier, serializer);
         <String>::sse_encode(self.title, serializer);
         <Option<String>>::sse_encode(self.original_title, serializer);
         <String>::sse_encode(self.image, serializer);
@@ -995,6 +1004,7 @@ impl SseEncode for crate::models::ContentMediaItem {
         <String>::sse_encode(self.title, serializer);
         <Option<String>>::sse_encode(self.section, serializer);
         <Option<String>>::sse_encode(self.image, serializer);
+        <Option<Vec<crate::models::ContentMediaItemSource>>>::sse_encode(self.sources, serializer);
         <Vec<String>>::sse_encode(self.params, serializer);
     }
 }
@@ -1163,6 +1173,16 @@ impl SseEncode for Option<crate::models::ContentDetails> {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::models::ContentDetails>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<Vec<crate::models::ContentMediaItemSource>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <Vec<crate::models::ContentMediaItemSource>>::sse_encode(value, serializer);
         }
     }
 }

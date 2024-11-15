@@ -9,8 +9,6 @@ import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'models.freezed.dart';
 
 class ContentDetails {
-  final String id;
-  final String supplier;
   final String title;
   final String? originalTitle;
   final String image;
@@ -21,8 +19,6 @@ class ContentDetails {
   final List<String> params;
 
   const ContentDetails({
-    required this.id,
-    required this.supplier,
     required this.title,
     this.originalTitle,
     required this.image,
@@ -35,8 +31,6 @@ class ContentDetails {
 
   @override
   int get hashCode =>
-      id.hashCode ^
-      supplier.hashCode ^
       title.hashCode ^
       originalTitle.hashCode ^
       image.hashCode ^
@@ -51,8 +45,6 @@ class ContentDetails {
       identical(this, other) ||
       other is ContentDetails &&
           runtimeType == other.runtimeType &&
-          id == other.id &&
-          supplier == other.supplier &&
           title == other.title &&
           originalTitle == other.originalTitle &&
           image == other.image &&
@@ -103,6 +95,7 @@ class ContentMediaItem {
   final String title;
   final String? section;
   final String? image;
+  final List<ContentMediaItemSource>? sources;
   final List<String> params;
 
   const ContentMediaItem({
@@ -110,6 +103,7 @@ class ContentMediaItem {
     required this.title,
     this.section,
     this.image,
+    this.sources,
     required this.params,
   });
 
@@ -119,6 +113,7 @@ class ContentMediaItem {
       title.hashCode ^
       section.hashCode ^
       image.hashCode ^
+      sources.hashCode ^
       params.hashCode;
 
   @override
@@ -130,6 +125,7 @@ class ContentMediaItem {
           title == other.title &&
           section == other.section &&
           image == other.image &&
+          sources == other.sources &&
           params == other.params;
 }
 
