@@ -607,7 +607,9 @@ class _ScrolledViewState extends ConsumerState<_ScrolledView> {
           itemCount: widget.pages.length,
           initialScrollIndex: widget.initialPage,
           itemBuilder: (context, index) => Image(
+            height: constraints.maxHeight,
             image: widget.pages[index],
+            fit: BoxFit.fitHeight,
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) {
                 return child;

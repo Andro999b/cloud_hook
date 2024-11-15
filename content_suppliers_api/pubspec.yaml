@@ -3,11 +3,10 @@ description: "Content Suppliers API"
 version: 0.0.1
 homepage:
 
-publish_to: none
-
 environment:
-  sdk: ^3.5.1
+  sdk: ">=3.3.0 <4.0.0"
   flutter: ">=3.24.0"
+publish_to: 'none'
 
 dependencies:
   flutter:
