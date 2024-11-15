@@ -350,7 +350,7 @@ FutureOr<ExternalLibrary> _loadExternalLibrary(
           '(without trying effectiveNativeLibDir since it is null)');
     }
 
-    final filePath = effectiveNativeLibDir.resolve(name).toFilePath();
+    final filePath = effectiveNativeLibDir.path + Platform.pathSeparator + name; 
     if (!File(filePath).existsSync()) {
       return fallback('(after trying $filePath but it does not exist)');
     }

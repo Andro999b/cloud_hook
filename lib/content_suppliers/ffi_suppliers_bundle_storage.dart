@@ -1,4 +1,5 @@
 import 'dart:io' as io;
+import 'dart:io';
 import 'package:cloud_hook/content_suppliers/ffi_supplier_bundle_info.dart';
 import 'package:cloud_hook/utils/logger.dart';
 import 'package:path_provider/path_provider.dart';
@@ -16,7 +17,7 @@ class FFISuppliersBundleStorage {
   Future<void> setup() async {
     final basePath = (await getApplicationSupportDirectory()).path;
 
-    libsDir = "$basePath/$ffiSupplierBundleDir/";
+    libsDir = "$basePath${Platform.pathSeparator}$ffiSupplierBundleDir";
 
     await io.Directory(libsDir).create();
   }
