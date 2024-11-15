@@ -47,7 +47,7 @@ pub trait ContentSupplier {
 #[enum_dispatch(ContentSupplier)]
 #[derive(EnumIter, EnumString, VariantNames)]
 pub enum AllContentSuppliers {
-    #[strum(serialize="UaserialsPro")]
+    #[strum(serialize="dummy")]
     DummyContentSupplier
 }
 

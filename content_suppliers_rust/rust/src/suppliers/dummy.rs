@@ -1,5 +1,5 @@
 
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::format};
 
 
 use crate::models::{
@@ -64,7 +64,7 @@ impl ContentSupplier for DummyContentSupplier {
     async fn get_content_details(&self, id: String) -> Result<Option<ContentDetails>, anyhow::Error> {
         Ok(Some(
             ContentDetails { 
-                title: "dummy_title".to_owned(),
+                title: format!("dummy_title {id}"),
                 original_title: Some(String::from("original_dummy_title")), 
                 image: "dummy_image".to_owned(), 
                 description: "dummy_description".to_owned(), 
