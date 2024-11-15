@@ -20,10 +20,10 @@ mixin _$ContentMediaItemSource {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(
-            String link, String description, Map<String, String> headers)
+            String link, String description, Map<String, String>? headers)
         video,
     required TResult Function(
-            String link, String description, Map<String, String> headers)
+            String link, String description, Map<String, String>? headers)
         subtitle,
     required TResult Function(String description, List<String> pages) manga,
   }) =>
@@ -31,10 +31,10 @@ mixin _$ContentMediaItemSource {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         video,
     TResult? Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         subtitle,
     TResult? Function(String description, List<String> pages)? manga,
   }) =>
@@ -42,10 +42,10 @@ mixin _$ContentMediaItemSource {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         video,
     TResult Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         subtitle,
     TResult Function(String description, List<String> pages)? manga,
     required TResult orElse(),
@@ -126,7 +126,7 @@ abstract class _$$ContentMediaItemSource_VideoImplCopyWith<$Res>
       __$$ContentMediaItemSource_VideoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String link, String description, Map<String, String> headers});
+  $Res call({String link, String description, Map<String, String>? headers});
 }
 
 /// @nodoc
@@ -146,7 +146,7 @@ class __$$ContentMediaItemSource_VideoImplCopyWithImpl<$Res>
   $Res call({
     Object? link = null,
     Object? description = null,
-    Object? headers = null,
+    Object? headers = freezed,
   }) {
     return _then(_$ContentMediaItemSource_VideoImpl(
       link: null == link
@@ -157,10 +157,10 @@ class __$$ContentMediaItemSource_VideoImplCopyWithImpl<$Res>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
-      headers: null == headers
+      headers: freezed == headers
           ? _value._headers
           : headers // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>,
+              as Map<String, String>?,
     ));
   }
 }
@@ -171,7 +171,7 @@ class _$ContentMediaItemSource_VideoImpl extends ContentMediaItemSource_Video {
   const _$ContentMediaItemSource_VideoImpl(
       {required this.link,
       required this.description,
-      required final Map<String, String> headers})
+      final Map<String, String>? headers})
       : _headers = headers,
         super._();
 
@@ -179,12 +179,14 @@ class _$ContentMediaItemSource_VideoImpl extends ContentMediaItemSource_Video {
   final String link;
   @override
   final String description;
-  final Map<String, String> _headers;
+  final Map<String, String>? _headers;
   @override
-  Map<String, String> get headers {
+  Map<String, String>? get headers {
+    final value = _headers;
+    if (value == null) return null;
     if (_headers is EqualUnmodifiableMapView) return _headers;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_headers);
+    return EqualUnmodifiableMapView(value);
   }
 
   @override
@@ -221,10 +223,10 @@ class _$ContentMediaItemSource_VideoImpl extends ContentMediaItemSource_Video {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(
-            String link, String description, Map<String, String> headers)
+            String link, String description, Map<String, String>? headers)
         video,
     required TResult Function(
-            String link, String description, Map<String, String> headers)
+            String link, String description, Map<String, String>? headers)
         subtitle,
     required TResult Function(String description, List<String> pages) manga,
   }) {
@@ -235,10 +237,10 @@ class _$ContentMediaItemSource_VideoImpl extends ContentMediaItemSource_Video {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         video,
     TResult? Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         subtitle,
     TResult? Function(String description, List<String> pages)? manga,
   }) {
@@ -249,10 +251,10 @@ class _$ContentMediaItemSource_VideoImpl extends ContentMediaItemSource_Video {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         video,
     TResult Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         subtitle,
     TResult Function(String description, List<String> pages)? manga,
     required TResult orElse(),
@@ -300,16 +302,15 @@ class _$ContentMediaItemSource_VideoImpl extends ContentMediaItemSource_Video {
 
 abstract class ContentMediaItemSource_Video extends ContentMediaItemSource {
   const factory ContentMediaItemSource_Video(
-          {required final String link,
-          required final String description,
-          required final Map<String, String> headers}) =
-      _$ContentMediaItemSource_VideoImpl;
+      {required final String link,
+      required final String description,
+      final Map<String, String>? headers}) = _$ContentMediaItemSource_VideoImpl;
   const ContentMediaItemSource_Video._() : super._();
 
   String get link;
   @override
   String get description;
-  Map<String, String> get headers;
+  Map<String, String>? get headers;
 
   /// Create a copy of ContentMediaItemSource
   /// with the given fields replaced by the non-null parameter values.
@@ -329,7 +330,7 @@ abstract class _$$ContentMediaItemSource_SubtitleImplCopyWith<$Res>
       __$$ContentMediaItemSource_SubtitleImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String link, String description, Map<String, String> headers});
+  $Res call({String link, String description, Map<String, String>? headers});
 }
 
 /// @nodoc
@@ -349,7 +350,7 @@ class __$$ContentMediaItemSource_SubtitleImplCopyWithImpl<$Res>
   $Res call({
     Object? link = null,
     Object? description = null,
-    Object? headers = null,
+    Object? headers = freezed,
   }) {
     return _then(_$ContentMediaItemSource_SubtitleImpl(
       link: null == link
@@ -360,10 +361,10 @@ class __$$ContentMediaItemSource_SubtitleImplCopyWithImpl<$Res>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
-      headers: null == headers
+      headers: freezed == headers
           ? _value._headers
           : headers // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>,
+              as Map<String, String>?,
     ));
   }
 }
@@ -375,7 +376,7 @@ class _$ContentMediaItemSource_SubtitleImpl
   const _$ContentMediaItemSource_SubtitleImpl(
       {required this.link,
       required this.description,
-      required final Map<String, String> headers})
+      final Map<String, String>? headers})
       : _headers = headers,
         super._();
 
@@ -383,12 +384,14 @@ class _$ContentMediaItemSource_SubtitleImpl
   final String link;
   @override
   final String description;
-  final Map<String, String> _headers;
+  final Map<String, String>? _headers;
   @override
-  Map<String, String> get headers {
+  Map<String, String>? get headers {
+    final value = _headers;
+    if (value == null) return null;
     if (_headers is EqualUnmodifiableMapView) return _headers;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_headers);
+    return EqualUnmodifiableMapView(value);
   }
 
   @override
@@ -425,10 +428,10 @@ class _$ContentMediaItemSource_SubtitleImpl
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(
-            String link, String description, Map<String, String> headers)
+            String link, String description, Map<String, String>? headers)
         video,
     required TResult Function(
-            String link, String description, Map<String, String> headers)
+            String link, String description, Map<String, String>? headers)
         subtitle,
     required TResult Function(String description, List<String> pages) manga,
   }) {
@@ -439,10 +442,10 @@ class _$ContentMediaItemSource_SubtitleImpl
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         video,
     TResult? Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         subtitle,
     TResult? Function(String description, List<String> pages)? manga,
   }) {
@@ -453,10 +456,10 @@ class _$ContentMediaItemSource_SubtitleImpl
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         video,
     TResult Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         subtitle,
     TResult Function(String description, List<String> pages)? manga,
     required TResult orElse(),
@@ -506,14 +509,14 @@ abstract class ContentMediaItemSource_Subtitle extends ContentMediaItemSource {
   const factory ContentMediaItemSource_Subtitle(
           {required final String link,
           required final String description,
-          required final Map<String, String> headers}) =
+          final Map<String, String>? headers}) =
       _$ContentMediaItemSource_SubtitleImpl;
   const ContentMediaItemSource_Subtitle._() : super._();
 
   String get link;
   @override
   String get description;
-  Map<String, String> get headers;
+  Map<String, String>? get headers;
 
   /// Create a copy of ContentMediaItemSource
   /// with the given fields replaced by the non-null parameter values.
@@ -618,10 +621,10 @@ class _$ContentMediaItemSource_MangaImpl extends ContentMediaItemSource_Manga {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(
-            String link, String description, Map<String, String> headers)
+            String link, String description, Map<String, String>? headers)
         video,
     required TResult Function(
-            String link, String description, Map<String, String> headers)
+            String link, String description, Map<String, String>? headers)
         subtitle,
     required TResult Function(String description, List<String> pages) manga,
   }) {
@@ -632,10 +635,10 @@ class _$ContentMediaItemSource_MangaImpl extends ContentMediaItemSource_Manga {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         video,
     TResult? Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         subtitle,
     TResult? Function(String description, List<String> pages)? manga,
   }) {
@@ -646,10 +649,10 @@ class _$ContentMediaItemSource_MangaImpl extends ContentMediaItemSource_Manga {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         video,
     TResult Function(
-            String link, String description, Map<String, String> headers)?
+            String link, String description, Map<String, String>? headers)?
         subtitle,
     TResult Function(String description, List<String> pages)? manga,
     required TResult orElse(),

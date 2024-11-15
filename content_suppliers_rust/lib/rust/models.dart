@@ -57,14 +57,12 @@ class ContentDetails {
 
 class ContentInfo {
   final String id;
-  final String supplier;
   final String title;
   final String? secondaryTitle;
   final String image;
 
   const ContentInfo({
     required this.id,
-    required this.supplier,
     required this.title,
     this.secondaryTitle,
     required this.image,
@@ -72,11 +70,7 @@ class ContentInfo {
 
   @override
   int get hashCode =>
-      id.hashCode ^
-      supplier.hashCode ^
-      title.hashCode ^
-      secondaryTitle.hashCode ^
-      image.hashCode;
+      id.hashCode ^ title.hashCode ^ secondaryTitle.hashCode ^ image.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -84,7 +78,6 @@ class ContentInfo {
       other is ContentInfo &&
           runtimeType == other.runtimeType &&
           id == other.id &&
-          supplier == other.supplier &&
           title == other.title &&
           secondaryTitle == other.secondaryTitle &&
           image == other.image;
@@ -136,12 +129,12 @@ sealed class ContentMediaItemSource with _$ContentMediaItemSource {
   const factory ContentMediaItemSource.video({
     required String link,
     required String description,
-    required Map<String, String> headers,
+    Map<String, String>? headers,
   }) = ContentMediaItemSource_Video;
   const factory ContentMediaItemSource.subtitle({
     required String link,
     required String description,
-    required Map<String, String> headers,
+    Map<String, String>? headers,
   }) = ContentMediaItemSource_Subtitle;
   const factory ContentMediaItemSource.manga({
     required String description,

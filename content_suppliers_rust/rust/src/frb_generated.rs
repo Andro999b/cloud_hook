@@ -486,13 +486,11 @@ impl SseDecode for crate::models::ContentInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_id = <String>::sse_decode(deserializer);
-        let mut var_supplier = <String>::sse_decode(deserializer);
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_secondaryTitle = <Option<String>>::sse_decode(deserializer);
         let mut var_image = <String>::sse_decode(deserializer);
         return crate::models::ContentInfo {
             id: var_id,
-            supplier: var_supplier,
             title: var_title,
             secondary_title: var_secondaryTitle,
             image: var_image,
@@ -530,7 +528,7 @@ impl SseDecode for crate::models::ContentMediaItemSource {
                 let mut var_link = <String>::sse_decode(deserializer);
                 let mut var_description = <String>::sse_decode(deserializer);
                 let mut var_headers =
-                    <std::collections::HashMap<String, String>>::sse_decode(deserializer);
+                    <Option<std::collections::HashMap<String, String>>>::sse_decode(deserializer);
                 return crate::models::ContentMediaItemSource::Video {
                     link: var_link,
                     description: var_description,
@@ -541,7 +539,7 @@ impl SseDecode for crate::models::ContentMediaItemSource {
                 let mut var_link = <String>::sse_decode(deserializer);
                 let mut var_description = <String>::sse_decode(deserializer);
                 let mut var_headers =
-                    <std::collections::HashMap<String, String>>::sse_decode(deserializer);
+                    <Option<std::collections::HashMap<String, String>>>::sse_decode(deserializer);
                 return crate::models::ContentMediaItemSource::Subtitle {
                     link: var_link,
                     description: var_description,
@@ -680,6 +678,19 @@ impl SseDecode for crate::models::MediaType {
             1 => crate::models::MediaType::Manga,
             _ => unreachable!("Invalid variant for MediaType: {}", inner),
         };
+    }
+}
+
+impl SseDecode for Option<std::collections::HashMap<String, String>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<std::collections::HashMap<String, String>>::sse_decode(
+                deserializer,
+            ));
+        } else {
+            return None;
+        }
     }
 }
 
@@ -827,7 +838,6 @@ impl flutter_rust_bridge::IntoDart for crate::models::ContentInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.id.into_into_dart().into_dart(),
-            self.supplier.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
             self.secondary_title.into_into_dart().into_dart(),
             self.image.into_into_dart().into_dart(),
@@ -990,7 +1000,6 @@ impl SseEncode for crate::models::ContentInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.id, serializer);
-        <String>::sse_encode(self.supplier, serializer);
         <String>::sse_encode(self.title, serializer);
         <Option<String>>::sse_encode(self.secondary_title, serializer);
         <String>::sse_encode(self.image, serializer);
@@ -1021,7 +1030,9 @@ impl SseEncode for crate::models::ContentMediaItemSource {
                 <i32>::sse_encode(0, serializer);
                 <String>::sse_encode(link, serializer);
                 <String>::sse_encode(description, serializer);
-                <std::collections::HashMap<String, String>>::sse_encode(headers, serializer);
+                <Option<std::collections::HashMap<String, String>>>::sse_encode(
+                    headers, serializer,
+                );
             }
             crate::models::ContentMediaItemSource::Subtitle {
                 link,
@@ -1031,7 +1042,9 @@ impl SseEncode for crate::models::ContentMediaItemSource {
                 <i32>::sse_encode(1, serializer);
                 <String>::sse_encode(link, serializer);
                 <String>::sse_encode(description, serializer);
-                <std::collections::HashMap<String, String>>::sse_encode(headers, serializer);
+                <Option<std::collections::HashMap<String, String>>>::sse_encode(
+                    headers, serializer,
+                );
             }
             crate::models::ContentMediaItemSource::Manga { description, pages } => {
                 <i32>::sse_encode(2, serializer);
@@ -1154,6 +1167,16 @@ impl SseEncode for crate::models::MediaType {
             },
             serializer,
         );
+    }
+}
+
+impl SseEncode for Option<std::collections::HashMap<String, String>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <std::collections::HashMap<String, String>>::sse_encode(value, serializer);
+        }
     }
 }
 

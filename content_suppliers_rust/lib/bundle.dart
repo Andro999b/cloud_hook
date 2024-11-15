@@ -274,7 +274,7 @@ class RustContentSupplier implements ContentSupplier {
   ContentSearchResult _mapSearchResult(models.ContentInfo bci) {
     return ContentSearchResult(
       id: bci.id,
-      supplier: bci.supplier,
+      supplier: name,
       image: bci.image,
       title: bci.title,
       secondaryTitle: bci.secondaryTitle,

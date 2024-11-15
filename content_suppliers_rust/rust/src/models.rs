@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum ContentType {
     Movie,
     Anime,
@@ -10,7 +10,7 @@ pub enum ContentType {
     Manga,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum MediaType {
     Video,
     Manga,
@@ -19,7 +19,6 @@ pub enum MediaType {
 #[derive(Debug)]
 pub struct ContentInfo {
     pub id: String,
-    pub supplier: String,
     pub title: String,
     pub secondary_title: Option<String>,
     pub image: String,
@@ -52,12 +51,12 @@ pub enum ContentMediaItemSource {
     Video {
         link: String,
         description: String,
-        headers: HashMap<String, String>,
+        headers: Option<HashMap<String, String>>,
     },
     Subtitle {
         link: String,
         description: String,
-        headers: HashMap<String, String>,
+        headers: Option<HashMap<String, String>>,
     },
     Manga {
         description: String,

@@ -13,8 +13,6 @@ use crate::models::{
 use super::ContentSupplier;
 
 
-static NAME: &str = "dummy";
-
 pub struct DummyContentSupplier;
 
 impl Default for DummyContentSupplier {
@@ -45,7 +43,6 @@ impl ContentSupplier for DummyContentSupplier {
         Ok(vec![
             ContentInfo {
                 id: query,
-                supplier: NAME.to_owned(),
                 title: types.join(","),
                 secondary_title: Some("secondary_dummy_title".to_owned()),
                 image: "dummy_image".to_owned()
@@ -57,7 +54,6 @@ impl ContentSupplier for DummyContentSupplier {
         Ok(vec![
             ContentInfo {
                 id: format!("{} {}", channel, page),
-                supplier: NAME.to_owned(),
                 title: "dummy_title".to_owned(),
                 secondary_title: Some("secondary_dummy_title".to_owned()),
                 image: "dummy_image".to_owned()
@@ -80,7 +76,6 @@ impl ContentSupplier for DummyContentSupplier {
                 similar: vec![
                     ContentInfo {
                         id: "dummy_similar".to_owned(),
-                        supplier: NAME.to_owned(),
                         title: "dummy_title".to_owned(),
                         secondary_title: Some("secondary_dummy_title".to_owned()),
                         image: "dummy_image".to_owned()
@@ -116,16 +111,16 @@ impl ContentSupplier for DummyContentSupplier {
             ContentMediaItemSource::Video {
                 link: "http://dummy_link".to_owned(),
                 description: format!("{} {}", id, params.join(",")),
-                headers: HashMap::from([
+                headers: Some(HashMap::from([
                     ("User-Agent".to_owned(), "dummy".to_owned())
-                ])
+                ]))
             },
             ContentMediaItemSource::Subtitle {
                 link: "http://dummy_link".to_owned(),
                 description: format!("{} {}", id, params.join(",")),
-                headers: HashMap::from([
+                headers: Some(HashMap::from([
                     ("User-Agent".to_owned(), "dummy".to_owned())
-                ])
+                ]))
             },
             ContentMediaItemSource::Manga { 
                 description: format!("{} {}", id, params.join(",")), 

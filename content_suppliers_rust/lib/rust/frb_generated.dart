@@ -448,14 +448,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ContentInfo dco_decode_content_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return ContentInfo(
       id: dco_decode_String(arr[0]),
-      supplier: dco_decode_String(arr[1]),
-      title: dco_decode_String(arr[2]),
-      secondaryTitle: dco_decode_opt_String(arr[3]),
-      image: dco_decode_String(arr[4]),
+      title: dco_decode_String(arr[1]),
+      secondaryTitle: dco_decode_opt_String(arr[2]),
+      image: dco_decode_String(arr[3]),
     );
   }
 
@@ -483,13 +482,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         return ContentMediaItemSource_Video(
           link: dco_decode_String(raw[1]),
           description: dco_decode_String(raw[2]),
-          headers: dco_decode_Map_String_String(raw[3]),
+          headers: dco_decode_opt_Map_String_String(raw[3]),
         );
       case 1:
         return ContentMediaItemSource_Subtitle(
           link: dco_decode_String(raw[1]),
           description: dco_decode_String(raw[2]),
-          headers: dco_decode_Map_String_String(raw[3]),
+          headers: dco_decode_opt_Map_String_String(raw[3]),
         );
       case 2:
         return ContentMediaItemSource_Manga(
@@ -562,6 +561,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   MediaType dco_decode_media_type(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return MediaType.values[raw as int];
+  }
+
+  @protected
+  Map<String, String>? dco_decode_opt_Map_String_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_Map_String_String(raw);
   }
 
   @protected
@@ -675,13 +680,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ContentInfo sse_decode_content_info(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_id = sse_decode_String(deserializer);
-    var var_supplier = sse_decode_String(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_secondaryTitle = sse_decode_opt_String(deserializer);
     var var_image = sse_decode_String(deserializer);
     return ContentInfo(
         id: var_id,
-        supplier: var_supplier,
         title: var_title,
         secondaryTitle: var_secondaryTitle,
         image: var_image);
@@ -716,13 +719,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 0:
         var var_link = sse_decode_String(deserializer);
         var var_description = sse_decode_String(deserializer);
-        var var_headers = sse_decode_Map_String_String(deserializer);
+        var var_headers = sse_decode_opt_Map_String_String(deserializer);
         return ContentMediaItemSource_Video(
             link: var_link, description: var_description, headers: var_headers);
       case 1:
         var var_link = sse_decode_String(deserializer);
         var var_description = sse_decode_String(deserializer);
-        var var_headers = sse_decode_Map_String_String(deserializer);
+        var var_headers = sse_decode_opt_Map_String_String(deserializer);
         return ContentMediaItemSource_Subtitle(
             link: var_link, description: var_description, headers: var_headers);
       case 2:
@@ -835,6 +838,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return MediaType.values[inner];
+  }
+
+  @protected
+  Map<String, String>? sse_decode_opt_Map_String_String(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_Map_String_String(deserializer));
+    } else {
+      return null;
+    }
   }
 
   @protected
@@ -956,7 +971,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_content_info(ContentInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.id, serializer);
-    sse_encode_String(self.supplier, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_opt_String(self.secondaryTitle, serializer);
     sse_encode_String(self.image, serializer);
@@ -987,7 +1001,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(0, serializer);
         sse_encode_String(link, serializer);
         sse_encode_String(description, serializer);
-        sse_encode_Map_String_String(headers, serializer);
+        sse_encode_opt_Map_String_String(headers, serializer);
       case ContentMediaItemSource_Subtitle(
           link: final link,
           description: final description,
@@ -996,7 +1010,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(1, serializer);
         sse_encode_String(link, serializer);
         sse_encode_String(description, serializer);
-        sse_encode_Map_String_String(headers, serializer);
+        sse_encode_opt_Map_String_String(headers, serializer);
       case ContentMediaItemSource_Manga(
           description: final description,
           pages: final pages
@@ -1092,6 +1106,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_media_type(MediaType self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_opt_Map_String_String(
+      Map<String, String>? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_Map_String_String(self, serializer);
+    }
   }
 
   @protected
