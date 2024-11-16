@@ -4,12 +4,12 @@ runtime-version: '46'
 sdk: org.gnome.Sdk
 command: cloud_hook
 finish-args:
-- "--share=ipc"
-- "--socket=fallback-x11"
-- "--socket=wayland"
-- "--socket=pulseaudio"
-- "--share=network"
 - "--device=all"
+- "--share=ipc"
+- "--share=network"
+- "--socket=wayland"
+- "--socket=fallback-x11"
+- "--socket=pulseaudio"
 modules:
 - name: libmpv
   cleanup:
@@ -20,12 +20,12 @@ modules:
   - "-Dbuild-date=false"
   - "-Dlibmpv=true"
   - "-Dmanpage-build=disabled"
+  - "-Dsdl2=enabled"
   - "-Dvulkan=enabled"
-  - "-Dvulkan-interop=enabled"
   sources:
   - type: archive
-    url: https://github.com/mpv-player/mpv/archive/v0.38.0.tar.gz
-    sha256: 86d9ef40b6058732f67b46d0bbda24a074fae860b3eaae05bab3145041303066
+    url: https://github.com/mpv-player/mpv/archive/v0.39.0.tar.gz
+    sha256: 2ca92437affb62c2b559b4419ea4785c70d023590500e8a52e95ea3ab4554683
   modules:
   - name: libplacebo
     buildsystem: meson
@@ -107,6 +107,9 @@ modules:
     - "--enable-shared"
     - "--disable-static"
     - "--disable-debug"
+    - "--disable-ffplay"
+    - "--enable-libass"
+    - "--enable-libfribidi"
     - "--enable-gnutls"
     - "--disable-encoders"
     - "--disable-muxers"
@@ -118,8 +121,8 @@ modules:
           - "--enable-nvdec"
     sources:
     - type: archive
-      url: https://ffmpeg.org/releases/ffmpeg-6.1.tar.xz
-      sha256: 488c76e57dd9b3bee901f71d5c95eaf1db4a5a31fe46a28654e837144207c270
+      url: https://ffmpeg.org/releases/ffmpeg-6.1.2.tar.xz
+      sha256: 3b624649725ecdc565c903ca6643d41f33bd49239922e45c9b1442c63dca4e38
     modules:
     - name: ffnvcodec
       only-arches:

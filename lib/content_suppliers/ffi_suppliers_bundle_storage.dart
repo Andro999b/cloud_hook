@@ -26,7 +26,7 @@ class FFISuppliersBundleStorage {
     final libFileName =
         io.Platform.isWindows ? "${info.libName}.dll" : "lib${info.libName}.so";
 
-    return "$libsDir$libFileName";
+    return "$libsDir${Platform.pathSeparator}$libFileName";
   }
 
   Future<bool> isInstalled(FFISupplierBundleInfo info) =>

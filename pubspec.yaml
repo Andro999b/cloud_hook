@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 1.5.0
 
 isar_version: &isar_version 3.1.8
-media_kit_version: &media_kit_version 50c510d
+media_kit_version: &media_kit_version 59b987e
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -82,11 +82,11 @@ dependency_overrides:
       url: https://github.com/media-kit/media-kit
       path: libs/universal/media_kit_libs_video
       ref: *media_kit_version
-  media_kit_native_event_loop:
-    git:
-      url: https://github.com/media-kit/media-kit
-      path: media_kit_native_event_loop
-      ref:  *media_kit_version 
+  # media_kit_native_event_loop:
+  #   git:
+  #     url: https://github.com/media-kit/media-kit
+  #     path: media_kit_native_event_loop
+  #     ref:  *media_kit_version 
   intl: any
 
 dev_dependencies:
