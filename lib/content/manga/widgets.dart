@@ -55,7 +55,7 @@ class VolumesButton extends ConsumerWidget {
                   context.push(
                       "/${contentDetails.mediaType.name}/${contentDetails.supplier}/${Uri.encodeComponent(contentDetails.id)}");
                 },
-            itemBuilder: mangaItemBuilder,
+            itemBuilder: mangaChapterListItemBuilder,
           ),
         );
       },
@@ -67,7 +67,7 @@ class VolumesButton extends ConsumerWidget {
   }
 }
 
-Widget mangaItemBuilder(
+Widget mangaChapterListItemBuilder(
   ContentMediaItem item,
   ContentProgress? contentProgress,
   SelectCallback onSelect,
@@ -101,29 +101,23 @@ class MangaItemsListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = item.title;
-    final theme = Theme.of(context);
 
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: FractionallySizedBox(
-            widthFactor: progress,
-            alignment: Alignment.centerLeft,
-            child: Container(color: theme.colorScheme.surfaceContainerHigh),
-          ),
-        ),
-        ListTile(
-          onTap: onTap,
-          autofocus: selected,
-          mouseCursor: SystemMouseCursors.click,
-          title: Text(
+    return ListTile(
+      onTap: onTap,
+      autofocus: selected,
+      mouseCursor: SystemMouseCursors.click,
+      title: Row(
+        children: [
+          Text(
             title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          trailing: selected ? const Icon(Icons.menu_book) : null,
-        ),
-      ],
+          const Spacer(),
+          if(selected) const Icon(Icons.menu_book)
+        ],
+      ),
+      subtitle: LinearProgressIndicator(value: progress),
     );
   }
 }

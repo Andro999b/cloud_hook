@@ -126,6 +126,7 @@ class MangaReaderControlTopBar extends ConsumerWidget {
           if (!AndroidTVDetector.isTV) ...[
             BackButton(
               onPressed: () {
+                context.pop();
                 context.go(
                     "/content/${contentDetails.supplier}/${Uri.encodeComponent(contentDetails.id)}");
               },

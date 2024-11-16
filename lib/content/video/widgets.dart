@@ -610,11 +610,11 @@ class PlayerErrorPopup extends StatelessWidget {
             focusColor: Colors.white.withOpacity(0.4),
             disabledColor: Colors.white.withOpacity(0.7),
           ),
-          menuChildren: [
+          menuChildrenBulder: (focusNode) => [
             ...value.reversed.take(10).mapIndexed(
                   (idx, error) => ListTile(
+                    focusNode: idx == 0 ? focusNode: null,
                     title: Text(error),
-                    autofocus: idx == 0,
                   ),
                 )
           ],

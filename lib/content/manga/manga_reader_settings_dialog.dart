@@ -4,6 +4,7 @@ import 'package:cloud_hook/content/manga/manga_provider.dart';
 import 'package:cloud_hook/content/manga/model.dart';
 import 'package:cloud_hook/settings/settings_provider.dart';
 import 'package:cloud_hook/widgets/dropdown.dart';
+import 'package:collection/collection.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -69,9 +70,10 @@ class _MangaReaderBackgroundSelector extends ConsumerWidget {
         ),
         Dropdown.button(
           lable: mangaReaderBackgroundLabel(context, currentBackground),
-          menuChildren: MangaReaderBackground.values
-              .map(
-                (value) => MenuItemButton(
+          menuChildrenBulder: (focusNode) => MangaReaderBackground.values
+              .mapIndexed(
+                (index, value) => MenuItemButton(
+                  focusNode: index == 0 ? focusNode: null,
                   onPressed: () {
                     ref
                         .read(mangaReaderBackgroundSettingsProvider.notifier)
@@ -135,9 +137,10 @@ class MangaTranslationSelector extends ConsumerWidget {
         ),
         Dropdown.button(
           lable: currentSource ?? sources.first.description,
-          menuChildren: sources
-              .map(
-                (value) => MenuItemButton(
+          menuChildrenBulder: (focusNode) => sources
+              .mapIndexed(
+                (index, value) => MenuItemButton(
+                  focusNode: index == 0 ? focusNode: null,
                   onPressed: () {
                     ref
                         .read(collectionItemProvider(contentDetails).notifier)
@@ -173,9 +176,10 @@ class _MangaReaderModeSelector extends ConsumerWidget {
         ),
         Dropdown.button(
           lable: mangaReaderModeLabel(context, currentMode),
-          menuChildren: MangaReaderMode.values
-              .map(
-                (value) => MenuItemButton(
+          menuChildrenBulder: (focusNode) => MangaReaderMode.values
+              .mapIndexed(
+                (index, value) => MenuItemButton(
+                  focusNode: index == 0 ? focusNode: null,
                   onPressed: () {
                     ref
                         .read(mangaReaderModeSettingsProvider.notifier)
@@ -211,9 +215,10 @@ class _ImageScaleSelector extends ConsumerWidget {
         ),
         Dropdown.button(
           lable: mangaReaderScaleLabel(context, currentScale),
-          menuChildren: MangaReaderScale.values
-              .map(
-                (value) => MenuItemButton(
+          menuChildrenBulder: (focusNode) => MangaReaderScale.values
+              .mapIndexed(
+                (index, value) => MenuItemButton(
+                  focusNode: index == 0 ? focusNode: null,
                   onPressed: () {
                     ref
                         .read(mangaReaderScaleSettingsProvider.notifier)

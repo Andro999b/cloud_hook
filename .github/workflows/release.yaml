@@ -151,7 +151,7 @@ jobs:
       - name: RePackage Desktops
         run: |
           tar -czf linux-x64.tar.gz -C linux-outputs .
-          zip -r windows-x64.zip windows-outputs
+          zip -r windows-x64.zip windows-outputs/
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:

@@ -22,11 +22,11 @@ class CollectionItemStatusSelector extends StatelessWidget {
     return Dropdown(
       anchorBuilder: anchorBuilder,
       alignmentOffset: alignmentOffset,
-      menuChildren: _statusMenuItems(context),
+      menuChildrenBulder: (focusNode) =>  _statusMenuItems(context, focusNode),
     );
   }
 
-  List<Widget> _statusMenuItems(BuildContext context) {
+  List<Widget> _statusMenuItems(BuildContext context, FocusNode focusNode) {
     return [
       ...MediaCollectionItemStatus.values
           .where(
@@ -36,6 +36,7 @@ class CollectionItemStatusSelector extends StatelessWidget {
           )
           .mapIndexed(
             (index, e) => MenuItemButton(
+              focusNode: index == 0 ? focusNode : null,
               onPressed: () => onSelect(e),
               child: Text(statusMenuItemLabel(context, e)),
             ),

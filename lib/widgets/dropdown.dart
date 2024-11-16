@@ -6,8 +6,10 @@ typedef AnchorChildBuilder = Function(
   Widget? child,
 );
 
+typedef MenuChildrenBuildert = List<Widget> Function(FocusNode focusNode);
+
 class Dropdown extends StatefulWidget {
-  final List<Widget> menuChildren;
+  final MenuChildrenBuildert menuChildrenBulder;
   final AnchorChildBuilder? anchorBuilder;
   final Offset? alignmentOffset;
   final MenuStyle? style;
@@ -18,7 +20,7 @@ class Dropdown extends StatefulWidget {
   const Dropdown({
     super.key,
     required this.anchorBuilder,
-    required this.menuChildren,
+    required this.menuChildrenBulder,
     this.alignmentOffset,
     this.style,
   });
@@ -29,7 +31,7 @@ class Dropdown extends StatefulWidget {
     Icon? icon,
     Offset? alignmentOffset,
     MenuStyle? style,
-    required List<Widget> menuChildren,
+    required MenuChildrenBuildert menuChildrenBulder,
   }) : this(
           key: key,
           anchorBuilder: (context, onPressed, child) => ElevatedButton.icon(
@@ -39,7 +41,7 @@ class Dropdown extends StatefulWidget {
           ),
           alignmentOffset: alignmentOffset,
           style: style,
-          menuChildren: menuChildren,
+          menuChildrenBulder: menuChildrenBulder,
         );
 
   Dropdown.iconButton({
@@ -47,7 +49,7 @@ class Dropdown extends StatefulWidget {
     required Icon icon,
     Offset? alignmentOffset,
     MenuStyle? style,
-    required List<Widget> menuChildren,
+    required MenuChildrenBuildert menuChildrenBulder,
   }) : this(
           key: key,
           anchorBuilder: (context, onPressed, child) => IconButton(
@@ -56,15 +58,17 @@ class Dropdown extends StatefulWidget {
           ),
           alignmentOffset: alignmentOffset,
           style: style,
-          menuChildren: menuChildren,
+          menuChildrenBulder: menuChildrenBulder,
         );
 }
 
 class _DropdownState extends State<Dropdown> {
   final _menuControler = MenuController();
+  final _focusNode = FocusNode();
 
   @override
   void dispose() {
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -80,8 +84,10 @@ class _DropdownState extends State<Dropdown> {
                 context,
                 () {
                   if (controller.isOpen) {
+                    _focusNode.previousFocus();
                     controller.close();
                   } else {
+                    _focusNode.requestFocus();
                     controller.open();
                   }
                 },
@@ -93,12 +99,13 @@ class _DropdownState extends State<Dropdown> {
       menuChildren: [
         BackButtonListener(
           onBackButtonPressed: () async {
+            _focusNode.previousFocus();
             _menuControler.close();
             return true;
           },
           child: FocusScope(
             child: Column(
-              children: widget.menuChildren,
+              children: widget.menuChildrenBulder(_focusNode),
             ),
           ),
         )

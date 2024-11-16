@@ -9,17 +9,21 @@ typedef PrioritySelectCallback = Function(int priority);
 class CollectionItemPrioritySelector extends StatelessWidget {
   final MediaCollectionItem collectionItem;
   final PrioritySelectCallback onSelect;
+  final FocusNode? focusNode;
 
   const CollectionItemPrioritySelector({
     super.key,
     required this.collectionItem,
     required this.onSelect,
+    this.focusNode,
   });
 
   @override
   Widget build(BuildContext context) {
     return Dropdown(
       anchorBuilder: (context, onPressed, child) => IconButton(
+        focusNode: focusNode,
+        autofocus: true,
         onPressed: onPressed,
         icon: Icon(_priorityIcon(collectionItem.priority)),
         tooltip: AppLocalizations.of(context)!
@@ -27,10 +31,11 @@ class CollectionItemPrioritySelector extends StatelessWidget {
       ),
       style: const MenuStyle(alignment: Alignment.topLeft),
       alignmentOffset: const Offset(0, -40),
-      menuChildren: List.generate(3, (index) => index)
+      menuChildrenBulder: (focusNode) => List.generate(3, (index) => index)
           .reversed
           .map(
             (index) => MenuItemButton(
+              focusNode: index == 0 ? focusNode : null,
               onPressed: () => onSelect(index),
               leadingIcon: Icon(_priorityIcon(index)),
               child: Text(priorityLabel(context, index)),

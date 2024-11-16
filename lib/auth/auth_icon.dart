@@ -61,8 +61,9 @@ class _AuthUserMenu extends ConsumerWidget {
         alignment:
             isMobile(context) ? Alignment.topCenter : Alignment.bottomLeft,
       ),
-      menuChildren: [
+      menuChildrenBulder: (focusNode) => [
         MenuItemButton(
+          focusNode: focusNode,
           onPressed: () => CollectionSync.run(),
           leadingIcon: const Icon(Icons.refresh),
           child: Text(AppLocalizations.of(context)!.reload),
