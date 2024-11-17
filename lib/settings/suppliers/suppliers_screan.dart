@@ -1,9 +1,9 @@
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/layouts/general_layout.dart';
-import 'package:cloud_hook/settings/suppliers/suppliers_settings.dart';
-import 'package:cloud_hook/utils/android_tv.dart';
-import 'package:cloud_hook/utils/visual.dart';
-import 'package:cloud_hook/widgets/back_nav_button.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/layouts/general_layout.dart';
+import 'package:strumok/settings/suppliers/suppliers_settings.dart';
+import 'package:strumok/utils/android_tv.dart';
+import 'package:strumok/utils/visual.dart';
+import 'package:strumok/widgets/back_nav_button.dart';
 import 'package:flutter/material.dart';
 
 class SuppliersSettingsScrean extends StatelessWidget {

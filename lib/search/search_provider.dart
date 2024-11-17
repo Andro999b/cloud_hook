@@ -1,9 +1,9 @@
-import 'package:cloud_hook/app_preferences.dart';
-import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
-import 'package:cloud_hook/search/search_model.dart';
-import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
-import 'package:cloud_hook/utils/collections.dart';
-import 'package:cloud_hook/utils/text.dart';
+import 'package:strumok/app_preferences.dart';
+import 'package:strumok/content_suppliers/content_suppliers.dart';
+import 'package:strumok/search/search_model.dart';
+import 'package:strumok/settings/suppliers/suppliers_settings_provider.dart';
+import 'package:strumok/utils/collections.dart';
+import 'package:strumok/utils/text.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';

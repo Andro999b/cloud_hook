@@ -1,5 +1,5 @@
-import 'package:cloud_hook/utils/android_tv.dart';
-import 'package:cloud_hook/utils/visual.dart';
+import 'package:strumok/utils/android_tv.dart';
+import 'package:strumok/utils/visual.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 

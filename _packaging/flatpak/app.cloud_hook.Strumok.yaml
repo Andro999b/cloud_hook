@@ -1,8 +1,8 @@
-id: app.cloud_hook.CloudHook
+id: app.cloud_hook.Strumok
 runtime: org.gnome.Platform
 runtime-version: '46'
 sdk: org.gnome.Sdk
-command: cloud_hook
+command: strumok
 finish-args:
 - "--device=all"
 - "--share=ipc"
@@ -135,14 +135,19 @@ modules:
       - type: archive
         url: https://github.com/FFmpeg/nv-codec-headers/releases/download/n12.1.14.0/nv-codec-headers-12.1.14.0.tar.gz
         sha256: 62b30ab37e4e9be0d0c5b37b8fee4b094e38e570984d56e1135a6b6c2c164c9f
-- name: cloud_hook
+- name: strumok
   buildsystem: simple
   only-arches:
     - x86_64
   build-commands:
   - "./build-flatpak.sh"
+  post-install:
+  - install -Dm644 -t ${FLATPAK_DEST}/share/icons/hicolor/scalable/apps/ icons/app.cloud_hook.Strumok.svg
+  - install -Dm644 -t ${FLATPAK_DEST}/share/applications desktop/app.cloud_hook.Strumok.desktop
   sources:
   - type: dir
     path: ../../build/linux/x64/release
   - type: file
     path: build-flatpak.sh
+  - type: dir
+    path: ../../data

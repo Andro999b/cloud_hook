@@ -1,5 +1,5 @@
-import 'package:cloud_hook/collection/collection_item_model.dart';
-import 'package:cloud_hook/collection/collection_provider.dart';
+import 'package:strumok/collection/collection_item_model.dart';
+import 'package:strumok/collection/collection_provider.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

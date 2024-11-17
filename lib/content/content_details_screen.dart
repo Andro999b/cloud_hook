@@ -1,7 +1,7 @@
-import 'package:cloud_hook/content/content_details_provider.dart';
-import 'package:cloud_hook/content/content_details_view.dart';
-import 'package:cloud_hook/layouts/general_layout.dart';
-import 'package:cloud_hook/widgets/display_error.dart';
+import 'package:strumok/content/content_details_provider.dart';
+import 'package:strumok/content/content_details_view.dart';
+import 'package:strumok/layouts/general_layout.dart';
+import 'package:strumok/widgets/display_error.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

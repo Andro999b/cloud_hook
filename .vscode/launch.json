@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "cloud_hook",
+            "name": "strumok",
             "request": "launch",
             "type": "dart",
             // "toolArgs": [

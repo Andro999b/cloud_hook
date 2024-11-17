@@ -1,5 +1,5 @@
-import 'package:cloud_hook/layouts/general_layout.dart';
-import 'package:cloud_hook/search/search_view.dart';
+import 'package:strumok/layouts/general_layout.dart';
+import 'package:strumok/search/search_view.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends StatelessWidget {

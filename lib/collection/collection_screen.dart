@@ -1,16 +1,16 @@
 import 'dart:io';
 
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/collection/collection_item_model.dart';
-import 'package:cloud_hook/collection/collection_provider.dart';
-import 'package:cloud_hook/collection/collection_top_bar.dart';
-import 'package:cloud_hook/collection/widgets/priority_selector.dart';
-import 'package:cloud_hook/collection/widgets/status_selector.dart';
-import 'package:cloud_hook/content/content_info_card.dart';
-import 'package:cloud_hook/layouts/general_layout.dart';
-import 'package:cloud_hook/utils/visual.dart';
-import 'package:cloud_hook/widgets/horizontal_list.dart';
-import 'package:cloud_hook/widgets/use_search_hint.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/collection/collection_item_model.dart';
+import 'package:strumok/collection/collection_provider.dart';
+import 'package:strumok/collection/collection_top_bar.dart';
+import 'package:strumok/collection/widgets/priority_selector.dart';
+import 'package:strumok/collection/widgets/status_selector.dart';
+import 'package:strumok/content/content_info_card.dart';
+import 'package:strumok/layouts/general_layout.dart';
+import 'package:strumok/utils/visual.dart';
+import 'package:strumok/widgets/horizontal_list.dart';
+import 'package:strumok/widgets/use_search_hint.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

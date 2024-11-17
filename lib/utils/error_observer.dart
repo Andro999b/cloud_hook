@@ -1,4 +1,4 @@
-import 'package:cloud_hook/utils/logger.dart';
+import 'package:strumok/utils/logger.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ErrorProviderObserver extends ProviderObserver {

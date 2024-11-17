@@ -1,4 +1,4 @@
-import 'package:cloud_hook/content/manga/model.dart';
+import 'package:strumok/content/manga/model.dart';
 import 'package:flutter/material.dart';
 
 class NextPageIntent extends Intent {

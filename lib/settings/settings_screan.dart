@@ -1,9 +1,9 @@
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/layouts/general_layout.dart';
-import 'package:cloud_hook/settings/app_version/app_version_settings.dart';
-import 'package:cloud_hook/settings/suppliers/suppliers_bundle_version_settings.dart';
-import 'package:cloud_hook/settings/theme/brightnes_switcher.dart';
-import 'package:cloud_hook/settings/theme/color_switcher.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/layouts/general_layout.dart';
+import 'package:strumok/settings/app_version/app_version_settings.dart';
+import 'package:strumok/settings/suppliers/suppliers_bundle_version_settings.dart';
+import 'package:strumok/settings/theme/brightnes_switcher.dart';
+import 'package:strumok/settings/theme/color_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

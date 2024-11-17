@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cloud_hook/app_secrets.dart';
+import 'package:strumok/app_secrets.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

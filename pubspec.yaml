@@ -1,5 +1,5 @@
-name: cloud_hook
-description: "Cloud Hooks"
+name: strumok
+description: "Strumok"
 publish_to: 'none'
 version: 1.5.0
 

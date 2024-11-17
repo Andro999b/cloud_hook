@@ -1,7 +1,7 @@
 import 'dart:io' as io;
 import 'dart:io';
-import 'package:cloud_hook/content_suppliers/ffi_supplier_bundle_info.dart';
-import 'package:cloud_hook/utils/logger.dart';
+import 'package:strumok/content_suppliers/ffi_supplier_bundle_info.dart';
+import 'package:strumok/utils/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 const ffiSupplierBundleDir = "ffi";

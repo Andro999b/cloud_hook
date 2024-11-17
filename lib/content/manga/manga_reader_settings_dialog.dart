@@ -1,9 +1,9 @@
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/collection/collection_item_provider.dart';
-import 'package:cloud_hook/content/manga/manga_provider.dart';
-import 'package:cloud_hook/content/manga/model.dart';
-import 'package:cloud_hook/settings/settings_provider.dart';
-import 'package:cloud_hook/widgets/dropdown.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/collection/collection_item_provider.dart';
+import 'package:strumok/content/manga/manga_provider.dart';
+import 'package:strumok/content/manga/model.dart';
+import 'package:strumok/settings/settings_provider.dart';
+import 'package:strumok/widgets/dropdown.dart';
 import 'package:collection/collection.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +73,7 @@ class _MangaReaderBackgroundSelector extends ConsumerWidget {
           menuChildrenBulder: (focusNode) => MangaReaderBackground.values
               .mapIndexed(
                 (index, value) => MenuItemButton(
-                  focusNode: index == 0 ? focusNode: null,
+                  focusNode: index == 0 ? focusNode : null,
                   onPressed: () {
                     ref
                         .read(mangaReaderBackgroundSettingsProvider.notifier)
@@ -140,7 +140,7 @@ class MangaTranslationSelector extends ConsumerWidget {
           menuChildrenBulder: (focusNode) => sources
               .mapIndexed(
                 (index, value) => MenuItemButton(
-                  focusNode: index == 0 ? focusNode: null,
+                  focusNode: index == 0 ? focusNode : null,
                   onPressed: () {
                     ref
                         .read(collectionItemProvider(contentDetails).notifier)
@@ -179,7 +179,7 @@ class _MangaReaderModeSelector extends ConsumerWidget {
           menuChildrenBulder: (focusNode) => MangaReaderMode.values
               .mapIndexed(
                 (index, value) => MenuItemButton(
-                  focusNode: index == 0 ? focusNode: null,
+                  focusNode: index == 0 ? focusNode : null,
                   onPressed: () {
                     ref
                         .read(mangaReaderModeSettingsProvider.notifier)
@@ -218,7 +218,7 @@ class _ImageScaleSelector extends ConsumerWidget {
           menuChildrenBulder: (focusNode) => MangaReaderScale.values
               .mapIndexed(
                 (index, value) => MenuItemButton(
-                  focusNode: index == 0 ? focusNode: null,
+                  focusNode: index == 0 ? focusNode : null,
                   onPressed: () {
                     ref
                         .read(mangaReaderScaleSettingsProvider.notifier)

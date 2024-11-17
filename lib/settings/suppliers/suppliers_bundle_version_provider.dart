@@ -3,13 +3,13 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cloud_hook/app_preferences.dart';
-import 'package:cloud_hook/app_secrets.dart';
-import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
-import 'package:cloud_hook/content_suppliers/ffi_supplier_bundle_info.dart';
-import 'package:cloud_hook/content_suppliers/ffi_suppliers_bundle_storage.dart';
-import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
-import 'package:cloud_hook/utils/logger.dart';
+import 'package:strumok/app_preferences.dart';
+import 'package:strumok/app_secrets.dart';
+import 'package:strumok/content_suppliers/content_suppliers.dart';
+import 'package:strumok/content_suppliers/ffi_supplier_bundle_info.dart';
+import 'package:strumok/content_suppliers/ffi_suppliers_bundle_storage.dart';
+import 'package:strumok/settings/suppliers/suppliers_settings_provider.dart';
+import 'package:strumok/utils/logger.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_download_manager/flutter_download_manager.dart';
 import 'package:http/http.dart';

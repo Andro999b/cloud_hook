@@ -1,6 +1,6 @@
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/content_suppliers/ffi_supplier_bundle_info.dart';
-import 'package:cloud_hook/settings/suppliers/suppliers_bundle_version_provider.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/content_suppliers/ffi_supplier_bundle_info.dart';
+import 'package:strumok/settings/suppliers/suppliers_bundle_version_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

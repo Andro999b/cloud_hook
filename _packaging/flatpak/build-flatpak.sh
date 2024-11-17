@@ -10,8 +10,8 @@ set -e
 # Echo all commands for debug purposes
 set -x
 
-projectName=cloud_hook
-executableName=cloud_hook
+projectName=strumok
+executableName=strumok
 
 cp -r bundle/ /app/$projectName
 chmod +x /app/$projectName/$executableName

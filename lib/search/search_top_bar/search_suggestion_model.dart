@@ -1,5 +1,5 @@
-import 'package:cloud_hook/app_database.dart';
-import 'package:cloud_hook/utils/text.dart';
+import 'package:strumok/app_database.dart';
+import 'package:strumok/utils/text.dart';
 import 'package:isar/isar.dart';
 
 part 'search_suggestion_model.g.dart';

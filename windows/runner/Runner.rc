@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "app" "\0"
-            VALUE "FileDescription", "cloud_hook" "\0"
+            VALUE "FileDescription", "strumok" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "cloud_hook" "\0"
+            VALUE "InternalName", "strumok" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 app. All rights reserved." "\0"
-            VALUE "OriginalFilename", "cloud_hook.exe" "\0"
-            VALUE "ProductName", "cloud_hook" "\0"
+            VALUE "OriginalFilename", "strumok.exe" "\0"
+            VALUE "ProductName", "strumok" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

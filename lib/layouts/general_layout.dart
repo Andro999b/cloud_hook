@@ -1,8 +1,8 @@
-import 'package:cloud_hook/layouts/app_theme.dart';
-import 'package:cloud_hook/layouts/bottom_navigation_layout.dart';
-import 'package:cloud_hook/layouts/side_navigation_layout.dart';
-import 'package:cloud_hook/utils/android_tv.dart';
-import 'package:cloud_hook/utils/visual.dart';
+import 'package:strumok/layouts/app_theme.dart';
+import 'package:strumok/layouts/bottom_navigation_layout.dart';
+import 'package:strumok/layouts/side_navigation_layout.dart';
+import 'package:strumok/utils/android_tv.dart';
+import 'package:strumok/utils/visual.dart';
 import 'package:flutter/material.dart';
 
 class GeneralLayout extends StatelessWidget {

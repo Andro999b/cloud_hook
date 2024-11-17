@@ -1,6 +1,6 @@
-import 'package:cloud_hook/collection/collection_repository.dart';
-import 'package:cloud_hook/search/search_top_bar/search_suggestion_model.dart';
-import 'package:cloud_hook/utils/logger.dart';
+import 'package:strumok/collection/collection_repository.dart';
+import 'package:strumok/search/search_top_bar/search_suggestion_model.dart';
+import 'package:strumok/utils/logger.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 

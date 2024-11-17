@@ -1,8 +1,8 @@
-import 'package:cloud_hook/content/content_info_card.dart';
-import 'package:cloud_hook/home/recomendations/recomendations_provider.dart';
-import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
-import 'package:cloud_hook/utils/visual.dart';
-import 'package:cloud_hook/widgets/horizontal_list.dart';
+import 'package:strumok/content/content_info_card.dart';
+import 'package:strumok/home/recomendations/recomendations_provider.dart';
+import 'package:strumok/settings/suppliers/suppliers_settings_provider.dart';
+import 'package:strumok/utils/visual.dart';
+import 'package:strumok/widgets/horizontal_list.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

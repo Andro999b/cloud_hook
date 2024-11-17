@@ -1,5 +1,5 @@
-import 'package:cloud_hook/content/video/video_content_view.dart';
-import 'package:cloud_hook/content/video/widgets.dart';
+import 'package:strumok/content/video/video_content_view.dart';
+import 'package:strumok/content/video/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';

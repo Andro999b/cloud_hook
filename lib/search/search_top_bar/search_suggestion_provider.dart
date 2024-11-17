@@ -1,4 +1,4 @@
-import 'package:cloud_hook/search/search_top_bar/search_suggestion_model.dart';
+import 'package:strumok/search/search_top_bar/search_suggestion_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search_suggestion_provider.g.dart';

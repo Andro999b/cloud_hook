@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/collection/collection_item_model.dart';
-import 'package:cloud_hook/collection/collection_item_provider.dart';
-import 'package:cloud_hook/content/media_items_list.dart';
-import 'package:cloud_hook/content/video/video_content_view.dart';
-import 'package:cloud_hook/layouts/app_theme.dart';
-import 'package:cloud_hook/utils/visual.dart';
-import 'package:cloud_hook/widgets/dropdown.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/collection/collection_item_model.dart';
+import 'package:strumok/collection/collection_item_provider.dart';
+import 'package:strumok/content/media_items_list.dart';
+import 'package:strumok/content/video/video_content_view.dart';
+import 'package:strumok/layouts/app_theme.dart';
+import 'package:strumok/utils/visual.dart';
+import 'package:strumok/widgets/dropdown.dart';
 import 'package:collection/collection.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
@@ -613,7 +613,7 @@ class PlayerErrorPopup extends StatelessWidget {
           menuChildrenBulder: (focusNode) => [
             ...value.reversed.take(10).mapIndexed(
                   (idx, error) => ListTile(
-                    focusNode: idx == 0 ? focusNode: null,
+                    focusNode: idx == 0 ? focusNode : null,
                     title: Text(error),
                   ),
                 )

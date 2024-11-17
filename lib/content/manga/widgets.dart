@@ -1,9 +1,9 @@
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/collection/collection_item_model.dart';
-import 'package:cloud_hook/collection/collection_item_provider.dart';
-import 'package:cloud_hook/content/manga/model.dart';
-import 'package:cloud_hook/content/media_items_list.dart';
-import 'package:cloud_hook/settings/settings_provider.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/collection/collection_item_model.dart';
+import 'package:strumok/collection/collection_item_provider.dart';
+import 'package:strumok/content/manga/model.dart';
+import 'package:strumok/content/media_items_list.dart';
+import 'package:strumok/settings/settings_provider.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -114,7 +114,7 @@ class MangaItemsListItem extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const Spacer(),
-          if(selected) const Icon(Icons.menu_book)
+          if (selected) const Icon(Icons.menu_book)
         ],
       ),
       subtitle: LinearProgressIndicator(value: progress),

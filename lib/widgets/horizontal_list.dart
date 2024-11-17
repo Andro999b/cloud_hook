@@ -1,4 +1,4 @@
-import 'package:cloud_hook/utils/visual.dart';
+import 'package:strumok/utils/visual.dart';
 import 'package:flutter/material.dart';
 
 class HorizontalList extends StatelessWidget {

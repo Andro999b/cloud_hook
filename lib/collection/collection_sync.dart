@@ -1,8 +1,8 @@
-import 'package:cloud_hook/app_database.dart';
-import 'package:cloud_hook/app_preferences.dart';
-import 'package:cloud_hook/auth/auth.dart';
-import 'package:cloud_hook/collection/collection_item_model.dart';
-import 'package:cloud_hook/collection/collection_repository.dart';
+import 'package:strumok/app_database.dart';
+import 'package:strumok/app_preferences.dart';
+import 'package:strumok/auth/auth.dart';
+import 'package:strumok/collection/collection_item_model.dart';
+import 'package:strumok/collection/collection_repository.dart';
 import 'package:firebase_dart/firebase_dart.dart';
 // ignore: implementation_imports
 import 'package:firebase_dart/src/database/impl/firebase_impl.dart';

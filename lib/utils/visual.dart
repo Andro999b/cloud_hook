@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:cloud_hook/utils/android_tv.dart';
+import 'package:strumok/utils/android_tv.dart';
 import 'package:flutter/widgets.dart';
 import 'package:isar/isar.dart';
 

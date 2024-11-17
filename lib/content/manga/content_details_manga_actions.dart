@@ -1,7 +1,7 @@
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/content/content_details_actions.dart';
-import 'package:cloud_hook/content/manga/widgets.dart';
-import 'package:cloud_hook/utils/visual.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/content/content_details_actions.dart';
+import 'package:strumok/content/manga/widgets.dart';
+import 'package:strumok/utils/visual.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

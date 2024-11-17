@@ -1,6 +1,6 @@
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/collection/collection_item_model.dart';
-import 'package:cloud_hook/content/manga/model.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/collection/collection_item_model.dart';
+import 'package:strumok/content/manga/model.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 

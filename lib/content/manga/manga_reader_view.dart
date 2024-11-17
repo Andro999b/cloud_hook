@@ -1,13 +1,13 @@
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/collection/collection_item_provider.dart';
-import 'package:cloud_hook/content/manga/intents.dart';
-import 'package:cloud_hook/content/manga/manga_provider.dart';
-import 'package:cloud_hook/content/manga/manga_reader_controls.dart';
-import 'package:cloud_hook/content/manga/model.dart';
-import 'package:cloud_hook/content/manga/widgets.dart';
-import 'package:cloud_hook/settings/settings_provider.dart';
-import 'package:cloud_hook/widgets/back_nav_button.dart';
-import 'package:cloud_hook/widgets/display_error.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/collection/collection_item_provider.dart';
+import 'package:strumok/content/manga/intents.dart';
+import 'package:strumok/content/manga/manga_provider.dart';
+import 'package:strumok/content/manga/manga_reader_controls.dart';
+import 'package:strumok/content/manga/model.dart';
+import 'package:strumok/content/manga/widgets.dart';
+import 'package:strumok/settings/settings_provider.dart';
+import 'package:strumok/widgets/back_nav_button.dart';
+import 'package:strumok/widgets/display_error.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -148,10 +148,10 @@ class _MangaPagesReaderViewState extends ConsumerState<_MangaPagesReaderView> {
           onInvoke: (intent) => _swithReaderImageMode(intent.mode),
         ),
         ScrollUpPageIntent: CallbackAction<ScrollUpPageIntent>(
-          onInvoke: (_) => _scrollTo(readerMode, 100),
+          onInvoke: (_) => _scrollTo(readerMode, 50),
         ),
         ScrollDownPageIntent: CallbackAction<ScrollDownPageIntent>(
-          onInvoke: (_) => _scrollTo(readerMode, -100),
+          onInvoke: (_) => _scrollTo(readerMode, -50),
         ),
       },
       autofocus: true,
@@ -221,7 +221,8 @@ class _MangaPagesReaderViewState extends ConsumerState<_MangaPagesReaderView> {
     if (readerMode.scroll) {
       scrollOffsetController.animateScroll(
         offset: -inc,
-        duration: const Duration(milliseconds: 100),
+        duration: const Duration(milliseconds: 5),
+        curve: Curves.linear,
       );
     } else {
       final value = transformationController.value.clone();

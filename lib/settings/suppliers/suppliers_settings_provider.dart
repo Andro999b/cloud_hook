@@ -1,5 +1,5 @@
-import 'package:cloud_hook/app_preferences.dart';
-import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
+import 'package:strumok/app_preferences.dart';
+import 'package:strumok/content_suppliers/content_suppliers.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

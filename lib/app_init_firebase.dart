@@ -1,4 +1,4 @@
-import 'package:cloud_hook/app_secrets.dart';
+import 'package:strumok/app_secrets.dart';
 import 'package:firebase_dart/firebase_dart.dart';
 import 'package:path_provider/path_provider.dart';
 

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Strumok
+GenericName=Strumok
+X-GNOME-FullName=Strumok
+Exec=strumok
+Terminal=false
+Type=Application
+Icon=app.cloud_hook.Strumok
+StartupNotify=true

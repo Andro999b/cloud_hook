@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/settings/app_version/app_version_provider.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/settings/app_version/app_version_provider.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

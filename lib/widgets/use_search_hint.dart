@@ -1,4 +1,4 @@
-import 'package:cloud_hook/app_localizations.dart';
+import 'package:strumok/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class UseSearchHint extends StatelessWidget {

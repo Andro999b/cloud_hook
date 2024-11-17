@@ -1,6 +1,6 @@
-import 'package:cloud_hook/auth/auth_icon.dart';
-import 'package:cloud_hook/layouts/navigation_data.dart';
-import 'package:cloud_hook/widgets/back_nav_button.dart';
+import 'package:strumok/auth/auth_icon.dart';
+import 'package:strumok/layouts/navigation_data.dart';
+import 'package:strumok/widgets/back_nav_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

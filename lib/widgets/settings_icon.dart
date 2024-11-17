@@ -1,5 +1,5 @@
-import 'package:cloud_hook/settings/app_version/app_version_provider.dart';
-import 'package:cloud_hook/settings/suppliers/suppliers_bundle_version_provider.dart';
+import 'package:strumok/settings/app_version/app_version_provider.dart';
+import 'package:strumok/settings/suppliers/suppliers_bundle_version_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

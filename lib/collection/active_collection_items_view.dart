@@ -1,10 +1,10 @@
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/collection/collection_item_model.dart';
-import 'package:cloud_hook/collection/collection_provider.dart';
-import 'package:cloud_hook/content/content_info_card.dart';
-import 'package:cloud_hook/widgets/horizontal_list.dart';
-import 'package:cloud_hook/widgets/horizontal_list_card.dart';
-import 'package:cloud_hook/widgets/use_search_hint.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/collection/collection_item_model.dart';
+import 'package:strumok/collection/collection_provider.dart';
+import 'package:strumok/content/content_info_card.dart';
+import 'package:strumok/widgets/horizontal_list.dart';
+import 'package:strumok/widgets/horizontal_list_card.dart';
+import 'package:strumok/widgets/use_search_hint.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

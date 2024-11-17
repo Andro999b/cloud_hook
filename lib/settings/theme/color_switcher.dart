@@ -1,4 +1,4 @@
-import 'package:cloud_hook/settings/settings_provider.dart';
+import 'package:strumok/settings/settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

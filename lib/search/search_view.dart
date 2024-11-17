@@ -1,7 +1,7 @@
-import 'package:cloud_hook/search/search_model.dart';
-import 'package:cloud_hook/search/search_provider.dart';
-import 'package:cloud_hook/search/search_results.dart';
-import 'package:cloud_hook/search/search_top_bar/search_top_bar.dart';
+import 'package:strumok/search/search_model.dart';
+import 'package:strumok/search/search_provider.dart';
+import 'package:strumok/search/search_results.dart';
+import 'package:strumok/search/search_top_bar/search_top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

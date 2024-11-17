@@ -1,6 +1,6 @@
-import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
-import 'package:cloud_hook/settings/suppliers/suppliers_settings_provider.dart';
-import 'package:cloud_hook/utils/visual.dart';
+import 'package:strumok/content_suppliers/content_suppliers.dart';
+import 'package:strumok/settings/suppliers/suppliers_settings_provider.dart';
+import 'package:strumok/utils/visual.dart';
 import 'package:collection/collection.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';

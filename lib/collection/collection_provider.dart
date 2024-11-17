@@ -1,10 +1,10 @@
-import 'package:cloud_hook/app_preferences.dart';
-import 'package:cloud_hook/auth/auth_provider.dart';
-import 'package:cloud_hook/collection/collection_item_model.dart';
-import 'package:cloud_hook/collection/collection_repository.dart';
-import 'package:cloud_hook/collection/collection_service.dart';
-import 'package:cloud_hook/content_suppliers/content_suppliers.dart';
-import 'package:cloud_hook/utils/collections.dart';
+import 'package:strumok/app_preferences.dart';
+import 'package:strumok/auth/auth_provider.dart';
+import 'package:strumok/collection/collection_item_model.dart';
+import 'package:strumok/collection/collection_repository.dart';
+import 'package:strumok/collection/collection_service.dart';
+import 'package:strumok/content_suppliers/content_suppliers.dart';
+import 'package:strumok/utils/collections.dart';
 import 'package:collection/collection.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:equatable/equatable.dart';

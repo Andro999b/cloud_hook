@@ -1,9 +1,9 @@
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/auth/auth.dart';
-import 'package:cloud_hook/auth/auth_provider.dart';
-import 'package:cloud_hook/collection/collection_sync.dart';
-import 'package:cloud_hook/utils/visual.dart';
-import 'package:cloud_hook/widgets/dropdown.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/auth/auth.dart';
+import 'package:strumok/auth/auth_provider.dart';
+import 'package:strumok/collection/collection_sync.dart';
+import 'package:strumok/utils/visual.dart';
+import 'package:strumok/widgets/dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

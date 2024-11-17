@@ -1,7 +1,7 @@
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/content/content_info_card.dart';
-import 'package:cloud_hook/search/search_model.dart';
-import 'package:cloud_hook/widgets/horizontal_list.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/content/content_info_card.dart';
+import 'package:strumok/search/search_model.dart';
+import 'package:strumok/widgets/horizontal_list.dart';
 import 'package:content_suppliers_api/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

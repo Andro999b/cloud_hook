@@ -1,5 +1,5 @@
-import 'package:cloud_hook/app_localizations.dart';
-import 'package:cloud_hook/widgets/settings_icon.dart';
+import 'package:strumok/app_localizations.dart';
+import 'package:strumok/widgets/settings_icon.dart';
 import 'package:flutter/material.dart';
 
 typedef LableBuilder = String Function(BuildContext context);
